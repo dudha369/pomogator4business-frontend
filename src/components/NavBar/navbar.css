@@ -1,176 +1,193 @@
+/* ---------- Liquid glass tab bar (iOS 26 style) ---------- */
+
 .navbar {
+  --nav-h: 60px;
+  --nav-pad: 4px;
+  --nav-spring: cubic-bezier(0.3, 1.5, 0.5, 1);
+
+  /* light */
+  --nav-tint: rgb(255 255 255 / 0.42);
+  --nav-edge: rgb(255 255 255 / 0.75);
+  --nav-edge-soft: rgb(255 255 255 / 0.3);
+  --nav-shadow: rgb(20 30 60 / 0.16);
+  --nav-lens: rgb(255 255 255 / 0.32);
+  --nav-lens-pressed: rgb(255 255 255 / 0.14);
+  --nav-text: var(--text);
+  --nav-active: var(--accent);
+
   position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1000;
-
-  left: 50%;
-  bottom: calc(14px + env(safe-area-inset-bottom));
-
-  transform: translateX(-50%);
-
-  width: max-content;
-  max-width: calc(100vw - 24px);
-
+  display: flex;
+  justify-content: center;
+  padding: 0 16px calc(10px + env(safe-area-inset-bottom));
   pointer-events: none;
 }
 
-.navbar .liquid-glass {
+@media (prefers-color-scheme: dark) {
+  .navbar {
+    --nav-tint: rgb(58 60 70 / 0.4);
+    --nav-edge: rgb(255 255 255 / 0.3);
+    --nav-edge-soft: rgb(255 255 255 / 0.1);
+    --nav-shadow: rgb(0 0 0 / 0.45);
+    --nav-lens: rgb(255 255 255 / 0.13);
+    --nav-lens-pressed: rgb(255 255 255 / 0.06);
+  }
+}
+
+.navbar__defs {
+  position: absolute;
+  pointer-events: none;
+}
+
+.navbar__bar {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding: var(--nav-pad);
   pointer-events: auto;
-
-  border-radius: 28px;
-
-  overflow: hidden;
-
-  --lg-radius: 28px;
+  /* НЕ ставить сюда filter/opacity/backdrop-filter/mask: это ломает линзу */
 }
 
-.navbar__content {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-
-  padding: 5px;
-
-  isolation: isolate;
-}
-
-.navbar__item {
-  position: relative;
-
-  display: block;
-
-  color: inherit;
-  text-decoration: none;
-
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-
-  user-select: none;
-}
-
-.navbar__button {
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-
-  min-width: 50px;
-  height: 48px;
-
-  padding: 0 14px;
-
-  border-radius: 23px;
-
-  color: currentColor;
-
-  transition:
-      color 180ms ease,
-      opacity 180ms ease;
-}
-
-.navbar__item:not(.navbar__item--active) .navbar__button:hover {
-  background: rgb(255 255 255 / 0.07);
-}
-
-.navbar__item:active .navbar__button {
-  transition: none;
-}
-
-.navbar__active-pill {
+/* Слой стекла */
+.navbar__glass {
   position: absolute;
   inset: 0;
-
-  z-index: -1;
-
-  border-radius: inherit;
-
-  background:
-      linear-gradient(
-          180deg,
-          rgb(255 255 255 / 0.20),
-          rgb(255 255 255 / 0.08)
-      );
-
-  border: 1px solid rgb(255 255 255 / 0.18);
-
+  border-radius: 999px;
+  background: var(--nav-tint);
+  -webkit-backdrop-filter: blur(22px) saturate(190%);
+  backdrop-filter: blur(22px) saturate(190%);
   box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.18),
-      inset 0 -1px 0 rgb(0 0 0 / 0.05),
-      0 2px 8px rgb(0 0 0 / 0.08);
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+      inset 0 0 0 1px var(--nav-edge-soft),
+      inset 0 1.5px 0 var(--nav-edge),
+      inset 0 -1px 0 var(--nav-edge-soft),
+      inset 0 0 22px rgb(255 255 255 / 0.06),
+      0 10px 32px var(--nav-shadow);
 }
 
-.navbar__icon {
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .navbar__glass {
+    background: var(--card-bg);
+  }
+}
+
+.navbar__track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  height: var(--nav-h);
+  touch-action: none; /* горизонтальный драг без скролла страницы */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Линза-индикатор */
+.navbar__lens {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc(100% / var(--n));
+  border-radius: 999px;
+  pointer-events: none;
+  background: var(--nav-lens);
+  -webkit-backdrop-filter: blur(4px) saturate(170%) brightness(1.1);
+  backdrop-filter: blur(4px) saturate(170%) brightness(1.1);
+  transform: translate3d(calc(var(--pos) * 100%), 0, 0) scale(1);
+  transition:
+      transform 0.55s var(--nav-spring),
+      background-color 0.3s;
+  box-shadow:
+      inset 0 1px 1px rgb(255 255 255 / 0.6),
+      inset 0 -1px 1px rgb(255 255 255 / 0.3),
+      inset 0 0 14px rgb(255 255 255 / 0.12),
+      0 2px 10px rgb(0 0 0 / 0.14);
+}
+
+/* Блики сверху и снизу */
+.navbar__lens::before,
+.navbar__lens::after {
+  content: "";
+  position: absolute;
+  left: 24%;
+  right: 24%;
+  height: 4px;
+  border-radius: 999px;
+  filter: blur(1.5px);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.95), transparent);
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+.navbar__lens::before { top: 3px; }
+.navbar__lens::after { bottom: 3px; opacity: 0.3; }
+
+/* Нажатие: линза раздувается и выходит за пределы панели */
+.navbar__track[data-pressed] .navbar__lens {
+  transform: translate3d(calc(var(--pos) * 100%), 0, 0) scale(1.2, 1.28);
+  background: var(--nav-lens-pressed);
+  box-shadow:
+      inset 0 1px 2px rgb(255 255 255 / 0.75),
+      inset 0 -1px 2px rgb(255 255 255 / 0.45),
+      inset 0 0 22px rgb(255 255 255 / 0.18),
+      0 12px 28px rgb(0 0 0 / 0.26);
+}
+.navbar__track[data-pressed] .navbar__lens::before,
+.navbar__track[data-pressed] .navbar__lens::after {
+  opacity: 0.95;
+}
+
+/* Во время драга линза следует за пальцем почти без задержки */
+.navbar__track[data-dragging] .navbar__lens {
+  transition:
+      transform 0.09s linear,
+      background-color 0.3s;
+}
+
+/* Вкладки */
+.navbar__item {
   position: relative;
   z-index: 1;
-
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  flex: 0 0 auto;
+  gap: 4px;
+  color: var(--nav-text);
+  opacity: 0.85;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+      color 0.25s,
+      opacity 0.25s,
+      transform 0.45s var(--nav-spring);
+}
+.navbar__item[data-active] {
+  color: var(--nav-active);
+  opacity: 1;
+}
+.navbar__track[data-pressed] .navbar__item[data-active] {
+  transform: scale(1.1);
+}
+.navbar__item:focus-visible {
+  outline: 2px solid var(--nav-active);
+  outline-offset: -4px;
+  border-radius: 999px;
 }
 
 .navbar__label {
-  position: relative;
-  z-index: 1;
-
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
   line-height: 1;
-
+  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
-.navbar__item:not(.navbar__item--active) {
-  opacity: 0.72;
-}
-
-.navbar__item--active {
-  opacity: 1;
-}
-
-/* Узкие экраны */
-
-@media (max-width: 420px) {
-  .navbar {
-    bottom: calc(10px + env(safe-area-inset-bottom));
+@media (prefers-reduced-motion: reduce) {
+  .navbar__lens,
+  .navbar__item {
+    transition-duration: 0.01ms !important;
   }
-
-  .navbar__content {
-    gap: 2px;
-    padding: 4px;
-  }
-
-  .navbar__button {
-    min-width: 48px;
-    height: 46px;
-
-    padding: 0 11px;
-
-    gap: 6px;
-  }
-
-  .navbar__label {
-    font-size: 12px;
-  }
-
-  .navbar .liquid-glass {
-    border-radius: 26px;
-    --lg-radius: 26px;
-  }
-}
-
-/* Если нужно сделать navbar только из иконок */
-
-.navbar--icons-only .navbar__label {
-  display: none;
-}
-
-.navbar--icons-only .navbar__button {
-  width: 50px;
-  padding: 0;
 }

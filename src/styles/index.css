@@ -155,45 +155,7 @@ body {
 
 .app-shell__content {
   flex: 1 1 auto;
-  padding-bottom: 76px;
-}
-
-.navbar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  background: var(--card-bg);
-  border-top: 1px solid var(--border);
-  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
-  z-index: 10;
-}
-
-.navbar__item {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 0;
-  text-decoration: none;
-  color: var(--hint);
-  border-radius: 12px;
-}
-
-.navbar__item--active {
-  color: var(--accent);
-}
-
-.navbar__icon {
-  font-size: 20px;
-  line-height: 1;
-}
-
-.navbar__label {
-  font-size: 11px;
-  font-weight: 600;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
 }
 
 .section {
