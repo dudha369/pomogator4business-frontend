@@ -1,15 +1,23 @@
+/*
+ * Источник истины по теме — ThemeProvider (src/theme/ThemeContext.tsx):
+ * он ставит <html data-theme="light|dark"> по реальной теме Telegram, а вне
+ * Telegram — по системной. --tg-theme-* переменные заполняет
+ * themeParams.bindCssVars() из ThemeProvider; ниже только фолбэки на случай,
+ * когда их ещё нет (самый первый рендер, до монтирования SDK).
+ */
 :root {
   --bg: var(--tg-theme-bg-color, #f2f2f7);
   --card-bg: var(--tg-theme-section-bg-color, var(--tg-theme-secondary-bg-color, #ffffff));
   --text: var(--tg-theme-text-color, #0f0f0f);
   --hint: var(--tg-theme-hint-color, #8e8e93);
   --accent: var(--tg-theme-link-color, #2f88ff);
+  --accent-glow: color-mix(in srgb, var(--accent) 55%, transparent);
   --border: rgba(0, 0, 0, 0.06);
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: var(--tg-theme-bg-color, #0e0e10);
     --card-bg: var(--tg-theme-section-bg-color, var(--tg-theme-secondary-bg-color, #1c1c1e));
     --text: var(--tg-theme-text-color, #f2f2f2);
@@ -17,6 +25,15 @@
     --accent: var(--tg-theme-link-color, #5aa4ff);
     --border: rgba(255, 255, 255, 0.08);
   }
+}
+
+:root[data-theme="dark"] {
+  --bg: var(--tg-theme-bg-color, #0e0e10);
+  --card-bg: var(--tg-theme-section-bg-color, var(--tg-theme-secondary-bg-color, #1c1c1e));
+  --text: var(--tg-theme-text-color, #f2f2f2);
+  --hint: var(--tg-theme-hint-color, #9a9a9e);
+  --accent: var(--tg-theme-link-color, #5aa4ff);
+  --border: rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -155,7 +172,7 @@ body {
 
 .app-shell__content {
   flex: 1 1 auto;
-  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
 }
 
 .section {

@@ -1,19 +1,21 @@
 /* ---------- Liquid glass tab bar (iOS 26 style) ---------- */
 
 .navbar {
-  --nav-h: 60px;
+  --nav-h: 50px;
   --nav-pad: 4px;
-  --nav-spring: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --nav-spring: cubic-bezier(0.3, 1.45, 0.5, 1);
+  --bulge-y: 8px;
+  --bulge-x: 6px;
 
-  /* light */
-  --nav-tint: rgb(255 255 255 / 0.42);
-  --nav-edge: rgb(255 255 255 / 0.75);
-  --nav-edge-soft: rgb(255 255 255 / 0.3);
-  --nav-shadow: rgb(20 30 60 / 0.16);
-  --nav-lens: rgb(255 255 255 / 0.32);
-  --nav-lens-pressed: rgb(255 255 255 / 0.14);
+  /* стекло панели — почти прозрачное, лишь слегка матовое (light) */
+  --nav-tint: rgb(255 255 255 / 0.16);
+  --nav-edge: rgb(255 255 255 / 0.55);
+  --nav-edge-soft: rgb(255 255 255 / 0.22);
+  --nav-shadow: rgb(20 30 60 / 0.14);
+
   --nav-text: var(--text);
   --nav-active: var(--accent);
+  --nav-glow: var(--accent-glow, rgb(47 136 255 / 0.5));
 
   position: fixed;
   left: 0;
@@ -27,14 +29,18 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .navbar {
-    --nav-tint: rgb(58 60 70 / 0.4);
-    --nav-edge: rgb(255 255 255 / 0.3);
-    --nav-edge-soft: rgb(255 255 255 / 0.1);
-    --nav-shadow: rgb(0 0 0 / 0.45);
-    --nav-lens: rgb(255 255 255 / 0.13);
-    --nav-lens-pressed: rgb(255 255 255 / 0.06);
+  :root:not([data-theme="light"]) .navbar {
+    --nav-tint: rgb(40 42 50 / 0.24);
+    --nav-edge: rgb(255 255 255 / 0.22);
+    --nav-edge-soft: rgb(255 255 255 / 0.08);
+    --nav-shadow: rgb(0 0 0 / 0.4);
   }
+}
+:root[data-theme="dark"] .navbar {
+  --nav-tint: rgb(40 42 50 / 0.24);
+  --nav-edge: rgb(255 255 255 / 0.22);
+  --nav-edge-soft: rgb(255 255 255 / 0.08);
+  --nav-shadow: rgb(0 0 0 / 0.4);
 }
 
 .navbar__defs {
@@ -45,26 +51,24 @@
 .navbar__bar {
   position: relative;
   width: 100%;
-  max-width: 380px;
+  max-width: 340px;
   padding: var(--nav-pad);
   pointer-events: auto;
-  /* НЕ ставить сюда filter/opacity/backdrop-filter/mask: это ломает линзу */
+  /* НЕ ставить сюда filter/opacity/backdrop-filter/mask/transform: это ломает линзу */
 }
 
-/* Слой стекла */
+/* Стекло панели: лёгкий блюр, фон остаётся хорошо читаемым сквозь него */
 .navbar__glass {
   position: absolute;
   inset: 0;
   border-radius: 999px;
   background: var(--nav-tint);
-  -webkit-backdrop-filter: blur(22px) saturate(190%);
-  backdrop-filter: blur(22px) saturate(190%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
   box-shadow:
       inset 0 0 0 1px var(--nav-edge-soft),
-      inset 0 1.5px 0 var(--nav-edge),
-      inset 0 -1px 0 var(--nav-edge-soft),
-      inset 0 0 22px rgb(255 255 255 / 0.06),
-      0 10px 32px var(--nav-shadow);
+      inset 0 1px 0 var(--nav-edge),
+      0 8px 26px var(--nav-shadow);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -78,75 +82,91 @@
   display: grid;
   grid-template-columns: repeat(var(--n), 1fr);
   height: var(--nav-h);
-  touch-action: none; /* горизонтальный драг без скролла страницы */
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
-/* Линза-индикатор */
-.navbar__lens {
+/* ---------- Свечение (мягкий цветной ореол, тема-зависимый) ---------- */
+.navbar__glow {
   position: absolute;
   top: 0;
-  bottom: 0;
   left: 0;
+  height: 100%;
   width: calc(100% / var(--n));
   border-radius: 999px;
+  inset: 0 auto 0 0;
+  transform: translate3d(calc(var(--pos) * 100%), 0, 0);
+  transition: transform 0.5s var(--nav-spring), opacity 0.3s, box-shadow 0.3s;
+  opacity: 0;
   pointer-events: none;
-  background: var(--nav-lens);
-  -webkit-backdrop-filter: blur(4px) saturate(170%) brightness(1.1);
-  backdrop-filter: blur(4px) saturate(170%) brightness(1.1);
-  transform: translate3d(calc(var(--pos) * 100%), 0, 0) scale(1);
-  transition:
-      transform 0.55s var(--nav-spring),
-      background-color 0.3s;
+  box-shadow: 0 0 0 0 transparent;
+}
+.navbar__glow[data-pressed] {
+  opacity: 1;
+  inset: calc(-1 * var(--bulge-y)) calc(-1 * var(--bulge-x)) calc(-1 * var(--bulge-y))
+  calc(-1 * var(--bulge-x));
   box-shadow:
-      inset 0 1px 1px rgb(255 255 255 / 0.6),
-      inset 0 -1px 1px rgb(255 255 255 / 0.3),
-      inset 0 0 14px rgb(255 255 255 / 0.12),
-      0 2px 10px rgb(0 0 0 / 0.14);
+      0 0 22px 3px var(--nav-glow),
+      0 0 0 1px var(--nav-glow);
 }
 
-/* Блики сверху и снизу */
-.navbar__lens::before,
-.navbar__lens::after {
-  content: "";
+/* ---------- Линза: статичный слой с рефракцией, никогда не двигается/не ресайзится ---------- */
+.navbar__lens {
   position: absolute;
-  left: 24%;
-  right: 24%;
-  height: 4px;
+  left: 0;
+  right: 0;
+  top: calc(-1 * var(--bulge-y));
+  bottom: calc(-1 * var(--bulge-y));
   border-radius: 999px;
-  filter: blur(1.5px);
-  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.95), transparent);
-  opacity: 0.5;
-  transition: opacity 0.3s;
+  pointer-events: none;
+  opacity: 0;
+  background: rgb(255 255 255 / 0.05);
+  clip-path: inset(
+      0
+      calc(100% - (var(--pos) + 1) / var(--n) * 100%)
+      0
+      calc(var(--pos) / var(--n) * 100%)
+      round 999px
+  );
+  transition: clip-path 0.5s var(--nav-spring), opacity 0.22s;
 }
-.navbar__lens::before { top: 3px; }
-.navbar__lens::after { bottom: 3px; opacity: 0.3; }
+.navbar__lens[data-pressed] {
+  opacity: 1;
+  clip-path: inset(
+      0
+      calc(100% - (var(--pos) + 1) / var(--n) * 100% - var(--bulge-x))
+      0
+      calc(var(--pos) / var(--n) * 100% - var(--bulge-x))
+      round 999px
+  );
+}
 
-/* Нажатие: линза раздувается и выходит за пределы панели */
-.navbar__track[data-pressed] .navbar__lens {
-  transform: translate3d(calc(var(--pos) * 100%), 0, 0) scale(1.2, 1.28);
-  background: var(--nav-lens-pressed);
+/* ---------- Рим: тонкая яркая кромка стекла поверх линзы ---------- */
+.navbar__rim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: calc(100% / var(--n));
+  border-radius: 999px;
+  transform: translate3d(calc(var(--pos) * 100%), 0, 0);
+  transition: transform 0.5s var(--nav-spring), opacity 0.25s, inset 0.5s var(--nav-spring);
+  opacity: 0;
+  pointer-events: none;
   box-shadow:
-      inset 0 1px 2px rgb(255 255 255 / 0.75),
-      inset 0 -1px 2px rgb(255 255 255 / 0.45),
-      inset 0 0 22px rgb(255 255 255 / 0.18),
-      0 12px 28px rgb(0 0 0 / 0.26);
+      inset 0 0 0 1px rgb(255 255 255 / 0.3),
+      inset 0 1px 1px rgb(255 255 255 / 0.55),
+      inset 0 -1px 1px rgb(0 0 0 / 0.12);
 }
-.navbar__track[data-pressed] .navbar__lens::before,
-.navbar__track[data-pressed] .navbar__lens::after {
-  opacity: 0.95;
-}
-
-/* Во время драга линза следует за пальцем почти без задержки */
-.navbar__track[data-dragging] .navbar__lens {
-  transition:
-      transform 0.09s linear,
-      background-color 0.3s;
+.navbar__rim[data-pressed] {
+  opacity: 1;
+  inset: calc(-1 * var(--bulge-y)) calc(-1 * var(--bulge-x)) calc(-1 * var(--bulge-y))
+  calc(-1 * var(--bulge-x));
 }
 
-/* Вкладки */
+/* ---------- Вкладки ---------- */
 .navbar__item {
   position: relative;
   z-index: 1;
@@ -154,22 +174,19 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   color: var(--nav-text);
-  opacity: 0.85;
+  opacity: 0.82;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition:
-      color 0.25s,
-      opacity 0.25s,
-      transform 0.45s var(--nav-spring);
+  transition: color 0.25s, opacity 0.25s, transform 0.45s var(--nav-spring);
 }
 .navbar__item[data-active] {
   color: var(--nav-active);
   opacity: 1;
 }
 .navbar__track[data-pressed] .navbar__item[data-active] {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 .navbar__item:focus-visible {
   outline: 2px solid var(--nav-active);
@@ -178,7 +195,7 @@
 }
 
 .navbar__label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.01em;
@@ -187,6 +204,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .navbar__lens,
+  .navbar__glow,
+  .navbar__rim,
   .navbar__item {
     transition-duration: 0.01ms !important;
   }

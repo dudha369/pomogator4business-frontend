@@ -5,22 +5,25 @@ import { LocaleProvider } from "./i18n/LocaleContext";
 import { AccountPage } from "./pages/AccountPage";
 import { CommandsPage } from "./pages/CommandsPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { ThemeProvider } from "./theme/ThemeContext";
 
 export function App() {
   return (
-    <LocaleProvider>
-      <BrowserRouter>
-        <div className="app-shell">
-          <div className="app-shell__content">
-            <Routes>
-              <Route element={<CommandsPage />} path="/" />
-              <Route element={<SettingsPage />} path="/settings" />
-              <Route element={<AccountPage />} path="/account" />
-            </Routes>
+    <ThemeProvider>
+      <LocaleProvider>
+        <BrowserRouter>
+          <div className="app-shell">
+            <div className="app-shell__content">
+              <Routes>
+                <Route element={<CommandsPage />} path="/" />
+                <Route element={<SettingsPage />} path="/settings" />
+                <Route element={<AccountPage />} path="/account" />
+              </Routes>
+            </div>
+            <NavBar />
           </div>
-          <NavBar />
-        </div>
-      </BrowserRouter>
-    </LocaleProvider>
+        </BrowserRouter>
+      </LocaleProvider>
+    </ThemeProvider>
   );
 }

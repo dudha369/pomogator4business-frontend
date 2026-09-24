@@ -19,16 +19,23 @@ type NavItem = {
 };
 
 /**
- * Настоящая рефракция (искажение фона линзой) через backdrop-filter:url(#svg)
- * работает только в Chromium: Android, Telegram Desktop (Win/Linux), Chrome.
- * iOS / macOS (WebKit) получают blur + блики, без искажения.
+ * Настоящая рефракция (искажение фона стеклом) через backdrop-filter:url(#svg)
+ * работает только в Chromium (Android, Telegram Desktop Win/Linux, Chrome).
+ * WebKit (iOS/macOS) получает чистое стекло: blur + насыщенность, без искажения —
+ * так делает и сам iOS 26 в WKWebView.
  */
 const SUPPORTS_REFRACTION =
   typeof navigator !== "undefined" &&
   /Chrome\/|Chromium\//.test(navigator.userAgent) &&
   !/CriOS|FxiOS|EdgiOS/.test(navigator.userAgent);
 
-/** Карта смещения: по краям линзы пиксели фона сдвигаются, в центре — нет. */
+/**
+ * Карта смещения для feDisplacementMap: по краям линзы пиксели фона сдвигаются,
+ * в центре — нет. Область фильтра (x/y/width/height ниже, в JSX) намеренно
+ * шире самой карты — иначе Chromium обрезает размытый край карты, и это видно
+ * как мигающий/"недогруженный" пиксельный шов во время движения (частый
+ * артефакт на Android).
+ */
 function buildDisplacementMap(w: number, h: number): string {
   const r = h / 2;
   const b = h * 0.24;
@@ -72,11 +79,14 @@ export function NavBar() {
   const gesture = useRef<{ id: number; startX: number; moved: boolean } | null>(
     null,
   );
-  const [pressed, setPressed] = useState(false);
+  // pressIndex: вкладка под пальцем — стекло появляется здесь сразу при касании
+  const [pressIndex, setPressIndex] = useState<number | null>(null);
+  // dragPos: дробная позиция во время протяжки пальцем
   const [dragPos, setDragPos] = useState<number | null>(null);
+  const pressed = pressIndex !== null;
 
-  const mapUrl = useMemo(() => buildDisplacementMap(128, 64), []);
-  const pos = dragPos ?? activeIndex;
+  const mapUrl = useMemo(() => buildDisplacementMap(160, 96), []);
+  const pos = dragPos ?? pressIndex ?? activeIndex;
   const visualIndex = Math.round(pos);
 
   const posFromX = (clientX: number) => {
@@ -86,32 +96,31 @@ export function NavBar() {
   };
 
   const onPointerDown = (e: PointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    trackRef.current?.setPointerCapture(e.pointerId);
     gesture.current = { id: e.pointerId, startX: e.clientX, moved: false };
-    setPressed(true);
+    setPressIndex(Math.round(posFromX(e.clientX)));
   };
 
   const onPointerMove = (e: PointerEvent) => {
     const g = gesture.current;
     if (!g) return;
-    if (!g.moved) {
-      if (Math.abs(e.clientX - g.startX) < DRAG_THRESHOLD) return;
+    if (!g.moved && Math.abs(e.clientX - g.startX) >= DRAG_THRESHOLD) {
       g.moved = true;
-      trackRef.current?.setPointerCapture(g.id);
     }
-    setDragPos(posFromX(e.clientX));
+    if (g.moved) setDragPos(posFromX(e.clientX));
   };
 
   const finish = (e: PointerEvent, commit: boolean) => {
     const g = gesture.current;
     gesture.current = null;
-    setPressed(false);
-    if (g?.moved) {
-      const idx = Math.round(posFromX(e.clientX));
-      setDragPos(null);
-      if (commit && items[idx] && idx !== activeIndex) {
-        navigator.vibrate?.(8);
-        navigate(items[idx].to);
-      }
+    setPressIndex(null);
+    setDragPos(null);
+    if (!g || !commit) return;
+    const idx = Math.round(posFromX(e.clientX));
+    if (items[idx] && idx !== activeIndex) {
+      navigator.vibrate?.(8);
+      navigate(items[idx].to); // страница меняется только при отпускании
     }
   };
 
@@ -122,24 +131,24 @@ export function NavBar() {
           <filter
             id="navbar-refraction"
             colorInterpolationFilters="sRGB"
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
+            x="-40%"
+            y="-90%"
+            width="180%"
+            height="280%"
           >
             <feImage
               href={mapUrl}
-              x="0"
-              y="0"
-              width="100%"
-              height="100%"
+              x="-40%"
+              y="-90%"
+              width="180%"
+              height="280%"
               preserveAspectRatio="none"
               result="map"
             />
             <feDisplacementMap
               in="SourceGraphic"
               in2="map"
-              scale="34"
+              scale="30"
               xChannelSelector="R"
               yChannelSelector="B"
             />
@@ -148,7 +157,7 @@ export function NavBar() {
       )}
 
       <div className="navbar__bar">
-        {/* Стекло — отдельный слой-сосед, НЕ предок линзы (иначе линза ничего не видит под собой) */}
+        {/* Стекло панели — отдельный слой-сосед, не предок линзы */}
         <div className="navbar__glass" />
 
         <div
@@ -156,23 +165,40 @@ export function NavBar() {
           className="navbar__track"
           style={{ "--n": n, "--pos": pos } as React.CSSProperties}
           data-pressed={pressed || undefined}
-          data-dragging={dragPos !== null || undefined}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={(e) => finish(e, true)}
           onPointerCancel={(e) => finish(e, false)}
         >
+          {/*
+            Цветное свечение вокруг стекла (как в оригинале). Едет и меняет
+            размер через transform/width — без backdrop-filter, поэтому
+            анимировать его дёшево и без побочных артефактов.
+          */}
+          <span className="navbar__glow" data-pressed={pressed || undefined} />
+
+          {/*
+            Сама "линза": статичный на весь трек слой с backdrop-filter.
+            Никогда не двигается и не меняется в размере — иначе Chromium
+            на Android/десктопе даёт швы и "плавающий" фон во время анимации.
+            Видимый кусок под текущей вкладкой вырезается через clip-path —
+            это дешёвая операция композитора, а не пересчёт фильтра.
+          */}
           <span
             className="navbar__lens"
+            data-pressed={pressed || undefined}
             style={
               SUPPORTS_REFRACTION
                 ? {
                   backdropFilter:
-                    "url(#navbar-refraction) blur(1.5px) saturate(1.7) brightness(1.1)",
+                    "url(#navbar-refraction) saturate(1.7) brightness(1.12)",
                 }
                 : undefined
             }
           />
+
+          {/* Тонкая яркая кромка стекла поверх линзы — тоже не использует backdrop-filter */}
+          <span className="navbar__rim" data-pressed={pressed || undefined} />
 
           {items.map((item, i) => {
             const Icon = item.icon;
@@ -185,8 +211,12 @@ export function NavBar() {
                 draggable={false}
                 className="navbar__item"
                 data-active={active || undefined}
+                onClick={(e) => {
+                  // мышь/тач обрабатываются жестом; клавиатура (detail 0) — обычной ссылкой
+                  if (e.detail !== 0) e.preventDefault();
+                }}
               >
-                <Icon size={24} strokeWidth={active ? 2.4 : 2} />
+                <Icon size={21} strokeWidth={1.7} />
                 <span className="navbar__label">{item.label}</span>
               </NavLink>
             );
