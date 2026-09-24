@@ -10,15 +10,20 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@sohumsuthar/liquid-glass": "^3.1.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@tma.js/sdk-react": "^3.0.23",
+    "lucide-react": "^1.48.0",
+    "motion": "^13.4.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react": "^6.1.1",
     "typescript": "^5.5.4",
     "vite": "^8.3.0"
   }
