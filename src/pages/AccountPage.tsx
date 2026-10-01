@@ -6,8 +6,16 @@ import type { AccountResponse } from "../api/types";
 import { Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { useLocale } from "../i18n/LocaleContext";
+import {
+  buildTimezoneOptions,
+  detectBrowserOffsetMinutes,
+  markTimezoneAutoApplied,
+  shouldAutoApplyTimezone,
+} from "../utils/timezone";
 
 type LoadState = "loading" | "ready" | "error";
+
+const TIMEZONE_OPTIONS = buildTimezoneOptions();
 
 export function AccountPage() {
   const { t } = useLocale();
@@ -15,14 +23,41 @@ export function AccountPage() {
   const [account, setAccount] = useState<AccountResponse | null>(null);
   const [requesting, setRequesting] = useState(false);
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
+  const [savingTimezone, setSavingTimezone] = useState(false);
 
   function load() {
     apiGet<AccountResponse>("/api/account")
-      .then((data) => {
-        setAccount(data);
-        setState("ready");
-      })
-      .catch(() => setState("error"));
+    .then((data) => {
+      setAccount(data);
+      setState("ready");
+      maybeAutoApplyTimezone(data);
+    })
+    .catch(() => setState("error"));
+  }
+
+  // Автоопределение часового пояса по браузеру — один раз на устройство.
+  // Если пользователь позже поправит пояс вручную через селектор ниже,
+  // это больше не перезатирается — ручной выбор имеет приоритет.
+  function maybeAutoApplyTimezone(data: AccountResponse) {
+    if (!shouldAutoApplyTimezone()) return;
+
+    const detected = detectBrowserOffsetMinutes();
+    markTimezoneAutoApplied();
+
+    if (detected === data.timezone_offset_minutes) return;
+
+    apiPost<{ offset_minutes: number }>("/api/account/timezone", {
+      offset_minutes: detected,
+    })
+    .then((res) => {
+      setAccount((prev) =>
+        prev ? { ...prev, timezone_offset_minutes: res.offset_minutes } : prev
+      );
+    })
+    .catch(() => {
+      // тихо игнорируем — у пользователя просто останется дефолтное
+      // значение с бэкенда (UTC+3), он всегда может поправить вручную
+    });
   }
 
   useEffect(load, []);
@@ -56,6 +91,22 @@ export function AccountPage() {
       setAccount((prev) =>
         prev ? { ...prev, emoji_status: { ...prev.emoji_status, enabled: !enabled } } : prev
       );
+    }
+  }
+
+  async function handleTimezoneChange(offsetMinutes: number) {
+    if (!account) return;
+    const previous = account.timezone_offset_minutes;
+    setAccount({ ...account, timezone_offset_minutes: offsetMinutes });
+    setSavingTimezone(true);
+    try {
+      await apiPost("/api/account/timezone", { offset_minutes: offsetMinutes });
+    } catch {
+      setAccount((prev) =>
+        prev ? { ...prev, timezone_offset_minutes: previous } : prev
+      );
+    } finally {
+      setSavingTimezone(false);
     }
   }
 
@@ -118,6 +169,22 @@ export function AccountPage() {
         ) : (
           <p className="section__hint">{t("account.mirrorNotConnected")}</p>
         )}
+      </Section>
+
+      <Section title={t("account.timezoneSection")}>
+        <select
+          className="timezone-select"
+          disabled={savingTimezone}
+          onChange={(e) => handleTimezoneChange(Number(e.target.value))}
+          value={account.timezone_offset_minutes}
+        >
+          {TIMEZONE_OPTIONS.map((opt) => (
+            <option key={opt.offsetMinutes} value={opt.offsetMinutes}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <p className="section__hint">{t("account.timezoneHint")}</p>
       </Section>
 
       <Section title={t("account.emojiSection")}>

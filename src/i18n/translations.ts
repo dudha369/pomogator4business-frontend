@@ -47,6 +47,8 @@ const ru: Dict = {
   "account.requesting": "Запрашиваю...",
   "account.accessDenied": "В доступе отказано.",
   "account.unsupported": "Эта функция недоступна в вашей версии Telegram.",
+  "account.timezoneSection": "Часовой пояс",
+  "account.timezoneHint": "Используется для часов в эмодзи-статусе. Определён автоматически — поменяйте, если путешествуете.",
 
   "rights.can_reply": "Отвечать на сообщения",
   "rights.can_read_messages": "Читать сообщения",
@@ -104,6 +106,8 @@ const en: Dict = {
   "account.requesting": "Requesting...",
   "account.accessDenied": "Access denied.",
   "account.unsupported": "This feature isn't available in your version of Telegram.",
+  "account.timezoneSection": "Time zone",
+  "account.timezoneHint": "Used for the emoji-status clock. Auto-detected — change it if you're travelling.",
 
   "rights.can_reply": "Reply to messages",
   "rights.can_read_messages": "Read messages",
@@ -161,6 +165,8 @@ const uk: Dict = {
   "account.requesting": "Запитую...",
   "account.accessDenied": "У доступі відмовлено.",
   "account.unsupported": "Ця функція недоступна у вашій версії Telegram.",
+  "account.timezoneSection": "Часовий пояс",
+  "account.timezoneHint": "Використовується для годинника в emoji-статусі. Визначено автоматично — змініть, якщо подорожуєте.",
 
   "rights.can_reply": "Відповідати на повідомлення",
   "rights.can_read_messages": "Читати повідомлення",

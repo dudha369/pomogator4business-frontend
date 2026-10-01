@@ -52,6 +52,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isTelegramEnvironment()) return;
     try {
+      // Раньше тут не было mount() — без него сигналы themeParams.isDark /
+      // .linkColor остаются undefined, и accent всегда падал в фолбэк-синий,
+      // даже настоящей теме Telegram. Это и была причина "ты вроде добавил
+      // тему, а сам всё равно используешь синий".
+      if (!themeParams.isMounted()) {
+        themeParams.mount();
+      }
       if (!themeParams.isCssVarsBound()) {
         themeParams.bindCssVars();
       }

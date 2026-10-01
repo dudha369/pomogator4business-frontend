@@ -84,6 +84,7 @@ export function NavBar() {
   // dragPos: дробная позиция во время протяжки пальцем
   const [dragPos, setDragPos] = useState<number | null>(null);
   const pressed = pressIndex !== null;
+  const dragging = dragPos !== null;
 
   const mapUrl = useMemo(() => buildDisplacementMap(160, 96), []);
   const pos = dragPos ?? pressIndex ?? activeIndex;
@@ -145,13 +146,58 @@ export function NavBar() {
               preserveAspectRatio="none"
               result="map"
             />
+            {/*
+              Настоящая хроматическая аберрация (не нарисованная градиентом):
+              три прохода displacement с разным scale для R/G/B-каналов.
+              У центра стекла все три displacement почти совпадают — цвета
+              складываются обратно в нормальные. У края (где кривизна карты
+              максимальна) они расходятся, и получается настоящая радужная
+              кайма, как на референсах, а не подрисованная линия.
+            */}
             <feDisplacementMap
               in="SourceGraphic"
               in2="map"
-              scale="30"
+              scale="36"
               xChannelSelector="R"
               yChannelSelector="B"
+              result="dispR"
             />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="map"
+              scale="28"
+              xChannelSelector="R"
+              yChannelSelector="B"
+              result="dispG"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="map"
+              scale="20"
+              xChannelSelector="R"
+              yChannelSelector="B"
+              result="dispB"
+            />
+            <feColorMatrix
+              in="dispR"
+              type="matrix"
+              values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"
+              result="chR"
+            />
+            <feColorMatrix
+              in="dispG"
+              type="matrix"
+              values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"
+              result="chG"
+            />
+            <feColorMatrix
+              in="dispB"
+              type="matrix"
+              values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"
+              result="chB"
+            />
+            <feBlend in="chR" in2="chG" mode="screen" result="rg" />
+            <feBlend in="rg" in2="chB" mode="screen" />
           </filter>
         </svg>
       )}
@@ -163,26 +209,41 @@ export function NavBar() {
         <div
           ref={trackRef}
           className="navbar__track"
-          style={{ "--n": n, "--pos": pos } as React.CSSProperties}
+          style={{ "--n": n, "--pos": pos, "--active": activeIndex } as React.CSSProperties}
           data-pressed={pressed || undefined}
+          data-dragging={dragging || undefined}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={(e) => finish(e, true)}
           onPointerCancel={(e) => finish(e, false)}
         >
           {/*
-            Цветное свечение вокруг стекла (как в оригинале). Едет и меняет
-            размер через transform/width — без backdrop-filter, поэтому
-            анимировать его дёшево и без побочных артефактов.
-          */}
-          <span className="navbar__glow" data-pressed={pressed || undefined} />
-
-          {/*
             Сама "линза": статичный на весь трек слой с backdrop-filter.
             Никогда не двигается и не меняется в размере — иначе Chromium
             на Android/десктопе даёт швы и "плавающий" фон во время анимации.
             Видимый кусок под текущей вкладкой вырезается через clip-path —
             это дешёвая операция композитора, а не пересчёт фильтра.
+          */}
+          {/*
+            Плоская пилюля выбранной вкладки. Всегда видна (не только при
+            нажатии), без блюра/свечения/теней — просто маркер "ты здесь".
+            Едет по --active (подтверждённый маршрут), а не по --pos, поэтому
+            во время протяжки пальцем она не дёргается — стоит на месте, пока
+            вкладка не сменится по-настоящему.
+          */}
+          <span className="navbar__active">
+            <span key={activeIndex} className="navbar__active__fill" />
+          </span>
+
+          {/*
+            Стекло при нажатии: статичный на весь трек слой с backdrop-filter.
+            Никогда не двигается и не меняется в размере — иначе Chromium
+            на Android/десктопе даёт швы и "плавающий" фон во время анимации.
+            Видимый кусок под текущей вкладкой вырезается через clip-path —
+            это дешёвая операция композитора, а не пересчёт фильтра.
+            Никакого отдельного цветного свечения/рима больше нет: весь
+            "блик" — это просто настоящее преломление реального фона под
+            панелью через backdrop-filter, как в оригинале.
           */}
           <span
             className="navbar__lens"
@@ -191,14 +252,11 @@ export function NavBar() {
               SUPPORTS_REFRACTION
                 ? {
                   backdropFilter:
-                    "url(#navbar-refraction) saturate(1.7) brightness(1.12)",
+                    "url(#navbar-refraction) blur(2px) saturate(1.5) brightness(1.06)",
                 }
                 : undefined
             }
           />
-
-          {/* Тонкая яркая кромка стекла поверх линзы — тоже не использует backdrop-filter */}
-          <span className="navbar__rim" data-pressed={pressed || undefined} />
 
           {items.map((item, i) => {
             const Icon = item.icon;
@@ -216,7 +274,7 @@ export function NavBar() {
                   if (e.detail !== 0) e.preventDefault();
                 }}
               >
-                <Icon size={21} strokeWidth={1.7} />
+                <Icon size={24} strokeWidth={1.7} />
                 <span className="navbar__label">{item.label}</span>
               </NavLink>
             );

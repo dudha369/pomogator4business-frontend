@@ -41,4 +41,5 @@ export interface AccountResponse {
   connection: AccountConnection | null;
   mirror: AccountMirror;
   emoji_status: AccountEmojiStatus;
+  timezone_offset_minutes: number;
 }
