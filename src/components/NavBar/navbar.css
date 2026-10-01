@@ -1,21 +1,34 @@
-/* ---------- Liquid glass tab bar (iOS 26 style) ---------- */
+/* ---------- Liquid glass tab bar (iOS 26 style) ----------
+ * Работает одинаково в WebKit (iOS/Telegram) и Chromium: никаких
+ * backdrop-filter: url(#svg) — Safari их не рисует. Вся «магия» линзы —
+ * увеличенная копия вкладок внутри стекла + блики + радужный ободок.
+ * Позиции/размеры линзы пишет NavBar.tsx прямо в style.transform.
+ */
 
 .navbar {
-  --nav-h: 64px;
-  --nav-pad: 5px;
-  --nav-spring: cubic-bezier(0.3, 1.4, 0.5, 1);
-  --bulge-y: 8px; /* насколько стекло вылезает выше/ниже панели при нажатии */
-  --bulge-x: 3px;
+  --nav-track-h: 56px;
+  --nav-pad: 4px;
+  --nav-bulge-y: 8px; /* синхронизировать с BULGE_Y в NavBar.tsx */
 
-  /* стекло панели — почти прозрачное, лишь слегка матовое (light) */
-  --nav-tint: rgb(255 255 255 / 0.16);
-  --nav-edge: rgb(255 255 255 / 0.55);
-  --nav-edge-soft: rgb(255 255 255 / 0.22);
-  --nav-shadow: rgb(20 30 60 / 0.14);
-  --nav-active-fill: rgb(0 0 0 / 0.16);
+  /* ----- light ----- */
+  --nav-tint-top: rgb(255 255 255 / 0.34);
+  --nav-tint-bottom: rgb(255 255 255 / 0.18);
+  --nav-rim-hi: rgb(255 255 255 / 0.95);
+  --nav-rim-lo: rgb(255 255 255 / 0.12);
+  --nav-shadow: rgb(20 30 60 / 0.16);
+  --nav-capsule: rgb(120 120 128 / 0.16);
+  --nav-capsule-edge: rgb(255 255 255 / 0.35);
 
   --nav-text: var(--text);
   --nav-active: var(--accent);
+
+  /* линза: прозрачная, только кромка */
+  --lens-outline: rgb(0 0 0 / 0.28);
+  --lens-drop: rgb(20 30 60 / 0.16);
+  --lens-crescent: rgb(20 30 70 / 0.34);
+  --lens-line: rgb(255 255 255 / 0.85);
+  --lens-backdrop: saturate(1.15);
+  --nav-lens-text: color-mix(in srgb, var(--nav-active) 55%, var(--nav-text));
 
   position: fixed;
   left: 0;
@@ -30,24 +43,33 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .navbar {
-    --nav-tint: rgb(40 42 50 / 0.26);
-    --nav-edge: rgb(255 255 255 / 0.22);
-    --nav-edge-soft: rgb(255 255 255 / 0.08);
-    --nav-shadow: rgb(0 0 0 / 0.4);
-    --nav-active-fill: rgb(255 255 255 / 0.16);
+    --nav-tint-top: rgb(70 72 84 / 0.38);
+    --nav-tint-bottom: rgb(40 42 52 / 0.3);
+    --nav-rim-hi: rgb(255 255 255 / 0.5);
+    --nav-rim-lo: rgb(255 255 255 / 0.07);
+    --nav-shadow: rgb(0 0 0 / 0.45);
+    --nav-capsule: rgb(255 255 255 / 0.13);
+    --nav-capsule-edge: rgb(255 255 255 / 0.1);
+    --lens-outline: rgb(0 0 0 / 0.6);
+    --lens-drop: rgb(0 0 0 / 0.3);
+    --lens-crescent: rgb(0 0 0 / 0.62);
+    --lens-line: rgb(255 255 255 / 0.5);
+    --lens-backdrop: saturate(1.25) brightness(1.06);
   }
 }
 :root[data-theme="dark"] .navbar {
-  --nav-tint: rgb(40 42 50 / 0.26);
-  --nav-edge: rgb(255 255 255 / 0.22);
-  --nav-edge-soft: rgb(255 255 255 / 0.08);
-  --nav-shadow: rgb(0 0 0 / 0.4);
-  --nav-active-fill: rgb(255 255 255 / 0.16);
-}
-
-.navbar__defs {
-  position: absolute;
-  pointer-events: none;
+  --nav-tint-top: rgb(70 72 84 / 0.38);
+  --nav-tint-bottom: rgb(40 42 52 / 0.3);
+  --nav-rim-hi: rgb(255 255 255 / 0.5);
+  --nav-rim-lo: rgb(255 255 255 / 0.07);
+  --nav-shadow: rgb(0 0 0 / 0.45);
+  --nav-capsule: rgb(255 255 255 / 0.13);
+  --nav-capsule-edge: rgb(255 255 255 / 0.1);
+  --lens-outline: rgb(0 0 0 / 0.6);
+  --lens-drop: rgb(0 0 0 / 0.3);
+  --lens-crescent: rgb(0 0 0 / 0.62);
+  --lens-line: rgb(255 255 255 / 0.5);
+  --lens-backdrop: saturate(1.25) brightness(1.06);
 }
 
 .navbar__bar {
@@ -59,18 +81,46 @@
   /* НЕ ставить сюда filter/opacity/backdrop-filter/mask/transform: это ломает линзу */
 }
 
-/* Стекло панели: лёгкий блюр, фон остаётся хорошо читаемым сквозь него */
+/* ---------- Стекло панели ---------- */
 .navbar__glass {
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: var(--nav-tint);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
+  background: linear-gradient(
+      180deg,
+      var(--nav-tint-top),
+      var(--nav-tint-bottom)
+  );
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  backdrop-filter: blur(22px) saturate(1.25);
   box-shadow:
-      inset 0 0 0 1px var(--nav-edge-soft),
-      inset 0 1px 0 var(--nav-edge),
-      0 8px 26px var(--nav-shadow);
+      0 10px 30px var(--nav-shadow),
+      0 2px 8px rgb(0 0 0 / 0.08);
+}
+
+/* Тонкий ободок: яркий сверху-слева и снизу-справа, как на реальном стекле */
+.navbar__glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+      135deg,
+      var(--nav-rim-hi) 0%,
+      var(--nav-rim-lo) 24%,
+      var(--nav-rim-lo) 62%,
+      var(--nav-rim-hi) 100%
+  );
+  -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -81,136 +131,57 @@
 
 .navbar__track {
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(var(--n), 1fr);
-  height: var(--nav-h);
+  height: var(--nav-track-h);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
 
-.navbar__track[data-dragging] .navbar__lens {
-  transition-duration: 0.08s;
-  transition-timing-function: linear;
-}
-
-/*
- * Пилюля выбранной вкладки — БЕЗ блюра/теней/свечения, просто чуть более
- * светлая/тёмная заливка, компактно облегающая иконку+подпись (не на всю
- * ширину колонки). Всегда видна под активной вкладкой (--active — это
- * подтверждённый маршрут, а не позиция пальца), поэтому во время протяжки
- * пальцем она не дёргается.
- *
- * Двухслойная структура специально: внешний .navbar__active отвечает
- * ТОЛЬКО за позицию (translateX, обычный плавный transition). Внутренний
- * .navbar__active__fill получает свой React key = activeIndex, поэтому при
- * каждой смене вкладки React пересоздаёт этот DOM-узел — а значит, его
- * CSS-анимация "сплющивания" перезапускается с нуля сама. Так пилюля,
- * как в оригинале, на ходу чуть растягивается вширь и приседает по высоте,
- * а затем плавно возвращается к обычной форме.
- */
-.navbar__active {
+/* ---------- Плоская пилюля выбранной вкладки ---------- */
+.navbar__capsule {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
-  width: calc(100% / var(--n));
-  pointer-events: none;
-  transform: translate3d(calc(var(--active) * 100%), 0, 0);
-  transition: transform 0.5s var(--nav-spring);
-}
-.navbar__active__fill {
-  position: absolute;
-  top: 9px;
-  bottom: 9px;
-  left: 10px;
-  right: 10px;
+  width: calc(100% / var(--n) - 4px); /* 4px = 2 * CAPSULE_INSET_X */
+  margin-left: 2px;
   border-radius: 999px;
-  background: var(--nav-active-fill);
-  animation: navbar-squash 0.55s var(--nav-spring);
-  transform-origin: center;
-}
-@keyframes navbar-squash {
-  0% {
-    transform: scale(1, 1);
-  }
-  32% {
-    transform: scale(1.16, 0.8);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
+  background: var(--nav-capsule);
+  box-shadow: inset 0 0 0 0.5px var(--nav-capsule-edge);
+  pointer-events: none;
 }
 
-/*
- * Стекло при нажатии: статичный на весь трек слой с backdrop-filter.
- * Никогда не двигается и не меняется в размере — иначе Chromium на
- * Android/десктопе даёт швы и "плавающий" фон во время анимации.
- * Видимый кусок под текущей вкладкой вырезается через clip-path — это
- * дешёвая операция композитора, а не пересчёт фильтра. Никакого
- * отдельного цветного свечения нет — весь блик это настоящее
- * преломление реального фона под панелью через backdrop-filter.
- * Небольшой чистый бевель (тонкая светлая линия сверху, тёмная снизу)
- * зашит в box-shadow этого же слоя, поэтому он идеально совпадает по
- * месту и не может "отстать" — это не отдельный элемент.
- */
-.navbar__lens {
+/* ---------- Ряд вкладок (оригинал и увеличенная копия внутри линзы) ---------- */
+.navbar__row {
   position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+}
+.navbar__row--zoom {
+  inset: auto; /* размеры и позицию задаёт NavBar.tsx в px */
   left: 0;
-  right: 0;
-  top: calc(-1 * var(--bulge-y));
-  bottom: calc(-1 * var(--bulge-y));
-  border-radius: 999px;
   pointer-events: none;
-  opacity: 0;
-  background: rgb(255 255 255 / 0.04);
-  -webkit-backdrop-filter: blur(2px) saturate(1.5) brightness(1.06);
-  backdrop-filter: blur(2px) saturate(1.5) brightness(1.06);
-  box-shadow:
-      inset 0 1px 1px rgb(255 255 255 / 0.4),
-      inset 0 -1px 1px rgb(0 0 0 / 0.18);
-  clip-path: inset(
-      0
-      calc(100% - (var(--pos) + 1) / var(--n) * 100%)
-      0
-      calc(var(--pos) / var(--n) * 100%)
-      round 999px
-  );
-  transition: clip-path 0.5s var(--nav-spring), opacity 0.2s;
-}
-.navbar__lens[data-pressed] {
-  opacity: 1;
-  clip-path: inset(
-      0
-      calc(100% - (var(--pos) + 1) / var(--n) * 100% - var(--bulge-x))
-      0
-      calc(var(--pos) / var(--n) * 100% - var(--bulge-x))
-      round 999px
-  );
 }
 
-/* ---------- Вкладки ---------- */
 .navbar__item {
   position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 3px;
   color: var(--nav-text);
-  opacity: 0.82;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.25s, opacity 0.25s, transform 0.45s var(--nav-spring);
+  transition: color 0.25s;
 }
 .navbar__item[data-active] {
   color: var(--nav-active);
-  opacity: 1;
 }
-.navbar__track[data-pressed] .navbar__item[data-active] {
-  transform: scale(1.06);
+.navbar__row--zoom .navbar__item {
+  color: var(--nav-lens-text); /* внутри линзы — ярче и с оттенком акцента, как в iOS */
 }
 .navbar__item:focus-visible {
   outline: 2px solid var(--nav-active);
@@ -219,19 +190,81 @@
 }
 
 .navbar__label {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
+/* ---------- Линза ----------
+ * ПРОЗРАЧНАЯ: ни заливки, ни градиентных бликов. Видно только:
+ *  1) тонкий тёмный контур;
+ *  2) кромку-«полумесяцы» сверху и снизу (ниже, в ::after) — именно так на
+ *     референсах выглядит преломление на длинных гранях линзы, а на скруглённых
+ *     торцах кромка почти исчезает;
+ *  3) искажённую увеличенную копию вкладок внутри (SVG-фильтр на .navbar__lens-clip).
+ * Размер задаёт JS в px; выступает за панель сверху/снизу на BULGE_Y.
+ */
+.navbar__lens {
+  position: absolute;
+  left: 0;
+  top: calc(-1 * var(--nav-bulge-y));
+  border-radius: 999px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  /* без блюра — линза «чище» панели; лишь чуть бодрит цвет под ней */
+  -webkit-backdrop-filter: var(--lens-backdrop);
+  backdrop-filter: var(--lens-backdrop);
+  box-shadow:
+      0 0 0 0.75px var(--lens-outline),
+      0 5px 16px var(--lens-drop);
+}
+
+.navbar__lens-clip {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  clip-path: inset(0 round 999px);
+}
+.navbar[data-warp] .navbar__lens-clip {
+  filter: url(#navbar-lens-warp);
+}
+
+.navbar__defs {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Кромка: полумесяцы по длинным граням. Отрицательный spread оставляет полосу
+ * только на плоских участках; цветные слои с чуть разным сдвигом дают
+ * дисперсию (голубой/розовый сверху, зелёный/жёлтый снизу). */
+.navbar__lens::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    /* верх */
+      inset 0 1.5px 0 -0.5px var(--lens-line),
+      inset 0 13px 8px -8px var(--lens-crescent),
+      inset 0 5px 3px -3.5px rgb(90 210 255 / 0.7),
+      inset 0 8px 4px -5.5px rgb(255 95 150 / 0.55),
+        /* низ */
+      inset 0 -1.5px 0 -0.5px var(--lens-line),
+      inset 0 -13px 8px -8px var(--lens-crescent),
+      inset 0 -5px 3px -3.5px rgb(130 255 170 / 0.65),
+      inset 0 -8px 4px -5.5px rgb(255 205 95 / 0.5),
+        /* едва заметный контур по кругу */
+      inset 0 0 0 0.5px rgb(255 255 255 / 0.16);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .navbar__lens,
-  .navbar__active,
-  .navbar__active__fill,
   .navbar__item {
     transition-duration: 0.01ms !important;
-    animation: none !important;
   }
 }
