@@ -1,12 +1,43 @@
-/** Шаг списка — 30 минут, этого достаточно для всех реальных поясов (включая Индию UTC+5:30). */
-const STEP_MINUTES = 30;
-const MIN_OFFSET = -12 * 60;
-const MAX_OFFSET = 14 * 60;
+import type { LocaleCode } from "../i18n/translations";
 
 export interface TimezoneOption {
   offsetMinutes: number;
-  label: string;
+  cities: Record<LocaleCode, string>;
 }
+
+/** Только реально существующие смещения — не сетка с шагом 30 минут, а
+ * конечный список ориентиров по городам, которым страны пользуются
+ * по факту (включая получасовые/45-минутные: Индия, Иран, Непал). */
+export const TIMEZONE_OPTIONS: TimezoneOption[] = [
+  { offsetMinutes: -720, cities: { ru: "Бейкер (о. США)", en: "Baker Island", uk: "Бейкер (о. США)" } },
+  { offsetMinutes: -660, cities: { ru: "Самоа", en: "Samoa", uk: "Самоа" } },
+  { offsetMinutes: -600, cities: { ru: "Гонолулу", en: "Honolulu", uk: "Гонолулу" } },
+  { offsetMinutes: -540, cities: { ru: "Анкоридж", en: "Anchorage", uk: "Анкоридж" } },
+  { offsetMinutes: -480, cities: { ru: "Лос-Анджелес", en: "Los Angeles", uk: "Лос-Анджелес" } },
+  { offsetMinutes: -420, cities: { ru: "Денвер", en: "Denver", uk: "Денвер" } },
+  { offsetMinutes: -360, cities: { ru: "Чикаго, Мехико", en: "Chicago, Mexico City", uk: "Чикаго, Мехіко" } },
+  { offsetMinutes: -300, cities: { ru: "Нью-Йорк, Богота", en: "New York, Bogotá", uk: "Нью-Йорк, Богота" } },
+  { offsetMinutes: -240, cities: { ru: "Сантьяго, Каракас", en: "Santiago, Caracas", uk: "Сантьяго, Каракас" } },
+  { offsetMinutes: -180, cities: { ru: "Буэнос-Айрес, Сан-Паулу", en: "Buenos Aires, São Paulo", uk: "Буенос-Айрес, Сан-Паулу" } },
+  { offsetMinutes: -60, cities: { ru: "Азорские о-ва", en: "Azores", uk: "Азорські о-ви" } },
+  { offsetMinutes: 0, cities: { ru: "Лондон, Лиссабон", en: "London, Lisbon", uk: "Лондон, Лісабон" } },
+  { offsetMinutes: 60, cities: { ru: "Берлин, Варшава", en: "Berlin, Warsaw", uk: "Берлін, Варшава" } },
+  { offsetMinutes: 120, cities: { ru: "Киев, Каир, Афины", en: "Kyiv, Cairo, Athens", uk: "Київ, Каїр, Афіни" } },
+  { offsetMinutes: 180, cities: { ru: "Москва, Минск, Стамбул", en: "Moscow, Minsk, Istanbul", uk: "Москва, Мінськ, Стамбул" } },
+  { offsetMinutes: 210, cities: { ru: "Тегеран", en: "Tehran", uk: "Тегеран" } },
+  { offsetMinutes: 240, cities: { ru: "Дубай, Баку", en: "Dubai, Baku", uk: "Дубай, Баку" } },
+  { offsetMinutes: 270, cities: { ru: "Кабул", en: "Kabul", uk: "Кабул" } },
+  { offsetMinutes: 300, cities: { ru: "Ташкент, Карачи", en: "Tashkent, Karachi", uk: "Ташкент, Карачі" } },
+  { offsetMinutes: 330, cities: { ru: "Дели, Мумбаи", en: "Delhi, Mumbai", uk: "Делі, Мумбаї" } },
+  { offsetMinutes: 360, cities: { ru: "Алматы, Дакка", en: "Almaty, Dhaka", uk: "Алмати, Дакка" } },
+  { offsetMinutes: 420, cities: { ru: "Бангкок, Новосибирск", en: "Bangkok, Novosibirsk", uk: "Бангкок, Новосибірськ" } },
+  { offsetMinutes: 480, cities: { ru: "Пекин, Сингапур", en: "Beijing, Singapore", uk: "Пекін, Сінгапур" } },
+  { offsetMinutes: 540, cities: { ru: "Токио, Сеул", en: "Tokyo, Seoul", uk: "Токіо, Сеул" } },
+  { offsetMinutes: 570, cities: { ru: "Аделаида", en: "Adelaide", uk: "Аделаїда" } },
+  { offsetMinutes: 600, cities: { ru: "Сидней, Владивосток", en: "Sydney, Vladivostok", uk: "Сідней, Владивосток" } },
+  { offsetMinutes: 660, cities: { ru: "Магадан", en: "Magadan", uk: "Магадан" } },
+  { offsetMinutes: 720, cities: { ru: "Окленд", en: "Auckland", uk: "Окленд" } },
+];
 
 function formatOffset(minutes: number): string {
   const sign = minutes >= 0 ? "+" : "-";
@@ -17,30 +48,29 @@ function formatOffset(minutes: number): string {
   return `UTC${sign}${hours}${minsPart}`;
 }
 
-export function buildTimezoneOptions(): TimezoneOption[] {
-  const options: TimezoneOption[] = [];
-  for (let m = MIN_OFFSET; m <= MAX_OFFSET; m += STEP_MINUTES) {
-    options.push({ offsetMinutes: m, label: formatOffset(m) });
-  }
-  return options;
+export function timezoneLabel(option: TimezoneOption, locale: LocaleCode): string {
+  return `${formatOffset(option.offsetMinutes)} — ${option.cities[locale]}`;
 }
 
-/** Смещение браузера пользователя в минутах, уже с нужным знаком
- * (getTimezoneOffset() отдаёт его инвертированным: для UTC+3 вернёт -180). */
+export function closestTimezoneOption(offsetMinutes: number): TimezoneOption {
+  return TIMEZONE_OPTIONS.reduce((closest, opt) =>
+    Math.abs(opt.offsetMinutes - offsetMinutes) < Math.abs(closest.offsetMinutes - offsetMinutes)
+      ? opt
+      : closest
+  );
+}
+
 export function detectBrowserOffsetMinutes(): number {
   return -new Date().getTimezoneOffset();
 }
 
 const STORAGE_KEY = "calora_tz_auto_applied";
 
-/** true, если автоопределение ещё ни разу не отправлялось с этого устройства —
- * используем localStorage, а не серверный флаг, чтобы не плодить миграции ради
- * одной метки "применяли или нет" и не трогать ручной выбор пользователя повторно. */
 export function shouldAutoApplyTimezone(): boolean {
   try {
     return localStorage.getItem(STORAGE_KEY) !== "1";
   } catch {
-    return false; // приватный режим браузера может блокировать localStorage — тогда просто не автоопределяем
+    return false;
   }
 }
 

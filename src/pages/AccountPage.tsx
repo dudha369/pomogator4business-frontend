@@ -7,23 +7,50 @@ import { Section } from "../components/Section";
 import { Switch } from "../components/Switch";
 import { useLocale } from "../i18n/LocaleContext";
 import {
-  buildTimezoneOptions,
+  TIMEZONE_OPTIONS,
+  closestTimezoneOption,
   detectBrowserOffsetMinutes,
   markTimezoneAutoApplied,
   shouldAutoApplyTimezone,
+  timezoneLabel,
 } from "../utils/timezone";
 
 type LoadState = "loading" | "ready" | "error";
 
-const TIMEZONE_OPTIONS = buildTimezoneOptions();
-
 export function AccountPage() {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [state, setState] = useState<LoadState>("loading");
   const [account, setAccount] = useState<AccountResponse | null>(null);
   const [requesting, setRequesting] = useState(false);
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
   const [savingTimezone, setSavingTimezone] = useState(false);
+  const [mirrorToken, setMirrorToken] = useState("");
+  const [connectingMirror, setConnectingMirror] = useState(false);
+  const [mirrorError, setMirrorError] = useState<string | null>(null);
+
+  async function handleMirrorConnect() {
+    if (!mirrorToken.trim()) return;
+    setConnectingMirror(true);
+    setMirrorError(null);
+    try {
+      const res = await apiPost<{ connected: boolean; username: string }>("/api/mirror/connect", {
+        token: mirrorToken.trim(),
+      });
+      setAccount((prev) =>
+        prev ? { ...prev, mirror: { connected: true, username: res.username } } : prev
+      );
+      setMirrorToken("");
+    } catch {
+      setMirrorError(t("account.mirrorConnectFailed"));
+    } finally {
+      setConnectingMirror(false);
+    }
+  }
+
+  async function handleMirrorDisconnect() {
+    await apiPost("/api/mirror/disconnect", {});
+    setAccount((prev) => (prev ? { ...prev, mirror: { connected: false, username: null } } : prev));
+  }
 
   function load() {
     apiGet<AccountResponse>("/api/account")
@@ -41,7 +68,7 @@ export function AccountPage() {
   function maybeAutoApplyTimezone(data: AccountResponse) {
     if (!shouldAutoApplyTimezone()) return;
 
-    const detected = detectBrowserOffsetMinutes();
+    const detected = closestTimezoneOption(detectBrowserOffsetMinutes()).offsetMinutes;
     markTimezoneAutoApplied();
 
     if (detected === data.timezone_offset_minutes) return;
@@ -162,12 +189,37 @@ export function AccountPage() {
 
       <Section title={t("account.mirrorSection")}>
         {account.mirror.connected ? (
-          <div className="info-row">
-            <span className="info-row__label">{t("account.mirrorConnected")}</span>
-            <span className="info-row__value">@{account.mirror.username}</span>
-          </div>
+          <>
+            <div className="info-row">
+              <span className="info-row__label">{t("account.mirrorConnected")}</span>
+              <span className="info-row__value">@{account.mirror.username}</span>
+            </div>
+            <button className="prefix-editor__save" onClick={handleMirrorDisconnect} type="button">
+              {t("account.mirrorDisconnect")}
+            </button>
+          </>
         ) : (
-          <p className="section__hint">{t("account.mirrorNotConnected")}</p>
+          <>
+            <p className="section__hint">{t("account.mirrorOnboarding")}</p>
+            <div className="prefix-editor">
+              <input
+                className="prefix-editor__input"
+                style={{ width: "auto", flex: 1 }}
+                onChange={(e) => setMirrorToken(e.target.value)}
+                placeholder="123456:AAAA...xyz"
+                value={mirrorToken}
+              />
+              <button
+                className="prefix-editor__save"
+                disabled={connectingMirror || !mirrorToken.trim()}
+                onClick={handleMirrorConnect}
+                type="button"
+              >
+                {connectingMirror ? t("account.mirrorConnecting") : t("account.mirrorConnect")}
+              </button>
+            </div>
+            {mirrorError && <p className="prefix-editor__error">{mirrorError}</p>}
+          </>
         )}
       </Section>
 
@@ -180,7 +232,7 @@ export function AccountPage() {
         >
           {TIMEZONE_OPTIONS.map((opt) => (
             <option key={opt.offsetMinutes} value={opt.offsetMinutes}>
-              {opt.label}
+              {timezoneLabel(opt, locale)}
             </option>
           ))}
         </select>
@@ -196,6 +248,8 @@ export function AccountPage() {
         ) : (
           <>
             <p className="section__hint">{t("account.emojiHint")}</p>
+            <p className="section__hint">{t("account.emojiExample")}</p>
+            <p className="section__hint">{t("account.emojiDisableNote")}</p>
             <button
               className="prefix-editor__save"
               disabled={requesting}
