@@ -2,12 +2,16 @@ import type { Command } from "../api/types";
 
 interface Props {
   command: Command;
+  enabled: boolean;
+  onOpen: () => void;
 }
 
-export function CommandCard({ command }: Props) {
+export function CommandCard({ command, enabled, onOpen }: Props) {
   return (
-    <div className="command-card">
-      <div className="command-card__badge">{command.name.charAt(0).toUpperCase()}</div>
+    <button className="command-card" onClick={onOpen} type="button">
+      <div className={`command-card__badge ${enabled ? "" : "command-card__badge--disabled"}`}>
+        {command.name.charAt(0).toUpperCase()}
+      </div>
       <div className="command-card__body">
         <div className="command-card__header">
           <span className="command-card__trigger">.{command.name}</span>
@@ -16,9 +20,10 @@ export function CommandCard({ command }: Props) {
               .{alias}
             </span>
           ))}
+          {!enabled && <span className="command-card__disabled-pill">off</span>}
         </div>
         <p className="command-card__description">{command.description}</p>
       </div>
-    </div>
+    </button>
   );
 }

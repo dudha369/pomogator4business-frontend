@@ -72,6 +72,11 @@ const ru: Dict = {
   "rights.can_transfer_and_upgrade_gifts": "Передавать и улучшать подарки",
   "rights.can_transfer_stars": "Переводить звёзды",
   "rights.can_manage_stories": "Управлять историями",
+
+  "commandModal.enabled": "Модуль включён",
+  "commandModal.about": "Описание",
+  "commandModal.usage": "Пример использования",
+  "commandModal.ownerOnly": "Доступно только владельцу аккаунта.",
 };
 
 const en: Dict = {
@@ -138,6 +143,11 @@ const en: Dict = {
   "rights.can_transfer_and_upgrade_gifts": "Transfer and upgrade gifts",
   "rights.can_transfer_stars": "Transfer stars",
   "rights.can_manage_stories": "Manage stories",
+
+  "commandModal.enabled": "Module enabled",
+  "commandModal.about": "About",
+  "commandModal.usage": "Usage",
+  "commandModal.ownerOnly": "Only available to the account owner.",
 };
 
 const uk: Dict = {
@@ -204,6 +214,11 @@ const uk: Dict = {
   "rights.can_transfer_and_upgrade_gifts": "Передавати і покращувати подарунки",
   "rights.can_transfer_stars": "Переказувати зірки",
   "rights.can_manage_stories": "Керувати історіями",
+
+  "commandModal.enabled": "Модуль увімкнено",
+  "commandModal.about": "Опис",
+  "commandModal.usage": "Приклад використання",
+  "commandModal.ownerOnly": "Доступно лише власнику акаунта.",
 };
 
 export const TRANSLATIONS: Record<LocaleCode, Dict> = { ru, en, uk };

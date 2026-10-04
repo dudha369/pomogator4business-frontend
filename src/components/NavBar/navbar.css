@@ -1,34 +1,38 @@
 /* ---------- Liquid glass tab bar (iOS 26 style) ----------
- * Работает одинаково в WebKit (iOS/Telegram) и Chromium: никаких
- * backdrop-filter: url(#svg) — Safari их не рисует. Вся «магия» линзы —
- * увеличенная копия вкладок внутри стекла + блики + радужный ободок.
- * Позиции/размеры линзы пишет NavBar.tsx прямо в style.transform.
+ * Размеры замерены по скриншотам Telegram / Find My — таблица в NavBar.tsx.
+ * Без backdrop-filter: url() и без SVG-фильтров: в WKWebView они не работают.
+ * Позиции/размеры линзы и капсулы пишет NavBar.tsx (--g, --ring — тоже оттуда).
  */
 
 .navbar {
-  --nav-track-h: 56px;
-  --nav-pad: 4px;
-  --nav-bulge-y: 8px; /* синхронизировать с BULGE_Y в NavBar.tsx */
+  --nav-cell: 102px; /* ширина вкладки (= капсула в покое) */
+  --nav-track-h: 56px; /* = TRACK_H в NavBar.tsx */
+  --nav-pad-x: 5.7px; /* край панели → первая ячейка */
+  --nav-pad-y: 3.5px; /* панель = 56 + 2×3.5 = 63 */
 
   /* ----- light ----- */
-  --nav-tint-top: rgb(255 255 255 / 0.34);
-  --nav-tint-bottom: rgb(255 255 255 / 0.18);
+  --nav-tint-top: rgb(255 255 255 / 0.5);
+  --nav-tint-bottom: rgb(255 255 255 / 0.34);
   --nav-rim-hi: rgb(255 255 255 / 0.95);
-  --nav-rim-lo: rgb(255 255 255 / 0.12);
+  --nav-rim-lo: rgb(255 255 255 / 0.15);
   --nav-shadow: rgb(20 30 60 / 0.16);
   --nav-capsule: rgb(120 120 128 / 0.16);
   --nav-capsule-edge: rgb(255 255 255 / 0.35);
 
   --nav-text: var(--text);
-  --nav-active: var(--accent);
+  --nav-inactive: color-mix(in srgb, var(--nav-text) 70%, transparent);
+  --nav-active: color-mix(in srgb, var(--accent) 45%, var(--nav-text));
+  --nav-lens-text: var(--nav-active);
 
-  /* линза: прозрачная, только кромка */
-  --lens-outline: rgb(0 0 0 / 0.28);
-  --lens-drop: rgb(20 30 60 / 0.16);
-  --lens-crescent: rgb(20 30 70 / 0.34);
-  --lens-line: rgb(255 255 255 / 0.85);
-  --lens-backdrop: saturate(1.15);
-  --nav-lens-text: color-mix(in srgb, var(--nav-active) 55%, var(--nav-text));
+  /* линза */
+  --lens-outline: rgb(0 0 0 / 0.32);
+  --lens-drop: rgb(20 30 60 / 0.2);
+  --lens-fill: rgb(255 255 255 / 0.06);
+  --lens-backdrop: saturate(1.2);
+  --lens-band: rgb(18 32 80 / 0.34); /* полосы кольца сверху/снизу */
+  --lens-band-edge: rgb(255 255 255 / 0.9); /* светлая линия по внутреннему краю */
+  --lens-arc: rgb(255 255 255 / 0.5); /* светлые дуги на торцах */
+  --lens-glint: 0.32;
 
   position: fixed;
   left: 0;
@@ -37,48 +41,56 @@
   z-index: 1000;
   display: flex;
   justify-content: center;
-  padding: 0 16px calc(10px + env(safe-area-inset-bottom));
+  /* нативная панель «плавает» ≈20pt над низом экрана при индикаторе Home 34pt */
+  padding: 0 20px max(10px, calc(env(safe-area-inset-bottom) - 14px));
   pointer-events: none;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .navbar {
-    --nav-tint-top: rgb(70 72 84 / 0.38);
-    --nav-tint-bottom: rgb(40 42 52 / 0.3);
+    --nav-tint-top: rgb(96 98 108 / 0.5);
+    --nav-tint-bottom: rgb(66 68 76 / 0.46);
     --nav-rim-hi: rgb(255 255 255 / 0.5);
     --nav-rim-lo: rgb(255 255 255 / 0.07);
     --nav-shadow: rgb(0 0 0 / 0.45);
-    --nav-capsule: rgb(255 255 255 / 0.13);
+    --nav-capsule: rgb(255 255 255 / 0.15);
     --nav-capsule-edge: rgb(255 255 255 / 0.1);
-    --lens-outline: rgb(0 0 0 / 0.6);
-    --lens-drop: rgb(0 0 0 / 0.3);
-    --lens-crescent: rgb(0 0 0 / 0.62);
-    --lens-line: rgb(255 255 255 / 0.5);
-    --lens-backdrop: saturate(1.25) brightness(1.06);
+    --lens-outline: rgb(0 0 0 / 0.7);
+    --lens-drop: rgb(0 0 0 / 0.35);
+    --lens-fill: rgb(255 255 255 / 0.07);
+    --lens-backdrop: saturate(1.3) brightness(1.1);
+    --lens-band: rgb(0 0 0 / 0.9);
+    --lens-band-edge: rgb(255 255 255 / 0.5);
+    --lens-arc: rgb(255 255 255 / 0.3);
+    --lens-glint: 0.4;
   }
 }
 :root[data-theme="dark"] .navbar {
-  --nav-tint-top: rgb(70 72 84 / 0.38);
-  --nav-tint-bottom: rgb(40 42 52 / 0.3);
+  --nav-tint-top: rgb(96 98 108 / 0.5);
+  --nav-tint-bottom: rgb(66 68 76 / 0.46);
   --nav-rim-hi: rgb(255 255 255 / 0.5);
   --nav-rim-lo: rgb(255 255 255 / 0.07);
   --nav-shadow: rgb(0 0 0 / 0.45);
-  --nav-capsule: rgb(255 255 255 / 0.13);
+  --nav-capsule: rgb(255 255 255 / 0.15);
   --nav-capsule-edge: rgb(255 255 255 / 0.1);
-  --lens-outline: rgb(0 0 0 / 0.6);
-  --lens-drop: rgb(0 0 0 / 0.3);
-  --lens-crescent: rgb(0 0 0 / 0.62);
-  --lens-line: rgb(255 255 255 / 0.5);
-  --lens-backdrop: saturate(1.25) brightness(1.06);
+  --lens-outline: rgb(0 0 0 / 0.7);
+  --lens-drop: rgb(0 0 0 / 0.35);
+  --lens-fill: rgb(255 255 255 / 0.07);
+  --lens-backdrop: saturate(1.3) brightness(1.1);
+  --lens-band: rgb(0 0 0 / 0.9);
+  --lens-band-edge: rgb(255 255 255 / 0.5);
+  --lens-arc: rgb(255 255 255 / 0.3);
+  --lens-glint: 0.4;
 }
 
+/* Панель: n вкладок по 102pt + поля. Для 3 вкладок = 317.4pt (у Telegram 318). */
 .navbar__bar {
   position: relative;
-  width: 100%;
-  max-width: 404px;
-  padding: var(--nav-pad);
+  width: min(100%, calc(var(--n) * var(--nav-cell) + 2 * var(--nav-pad-x)));
+  padding: var(--nav-pad-y) var(--nav-pad-x);
   pointer-events: auto;
-  /* НЕ ставить сюда filter/opacity/backdrop-filter/mask/transform: это ломает линзу */
+  transform-origin: 50% 50%;
+  will-change: transform;
 }
 
 /* ---------- Стекло панели ---------- */
@@ -86,19 +98,12 @@
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: linear-gradient(
-      180deg,
-      var(--nav-tint-top),
-      var(--nav-tint-bottom)
-  );
+  background: linear-gradient(180deg, var(--nav-tint-top), var(--nav-tint-bottom));
   -webkit-backdrop-filter: blur(22px) saturate(1.25);
   backdrop-filter: blur(22px) saturate(1.25);
-  box-shadow:
-      0 10px 30px var(--nav-shadow),
-      0 2px 8px rgb(0 0 0 / 0.08);
+  box-shadow: 0 10px 30px var(--nav-shadow), 0 2px 8px rgb(0 0 0 / 0.08);
 }
 
-/* Тонкий ободок: яркий сверху-слева и снизу-справа, как на реальном стекле */
 .navbar__glass::before {
   content: "";
   position: absolute;
@@ -112,13 +117,9 @@
       var(--nav-rim-lo) 62%,
       var(--nav-rim-hi) 100%
   );
-  -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
   pointer-events: none;
 }
@@ -138,21 +139,20 @@
   -webkit-touch-callout: none;
 }
 
-/* ---------- Плоская пилюля выбранной вкладки ---------- */
+/* ---------- Плоская капсула выбранной вкладки (в покое) ---------- */
 .navbar__capsule {
   position: absolute;
   top: 0;
-  bottom: 0;
   left: 0;
-  width: calc(100% / var(--n) - 4px); /* 4px = 2 * CAPSULE_INSET_X */
-  margin-left: 2px;
+  width: var(--nav-cell);
+  height: var(--nav-track-h);
   border-radius: 999px;
   background: var(--nav-capsule);
   box-shadow: inset 0 0 0 0.5px var(--nav-capsule-edge);
   pointer-events: none;
 }
 
-/* ---------- Ряд вкладок (оригинал и увеличенная копия внутри линзы) ---------- */
+/* ---------- Ряд вкладок ---------- */
 .navbar__row {
   position: absolute;
   inset: 0;
@@ -160,28 +160,35 @@
   grid-template-columns: repeat(var(--n), 1fr);
 }
 .navbar__row--zoom {
-  inset: auto; /* размеры и позицию задаёт NavBar.tsx в px */
+  inset: auto;
   left: 0;
   pointer-events: none;
 }
 
 .navbar__item {
+  --item-base: var(--nav-inactive);
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  color: var(--nav-text);
+  gap: 2px; /* у lucide-иконки уже есть внутренние поля */
+  color: var(--item-base);
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.25s;
 }
 .navbar__item[data-active] {
-  color: var(--nav-active);
+  --item-base: var(--nav-active);
 }
+/* в линзе цвет плавно идёт от обычного к «стеклянному» вместе с --g — без скачка */
 .navbar__row--zoom .navbar__item {
-  color: var(--nav-lens-text); /* внутри линзы — ярче и с оттенком акцента, как в iOS */
+  transition: none;
+  color: color-mix(
+      in srgb,
+      var(--nav-lens-text) calc(var(--g, 0) * 100%),
+      var(--item-base)
+  );
 }
 .navbar__item:focus-visible {
   outline: 2px solid var(--nav-active);
@@ -190,37 +197,43 @@
 }
 
 .navbar__label {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   line-height: 1;
-  letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
 /* ---------- Линза ----------
- * ПРОЗРАЧНАЯ: ни заливки, ни градиентных бликов. Видно только:
- *  1) тонкий тёмный контур;
- *  2) кромку-«полумесяцы» сверху и снизу (ниже, в ::after) — именно так на
- *     референсах выглядит преломление на длинных гранях линзы, а на скруглённых
- *     торцах кромка почти исчезает;
- *  3) искажённую увеличенную копию вкладок внутри (SVG-фильтр на .navbar__lens-clip).
- * Размер задаёт JS в px; выступает за панель сверху/снизу на BULGE_Y.
+ * ::before  — стекло: тёмный контур, мягкая тень, лёгкая заливка, чуть ярче панели
+ * .clip     — увеличенная копия вкладок
+ * ::after   — кольцо шириной --ring: плоские тёмные полосы сверху/снизу со светлой
+ *             линией по внутреннему краю, светлые дуги на торцах, радужные блики
+ * Размер и позицию пишет JS.
  */
 .navbar__lens {
+  --g: 0;
+  --ring: 4px;
   position: absolute;
   left: 0;
-  top: calc(-1 * var(--nav-bulge-y));
+  top: 0;
   border-radius: 999px;
-  opacity: 0;
   visibility: hidden;
   pointer-events: none;
   isolation: isolate;
-  /* без блюра — линза «чище» панели; лишь чуть бодрит цвет под ней */
+}
+
+.navbar__lens::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: clamp(0, calc(var(--g) * 1.7), 1);
+  background: var(--lens-fill);
   -webkit-backdrop-filter: var(--lens-backdrop);
   backdrop-filter: var(--lens-backdrop);
   box-shadow:
       0 0 0 0.75px var(--lens-outline),
-      0 5px 16px var(--lens-drop);
+      0 6px 18px var(--lens-drop);
 }
 
 .navbar__lens-clip {
@@ -230,37 +243,52 @@
   overflow: hidden;
   clip-path: inset(0 round 999px);
 }
-.navbar[data-warp] .navbar__lens-clip {
-  filter: url(#navbar-lens-warp);
-}
 
-.navbar__defs {
-  position: absolute;
-  pointer-events: none;
-}
-
-/* Кромка: полумесяцы по длинным граням. Отрицательный spread оставляет полосу
- * только на плоских участках; цветные слои с чуть разным сдвигом дают
- * дисперсию (голубой/розовый сверху, зелёный/жёлтый снизу). */
 .navbar__lens::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  padding: var(--ring);
   pointer-events: none;
-  box-shadow:
-    /* верх */
-      inset 0 1.5px 0 -0.5px var(--lens-line),
-      inset 0 13px 8px -8px var(--lens-crescent),
-      inset 0 5px 3px -3.5px rgb(90 210 255 / 0.7),
-      inset 0 8px 4px -5.5px rgb(255 95 150 / 0.55),
-        /* низ */
-      inset 0 -1.5px 0 -0.5px var(--lens-line),
-      inset 0 -13px 8px -8px var(--lens-crescent),
-      inset 0 -5px 3px -3.5px rgb(130 255 170 / 0.65),
-      inset 0 -8px 4px -5.5px rgb(255 205 95 / 0.5),
-        /* едва заметный контур по кругу */
-      inset 0 0 0 0.5px rgb(255 255 255 / 0.16);
+  opacity: clamp(0, calc(var(--g) * 1.7), 1);
+  background:
+    /* радужные блики: на нативе они живут на диагональных дугах */
+      conic-gradient(
+          from 0deg at 50% 50%,
+          transparent 0 6%,
+          rgb(255 215 120 / var(--lens-glint)) 9%,
+          rgb(255 110 190 / var(--lens-glint)) 12%,
+          rgb(120 190 255 / var(--lens-glint)) 15%,
+          transparent 19% 53%,
+          rgb(120 255 200 / var(--lens-glint)) 57%,
+          rgb(255 215 120 / var(--lens-glint)) 61%,
+          rgb(190 120 255 / var(--lens-glint)) 65%,
+          transparent 70%
+      ),
+        /* светлые дуги на торцах */
+      linear-gradient(
+          90deg,
+          var(--lens-arc) 0,
+          transparent calc(var(--ring) * 2.2) calc(100% - var(--ring) * 2.2),
+          var(--lens-arc) 100%
+      ),
+        /* плоские полосы сверху и снизу + светлая линия по внутреннему краю */
+      linear-gradient(
+          180deg,
+          var(--lens-band) 0,
+          var(--lens-band) calc(var(--ring) - 1.2px),
+          var(--lens-band-edge) var(--ring),
+          transparent calc(var(--ring) + 1px),
+          transparent calc(100% - var(--ring) - 1px),
+          var(--lens-band-edge) calc(100% - var(--ring)),
+          var(--lens-band) calc(100% - var(--ring) + 1.2px),
+          var(--lens-band) 100%
+      );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
 }
 
 @media (prefers-reduced-motion: reduce) {

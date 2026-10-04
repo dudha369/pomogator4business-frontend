@@ -1,0 +1,75 @@
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+}
+.sheet-backdrop--open {
+  animation: sheet-fade-in 0.22s ease both;
+}
+.sheet-backdrop--closing {
+  animation: sheet-fade-out 0.22s ease both;
+}
+
+@keyframes sheet-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes sheet-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: min(86vh, 720px);
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.3);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  overflow: hidden;
+  touch-action: none;
+}
+.sheet--open {
+  animation: sheet-slide-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.sheet--closing {
+  animation: sheet-slide-out 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes sheet-slide-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes sheet-slide-out {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+.sheet__handle-zone {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 6px;
+  cursor: grab;
+  touch-action: none;
+}
+.sheet__handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--hint);
+  opacity: 0.5;
+}
+.sheet__content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 4px 20px 24px;
+  -webkit-overflow-scrolling: touch;
+}

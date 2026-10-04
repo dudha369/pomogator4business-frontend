@@ -1,0 +1,94 @@
+.command-modal__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-top: 8px;
+  margin-bottom: 18px;
+}
+.command-modal__badge {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6a8dff, #7b5cff);
+}
+.command-modal__heading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.command-modal__title {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.command-modal__triggers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.command-modal__trigger {
+  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent);
+}
+.command-modal__alias {
+  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-size: 12px;
+  color: var(--hint);
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+.command-modal__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 14px;
+  margin-bottom: 16px;
+}
+.command-modal__row-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.command-modal__section {
+  margin-bottom: 16px;
+}
+.command-modal__section-title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--hint);
+}
+.command-modal__text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.command-modal__usage {
+  display: block;
+  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-size: 14px;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--accent);
+}
+.command-modal__hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--hint);
+}
