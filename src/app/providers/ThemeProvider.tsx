@@ -7,7 +7,7 @@ import {
 } from "react";
 import { themeParams, useSignal } from "@tma.js/sdk-react";
 
-import { isTelegramEnvironment } from "../telegram/init";
+import { isTelegramEnvironment } from "@/shared/telegram/init";
 
 interface ThemeContextValue {
   /** true = тёмная тема (телеграм или системная, смотря что доступно) */

@@ -1,34 +1,4 @@
-export type LocaleCode = "ru" | "en" | "uk";
-
-export const LANGUAGE_NAMES: Record<LocaleCode, string> = {
-  ru: "Русский",
-  en: "English",
-  uk: "Українська",
-};
-
-type Dict = Record<string, string>;
-
-const ru: Dict = {
-  "nav.commands": "Команды",
-  "nav.settings": "Настройки",
-  "nav.account": "Аккаунт",
-
-  "commands.title": "Команды",
-  "commands.loading": "Загрузка...",
-  "commands.error": "Не удалось загрузить список команд. Проверьте подключение к серверу.",
-
-  "settings.title": "Настройки",
-  "settings.loading": "Загрузка...",
-  "settings.error": "Не удалось загрузить настройки. Откройте приложение через бота в Telegram.",
-  "settings.prefixSection": "Префикс команд",
-  "settings.save": "Сохранить",
-  "settings.saving": "Сохраняю...",
-  "settings.prefixHint": "Текущий префикс: «{prefix}» — например, «{prefix}flip»",
-  "settings.prefixError": "Префикс должен быть ровно одним символом",
-  "settings.prefixSaveError": "Не удалось сохранить префикс",
-  "settings.modulesSection": "Модули",
-  "settings.languageSection": "Язык",
-
+export const RU = {
   "account.title": "Аккаунт",
   "account.loading": "Загрузка...",
   "account.error": "Не удалось загрузить данные аккаунта. Откройте приложение через бота в Telegram.",
@@ -37,14 +7,6 @@ const ru: Dict = {
   "account.prefix": "Префикс",
   "account.rightsEmpty": "Права не выданы или ещё не синхронизированы.",
   "account.notConnected": "Бот ещё не подключён к вашему бизнес-аккаунту. Подключите его в Telegram: Настройки → Telegram Business → Чат-боты.",
-  "account.mirrorSection": "Личное зеркало",
-  "account.mirrorConnected": "Подключено",
-  "account.mirrorNotConnected": "Зеркало не подключено. Напишите боту команду /mirror в личных сообщениях.",
-  "account.mirrorOnboarding": "Создайте бота через @BotFather (/newbot), скопируйте выданный токен и вставьте ниже.",
-  "account.mirrorConnect": "Подключить",
-  "account.mirrorConnecting": "Подключаю...",
-  "account.mirrorConnectFailed": "Не удалось подключиться с этим токеном. Проверьте и попробуйте снова.",
-  "account.mirrorDisconnect": "Отключить",
   "account.emojiExample": "Пример: ⏰ 14:32 вместо обычного значка в профиле — обновляется каждую минуту.",
   "account.emojiDisableNote": "При выключении статус снимается полностью. Вернуть точно тот же статус, что стоял до включения, невозможно — Telegram не даёт боту узнать, что там было.",
   "account.emojiSection": "Часы в эмодзи-статусе",
@@ -72,34 +34,9 @@ const ru: Dict = {
   "rights.can_transfer_and_upgrade_gifts": "Передавать и улучшать подарки",
   "rights.can_transfer_stars": "Переводить звёзды",
   "rights.can_manage_stories": "Управлять историями",
-
-  "commandModal.enabled": "Модуль включён",
-  "commandModal.about": "Описание",
-  "commandModal.usage": "Пример использования",
-  "commandModal.ownerOnly": "Доступно только владельцу аккаунта.",
 };
 
-const en: Dict = {
-  "nav.commands": "Commands",
-  "nav.settings": "Settings",
-  "nav.account": "Account",
-
-  "commands.title": "Commands",
-  "commands.loading": "Loading...",
-  "commands.error": "Couldn't load the command list. Check your connection to the server.",
-
-  "settings.title": "Settings",
-  "settings.loading": "Loading...",
-  "settings.error": "Couldn't load settings. Open the app via the bot in Telegram.",
-  "settings.prefixSection": "Command prefix",
-  "settings.save": "Save",
-  "settings.saving": "Saving...",
-  "settings.prefixHint": "Current prefix: \"{prefix}\" — e.g. \"{prefix}flip\"",
-  "settings.prefixError": "The prefix must be exactly one character",
-  "settings.prefixSaveError": "Couldn't save the prefix",
-  "settings.modulesSection": "Modules",
-  "settings.languageSection": "Language",
-
+export const EN = {
   "account.title": "Account",
   "account.loading": "Loading...",
   "account.error": "Couldn't load account data. Open the app via the bot in Telegram.",
@@ -108,14 +45,6 @@ const en: Dict = {
   "account.prefix": "Prefix",
   "account.rightsEmpty": "No rights granted yet, or not synced yet.",
   "account.notConnected": "The bot isn't connected to your business account yet. Connect it in Telegram: Settings → Telegram Business → Chatbots.",
-  "account.mirrorSection": "Personal mirror",
-  "account.mirrorConnected": "Connected",
-  "account.mirrorNotConnected": "Mirror isn't connected. Send the bot /mirror in a direct message.",
-  "account.mirrorOnboarding": "Create a bot via @BotFather (/newbot), copy the token it gives you, and paste it below.",
-  "account.mirrorConnect": "Connect",
-  "account.mirrorConnecting": "Connecting...",
-  "account.mirrorConnectFailed": "Couldn't connect with this token. Check it and try again.",
-  "account.mirrorDisconnect": "Disconnect",
   "account.emojiExample": "Example: ⏰ 14:32 instead of your usual profile badge — updates every minute.",
   "account.emojiDisableNote": "Turning this off clears the status entirely. Restoring exactly what was there before isn't possible — Telegram doesn't let a bot read a user's current status.",
   "account.emojiSection": "Emoji-status clock",
@@ -143,34 +72,9 @@ const en: Dict = {
   "rights.can_transfer_and_upgrade_gifts": "Transfer and upgrade gifts",
   "rights.can_transfer_stars": "Transfer stars",
   "rights.can_manage_stories": "Manage stories",
-
-  "commandModal.enabled": "Module enabled",
-  "commandModal.about": "About",
-  "commandModal.usage": "Usage",
-  "commandModal.ownerOnly": "Only available to the account owner.",
 };
 
-const uk: Dict = {
-  "nav.commands": "Команди",
-  "nav.settings": "Налаштування",
-  "nav.account": "Акаунт",
-
-  "commands.title": "Команди",
-  "commands.loading": "Завантаження...",
-  "commands.error": "Не вдалося завантажити список команд. Перевірте з'єднання із сервером.",
-
-  "settings.title": "Налаштування",
-  "settings.loading": "Завантаження...",
-  "settings.error": "Не вдалося завантажити налаштування. Відкрийте застосунок через бота в Telegram.",
-  "settings.prefixSection": "Префікс команд",
-  "settings.save": "Зберегти",
-  "settings.saving": "Зберігаю...",
-  "settings.prefixHint": "Поточний префікс: «{prefix}» — наприклад, «{prefix}flip»",
-  "settings.prefixError": "Префікс має бути рівно одним символом",
-  "settings.prefixSaveError": "Не вдалося зберегти префікс",
-  "settings.modulesSection": "Модулі",
-  "settings.languageSection": "Мова",
-
+export const UK = {
   "account.title": "Акаунт",
   "account.loading": "Завантаження...",
   "account.error": "Не вдалося завантажити дані акаунта. Відкрийте застосунок через бота в Telegram.",
@@ -179,14 +83,6 @@ const uk: Dict = {
   "account.prefix": "Префікс",
   "account.rightsEmpty": "Права не видані або ще не синхронізовані.",
   "account.notConnected": "Бот ще не підключений до вашого бізнес-акаунта. Підключіть його в Telegram: Налаштування → Telegram Business → Чат-боти.",
-  "account.mirrorSection": "Особисте дзеркало",
-  "account.mirrorConnected": "Підключено",
-  "account.mirrorNotConnected": "Дзеркало не підключено. Напишіть боту команду /mirror в особистих повідомленнях.",
-  "account.mirrorOnboarding": "Створіть бота через @BotFather (/newbot), скопіюйте виданий токен і вставте нижче.",
-  "account.mirrorConnect": "Підключити",
-  "account.mirrorConnecting": "Підключаю...",
-  "account.mirrorConnectFailed": "Не вдалося підключитися з цим токеном. Перевірте і спробуйте ще раз.",
-  "account.mirrorDisconnect": "Відключити",
   "account.emojiExample": "Приклад: ⏰ 14:32 замість звичайного значка в профілі — оновлюється щохвилини.",
   "account.emojiDisableNote": "При вимкненні статус знімається повністю. Повернути точно той самий статус, що був до увімкнення, неможливо — Telegram не дає боту дізнатися, що там було.",
   "account.emojiSection": "Годинник в emoji-статусі",
@@ -214,11 +110,4 @@ const uk: Dict = {
   "rights.can_transfer_and_upgrade_gifts": "Передавати і покращувати подарунки",
   "rights.can_transfer_stars": "Переказувати зірки",
   "rights.can_manage_stories": "Керувати історіями",
-
-  "commandModal.enabled": "Модуль увімкнено",
-  "commandModal.about": "Опис",
-  "commandModal.usage": "Приклад використання",
-  "commandModal.ownerOnly": "Доступно лише власнику акаунта.",
 };
-
-export const TRANSLATIONS: Record<LocaleCode, Dict> = { ru, en, uk };

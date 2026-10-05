@@ -1,13 +1,10 @@
-import type { LocaleCode } from "../i18n/translations";
+import type { LocaleCode } from "@/i18n";
 
 export interface TimezoneOption {
   offsetMinutes: number;
   cities: Record<LocaleCode, string>;
 }
 
-/** Только реально существующие смещения — не сетка с шагом 30 минут, а
- * конечный список ориентиров по городам, которым страны пользуются
- * по факту (включая получасовые/45-минутные: Индия, Иран, Непал). */
 export const TIMEZONE_OPTIONS: TimezoneOption[] = [
   { offsetMinutes: -720, cities: { ru: "Бейкер (о. США)", en: "Baker Island", uk: "Бейкер (о. США)" } },
   { offsetMinutes: -660, cities: { ru: "Самоа", en: "Samoa", uk: "Самоа" } },

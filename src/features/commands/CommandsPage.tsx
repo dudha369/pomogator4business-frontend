@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { apiGet } from "../api/client";
-import type { Command, CommandsResponse, ModuleState, SettingsResponse } from "../api/types";
-import { CommandCard } from "../components/CommandCard";
-import { CommandModal } from "../components/CommandModal/CommandModal";
-import { useLocale } from "../i18n/LocaleContext";
+import { useLocale } from "@/i18n";
+import { CommandCard } from "./components/CommandCard";
+import { CommandModal } from "./components/CommandModal/CommandModal";
+import { fetchCommands, fetchModuleStates } from "./api";
+import type { Command, ModuleState } from "./types";
 
 type LoadState = "loading" | "ready" | "error";
 
@@ -19,15 +19,11 @@ export function CommandsPage() {
     let cancelled = false;
     setState("loading");
 
-    Promise.all([
-      apiGet<CommandsResponse>(`/api/commands?locale=${locale}`),
-      apiGet<SettingsResponse>("/api/settings"),
-    ])
-    .then(([commandsRes, settingsRes]) => {
+    Promise.all([fetchCommands(locale), fetchModuleStates()])
+    .then(([commandsRes, modulesRes]) => {
       if (cancelled) return;
-      const sorted = [...commandsRes.commands].sort((a, b) => a.name.localeCompare(b.name));
-      setCommands(sorted);
-      setModules(settingsRes.modules);
+      setCommands(commandsRes);
+      setModules(modulesRes);
       setState("ready");
     })
     .catch(() => {

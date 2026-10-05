@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
-import { NavBar } from "./components/NavBar/NavBar";
-import { LocaleProvider } from "./i18n/LocaleContext";
-import { AccountPage } from "./pages/AccountPage";
-import { CommandsPage } from "./pages/CommandsPage";
-import { SettingsPage } from "./pages/SettingsPage";
-import { ThemeProvider } from "./theme/ThemeContext";
+import { NavBar } from "@/shared/ui/NavBar/NavBar";
+import { LocaleProvider } from "@/i18n";
+import { ThemeProvider } from "./providers/ThemeProvider";
+import { AccountPage } from "@/features/account/AccountPage";
+import { SettingsPage } from "@/features/settings/SettingsPage";
+import { CommandsPage } from "@/features/commands/CommandsPage";
 
 export function App() {
   return (

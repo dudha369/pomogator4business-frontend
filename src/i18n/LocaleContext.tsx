@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
-import { apiGet, apiPost } from "../api/client";
-import type { LocaleCode } from "./translations";
-import { TRANSLATIONS } from "./translations";
+import { apiGet, apiPost } from "@/shared/api/client";
+import { TRANSLATIONS } from "./merge";
+import type { LocaleCode } from "./types";
 
 interface LocaleContextValue {
   locale: LocaleCode;
@@ -26,17 +26,13 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     apiGet<{ locale: LocaleCode }>("/api/locale")
-      .then((data) => setLocaleState(data.locale))
-      .catch(() => {
-        // остаёмся на локали по умолчанию, если не в Telegram / нет initData
-      });
+    .then((data) => setLocaleState(data.locale))
+    .catch(() => {});
   }, []);
 
   const setLocale = useCallback((code: LocaleCode) => {
     setLocaleState(code);
-    apiPost("/api/locale", { locale: code }).catch(() => {
-      // откат не делаем: локальный выбор всё равно применяем к интерфейсу
-    });
+    apiPost("/api/locale", { locale: code }).catch(() => {});
   }, []);
 
   const t = useCallback(

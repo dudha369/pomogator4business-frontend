@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { useLocale } from "../../i18n/LocaleContext";
+import { useLocale } from "@/i18n/LocaleContext";
 import { haptic } from "../../telegram/haptics";
 
 import "./navbar.css";

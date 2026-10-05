@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { postEvent, requestEmojiStatusAccess } from "@tma.js/sdk-react";
 
-import { apiGet, apiPost } from "../api/client";
-import type { AccountResponse } from "../api/types";
-import { Section } from "../components/Section";
-import { Switch } from "../components/Switch";
-import { useLocale } from "../i18n/LocaleContext";
+import { Section } from "@/shared/ui/Section";
+import { Switch } from "@/shared/ui/Switch";
+import { useLocale } from "@/i18n";
+import { fetchAccount, toggleEmojiStatus as apiToggleEmojiStatus, updateTimezone } from "./api";
 import {
   TIMEZONE_OPTIONS,
   closestTimezoneOption,
@@ -13,7 +12,8 @@ import {
   markTimezoneAutoApplied,
   shouldAutoApplyTimezone,
   timezoneLabel,
-} from "../utils/timezone";
+} from "./timezone";
+import type { AccountResponse } from "./types";
 
 type LoadState = "loading" | "ready" | "error";
 
@@ -24,36 +24,9 @@ export function AccountPage() {
   const [requesting, setRequesting] = useState(false);
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
   const [savingTimezone, setSavingTimezone] = useState(false);
-  const [mirrorToken, setMirrorToken] = useState("");
-  const [connectingMirror, setConnectingMirror] = useState(false);
-  const [mirrorError, setMirrorError] = useState<string | null>(null);
-
-  async function handleMirrorConnect() {
-    if (!mirrorToken.trim()) return;
-    setConnectingMirror(true);
-    setMirrorError(null);
-    try {
-      const res = await apiPost<{ connected: boolean; username: string }>("/api/mirror/connect", {
-        token: mirrorToken.trim(),
-      });
-      setAccount((prev) =>
-        prev ? { ...prev, mirror: { connected: true, username: res.username } } : prev
-      );
-      setMirrorToken("");
-    } catch {
-      setMirrorError(t("account.mirrorConnectFailed"));
-    } finally {
-      setConnectingMirror(false);
-    }
-  }
-
-  async function handleMirrorDisconnect() {
-    await apiPost("/api/mirror/disconnect", {});
-    setAccount((prev) => (prev ? { ...prev, mirror: { connected: false, username: null } } : prev));
-  }
 
   function load() {
-    apiGet<AccountResponse>("/api/account")
+    fetchAccount()
     .then((data) => {
       setAccount(data);
       setState("ready");
@@ -62,29 +35,16 @@ export function AccountPage() {
     .catch(() => setState("error"));
   }
 
-  // Автоопределение часового пояса по браузеру — один раз на устройство.
-  // Если пользователь позже поправит пояс вручную через селектор ниже,
-  // это больше не перезатирается — ручной выбор имеет приоритет.
   function maybeAutoApplyTimezone(data: AccountResponse) {
     if (!shouldAutoApplyTimezone()) return;
-
     const detected = closestTimezoneOption(detectBrowserOffsetMinutes()).offsetMinutes;
     markTimezoneAutoApplied();
-
     if (detected === data.timezone_offset_minutes) return;
-
-    apiPost<{ offset_minutes: number }>("/api/account/timezone", {
-      offset_minutes: detected,
+    updateTimezone(detected)
+    .then((offset) => {
+      setAccount((prev) => (prev ? { ...prev, timezone_offset_minutes: offset } : prev));
     })
-    .then((res) => {
-      setAccount((prev) =>
-        prev ? { ...prev, timezone_offset_minutes: res.offset_minutes } : prev
-      );
-    })
-    .catch(() => {
-      // тихо игнорируем — у пользователя просто останется дефолтное
-      // значение с бэкенда (UTC+3), он всегда может поправить вручную
-    });
+    .catch(() => {});
   }
 
   useEffect(load, []);
@@ -98,7 +58,6 @@ export function AccountPage() {
         postEvent("web_app_data_send", {
           data: JSON.stringify({ emoji_status_access: true }),
         });
-        // Mini App закроется автоматически после postEvent — подтверждение придёт в чат с ботом.
       } else {
         setAccessMessage(t("account.accessDenied"));
       }
@@ -109,11 +68,11 @@ export function AccountPage() {
     }
   }
 
-  async function toggleEmojiStatus(enabled: boolean) {
+  async function handleToggleEmojiStatus(enabled: boolean) {
     if (!account) return;
     setAccount({ ...account, emoji_status: { ...account.emoji_status, enabled } });
     try {
-      await apiPost("/api/settings/emoji-status", { enabled });
+      await apiToggleEmojiStatus(enabled);
     } catch {
       setAccount((prev) =>
         prev ? { ...prev, emoji_status: { ...prev.emoji_status, enabled: !enabled } } : prev
@@ -127,11 +86,9 @@ export function AccountPage() {
     setAccount({ ...account, timezone_offset_minutes: offsetMinutes });
     setSavingTimezone(true);
     try {
-      await apiPost("/api/account/timezone", { offset_minutes: offsetMinutes });
+      await updateTimezone(offsetMinutes);
     } catch {
-      setAccount((prev) =>
-        prev ? { ...prev, timezone_offset_minutes: previous } : prev
-      );
+      setAccount((prev) => (prev ? { ...prev, timezone_offset_minutes: previous } : prev));
     } finally {
       setSavingTimezone(false);
     }
@@ -140,7 +97,6 @@ export function AccountPage() {
   if (state === "loading") {
     return <div className="page__status">{t("account.loading")}</div>;
   }
-
   if (state === "error" || !account) {
     return <div className="page__status page__status--error">{t("account.error")}</div>;
   }
@@ -169,7 +125,6 @@ export function AccountPage() {
               <span className="info-row__label">{t("account.prefix")}</span>
               <span className="info-row__value">{account.connection.prefix}</span>
             </div>
-
             {grantedRights.length > 0 ? (
               <div className="rights-list">
                 {grantedRights.map(([key]) => (
@@ -184,42 +139,6 @@ export function AccountPage() {
           </>
         ) : (
           <p className="section__hint">{t("account.notConnected")}</p>
-        )}
-      </Section>
-
-      <Section title={t("account.mirrorSection")}>
-        {account.mirror.connected ? (
-          <>
-            <div className="info-row">
-              <span className="info-row__label">{t("account.mirrorConnected")}</span>
-              <span className="info-row__value">@{account.mirror.username}</span>
-            </div>
-            <button className="prefix-editor__save" onClick={handleMirrorDisconnect} type="button">
-              {t("account.mirrorDisconnect")}
-            </button>
-          </>
-        ) : (
-          <>
-            <p className="section__hint">{t("account.mirrorOnboarding")}</p>
-            <div className="prefix-editor">
-              <input
-                className="prefix-editor__input"
-                style={{ width: "auto", flex: 1 }}
-                onChange={(e) => setMirrorToken(e.target.value)}
-                placeholder="123456:AAAA...xyz"
-                value={mirrorToken}
-              />
-              <button
-                className="prefix-editor__save"
-                disabled={connectingMirror || !mirrorToken.trim()}
-                onClick={handleMirrorConnect}
-                type="button"
-              >
-                {connectingMirror ? t("account.mirrorConnecting") : t("account.mirrorConnect")}
-              </button>
-            </div>
-            {mirrorError && <p className="prefix-editor__error">{mirrorError}</p>}
-          </>
         )}
       </Section>
 
@@ -241,15 +160,18 @@ export function AccountPage() {
 
       <Section title={t("account.emojiSection")}>
         {account.emoji_status.granted ? (
-          <div className="info-row">
-            <span className="info-row__label">{t("account.emojiEnabled")}</span>
-            <Switch checked={account.emoji_status.enabled} onChange={toggleEmojiStatus} />
-          </div>
+          <>
+            <div className="info-row">
+              <span className="info-row__label">{t("account.emojiEnabled")}</span>
+              <Switch checked={account.emoji_status.enabled} onChange={handleToggleEmojiStatus} />
+            </div>
+            <p className="section__hint">{t("account.emojiExample")}</p>
+            <p className="section__hint">{t("account.emojiDisableNote")}</p>
+          </>
         ) : (
           <>
             <p className="section__hint">{t("account.emojiHint")}</p>
             <p className="section__hint">{t("account.emojiExample")}</p>
-            <p className="section__hint">{t("account.emojiDisableNote")}</p>
             <button
               className="prefix-editor__save"
               disabled={requesting}

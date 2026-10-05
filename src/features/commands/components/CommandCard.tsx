@@ -1,4 +1,4 @@
-import type { Command } from "../api/types";
+import type { Command } from "../types";
 
 interface Props {
   command: Command;

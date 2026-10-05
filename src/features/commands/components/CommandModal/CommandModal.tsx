@@ -1,10 +1,10 @@
 import { useState } from "react";
 
-import { apiPost } from "../../api/client";
-import type { Command } from "../../api/types";
-import { useLocale } from "../../i18n/LocaleContext";
-import { BottomSheet } from "../BottomSheet/BottomSheet";
-import { Switch } from "../Switch";
+import { apiPost } from "@/shared/api/client";
+import { BottomSheet } from "@/shared/ui/BottomSheet/BottomSheet";
+import { Switch } from "@/shared/ui/Switch";
+import { useLocale } from "@/i18n";
+import type { Command } from "../../types";
 
 import "./commandmodal.css";
 
