@@ -11,6 +11,7 @@ import {
   updatePrefix,
 } from "./api";
 import type { MirrorStatus } from "./types";
+import { COLOR_SCHEMES, useColorScheme } from "@/app/providers/ColorSchemeProvider";
 
 type LoadState = "loading" | "ready" | "error";
 
@@ -26,6 +27,7 @@ export function SettingsPage() {
   const [mirrorToken, setMirrorToken] = useState("");
   const [connectingMirror, setConnectingMirror] = useState(false);
   const [mirrorError, setMirrorError] = useState<string | null>(null);
+  const { scheme, setScheme } = useColorScheme();
 
   useEffect(() => {
     let cancelled = false;
@@ -104,6 +106,21 @@ export function SettingsPage() {
             >
               {LANGUAGE_NAMES[code]}
             </button>
+          ))}
+        </div>
+      </Section>
+
+      <Section title={t("settings.colorSchemeSection")}>
+        <div className="color-scheme-row">
+          {COLOR_SCHEMES.map((option) => (
+            <button
+              aria-label={option.value}
+              className={`color-swatch ${scheme === option.value ? "color-swatch--active" : ""}`}
+              key={option.value}
+              onClick={() => setScheme(option.value)}
+              style={{ background: option.swatch }}
+              type="button"
+            />
           ))}
         </div>
       </Section>

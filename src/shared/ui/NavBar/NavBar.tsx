@@ -8,9 +8,10 @@ import {
 } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
-  ClipboardList,
-  Settings2,
-  UserRound,
+  Home,
+  Archive,
+  Blocks,
+  UserCircle2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -109,10 +110,10 @@ export function NavBar() {
   const navigate = useNavigate();
 
   const items: NavItem[] = [
-    { to: "/", label: t("nav.commands"), icon: ClipboardList, end: true },
-    { to: "/settings", label: t("nav.settings"), icon: Settings2 },
-    { to: "/account", label: t("nav.account"), icon: UserRound },
-    // Новая вкладка: { to: "/something", label: t("nav.something"), icon: SomeLucideIcon },
+    { to: "/", label: t("nav.home"), icon: Home, end: true },
+    { to: "/commands", label: t("nav.commands"), icon: Blocks },
+    { to: "/archive", label: t("nav.archive"), icon: Archive },
+    { to: "/account", label: t("nav.account"), icon: UserCircle2 },
   ];
   const n = items.length;
 

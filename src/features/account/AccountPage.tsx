@@ -35,11 +35,14 @@ export function AccountPage() {
     .catch(() => setState("error"));
   }
 
-  function maybeAutoApplyTimezone(data: AccountResponse) {
-    if (!shouldAutoApplyTimezone()) return;
+  async function maybeAutoApplyTimezone(data: AccountResponse) {
+    if (!(await shouldAutoApplyTimezone())) return;
+
     const detected = closestTimezoneOption(detectBrowserOffsetMinutes()).offsetMinutes;
-    markTimezoneAutoApplied();
+    await markTimezoneAutoApplied();
+
     if (detected === data.timezone_offset_minutes) return;
+
     updateTimezone(detected)
     .then((offset) => {
       setAccount((prev) => (prev ? { ...prev, timezone_offset_minutes: offset } : prev));

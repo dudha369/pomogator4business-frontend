@@ -16,6 +16,7 @@ export const RU = {
   "settings.mirrorConnecting": "Подключаю...",
   "settings.mirrorConnectFailed": "Не удалось подключиться с этим токеном. Проверьте и попробуйте снова.",
   "settings.mirrorDisconnect": "Отключить",
+  "settings.colorSchemeSection": "Цветовая схема",
 };
 
 export const EN = {
@@ -36,6 +37,7 @@ export const EN = {
   "settings.mirrorConnecting": "Connecting...",
   "settings.mirrorConnectFailed": "Couldn't connect with this token. Check it and try again.",
   "settings.mirrorDisconnect": "Disconnect",
+  "settings.colorSchemeSection": "Color scheme",
 };
 
 export const UK = {
@@ -56,4 +58,5 @@ export const UK = {
   "settings.mirrorConnecting": "Підключаю...",
   "settings.mirrorConnectFailed": "Не вдалося підключитися з цим токеном. Перевірте і спробуйте ще раз.",
   "settings.mirrorDisconnect": "Відключити",
+  "settings.colorSchemeSection": "Колірна схема",
 };

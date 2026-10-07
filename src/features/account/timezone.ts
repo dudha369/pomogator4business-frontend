@@ -1,4 +1,5 @@
 import type { LocaleCode } from "@/i18n";
+import { getStoredValue, setStoredValue } from "@/shared/telegram/storage";
 
 export interface TimezoneOption {
   offsetMinutes: number;
@@ -63,18 +64,11 @@ export function detectBrowserOffsetMinutes(): number {
 
 const STORAGE_KEY = "calora_tz_auto_applied";
 
-export function shouldAutoApplyTimezone(): boolean {
-  try {
-    return localStorage.getItem(STORAGE_KEY) !== "1";
-  } catch {
-    return false;
-  }
+export async function shouldAutoApplyTimezone(): Promise<boolean> {
+  const value = await getStoredValue(STORAGE_KEY);
+  return value !== "1";
 }
 
-export function markTimezoneAutoApplied(): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, "1");
-  } catch {
-    // ignore
-  }
+export async function markTimezoneAutoApplied(): Promise<void> {
+  await setStoredValue(STORAGE_KEY, "1");
 }

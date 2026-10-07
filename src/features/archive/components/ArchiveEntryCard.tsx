@@ -1,41 +1,36 @@
 import { useLocale } from "@/i18n";
+import { formatRelativeTime } from "@/shared/utils/relativeTime";
+import { useChatInfo } from "../hooks/useChatInfo";
 import type { ArchiveEntry } from "../types";
+import { ArchiveAvatar } from "./ArchiveAvatar";
 
 interface Props {
   entry: ArchiveEntry;
+  onOpen: () => void;
 }
 
-function formatTime(unixSeconds: number, locale: string): string {
-  return new Date(unixSeconds * 1000).toLocaleString(locale, {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-export function ArchiveEntryCard({ entry }: Props) {
+export function ArchiveEntryCard({ entry, onOpen }: Props) {
   const { t, locale } = useLocale();
+  const info = useChatInfo(entry.chat_id);
   const isDeleted = entry.event === "deleted";
+  const displayName = info?.full_name || t("archive.unknownSender");
 
   return (
-    <div className={`archive-entry ${isDeleted ? "archive-entry--deleted" : "archive-entry--edited"}`}>
-      <div className="archive-entry__header">
-        <span className="archive-entry__icon">{isDeleted ? "🗑" : "✏️"}</span>
-        <span className="archive-entry__label">
-          {isDeleted ? t("archive.eventDeleted") : t("archive.eventEdited")}
+    <button className="archive-entry" onClick={onOpen} type="button">
+      <ArchiveAvatar fallbackLabel={displayName} userId={entry.chat_id} />
+      <div className="archive-entry__body">
+        <div className="archive-entry__header">
+          <span className="archive-entry__name">{displayName}</span>
+          {info?.username && <span className="archive-entry__username">@{info.username}</span>}
+          <span className="archive-entry__icon">{isDeleted ? "🗑" : "✏️"}</span>
+        </div>
+        <p className="archive-entry__preview">
+          {(isDeleted ? entry.old_text : entry.new_text) || t("archive.mediaPlaceholder")}
+        </p>
+        <span className="archive-entry__time">
+          {formatRelativeTime(entry.created_at, locale)}
         </span>
-        <span className="archive-entry__time">{formatTime(entry.created_at, locale)}</span>
       </div>
-
-      {isDeleted ? (
-        <p className="archive-entry__text">{entry.old_text || t("archive.mediaPlaceholder")}</p>
-      ) : (
-        <>
-          <p className="archive-entry__text archive-entry__text--old">{entry.old_text}</p>
-          <p className="archive-entry__text archive-entry__text--new">{entry.new_text}</p>
-        </>
-      )}
-    </div>
+    </button>
   );
 }

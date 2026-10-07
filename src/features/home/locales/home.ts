@@ -1,0 +1,47 @@
+export const RU = {
+  "home.title": "Обзор",
+  "home.loading": "Загрузка...",
+  "home.error": "Не удалось загрузить сводку.",
+  "home.connected": "Бот подключён",
+  "home.notConnected": "Бот не подключён",
+  "home.notConnectedHint": "Подключите в Telegram: Настройки → Telegram Business → Чат-боты.",
+  "home.modulesEnabled": "Модулей включено",
+  "home.commandsTotal": "Всего команд",
+  "home.mirror": "Зеркало",
+  "home.emojiStatus": "Эмодзи-статус",
+  "home.recentDeleted": "Недавно удалено сообщение",
+  "home.recentEdited": "Недавно изменено сообщение",
+  "home.recentActivity": "Последняя активность",
+};
+
+export const EN = {
+  "home.title": "Overview",
+  "home.loading": "Loading...",
+  "home.error": "Couldn't load the summary.",
+  "home.connected": "Bot connected",
+  "home.notConnected": "Bot not connected",
+  "home.notConnectedHint": "Connect it in Telegram: Settings → Telegram Business → Chatbots.",
+  "home.modulesEnabled": "Modules enabled",
+  "home.commandsTotal": "Total commands",
+  "home.mirror": "Mirror",
+  "home.emojiStatus": "Emoji status",
+  "home.recentDeleted": "A message was recently deleted",
+  "home.recentEdited": "A message was recently edited",
+  "home.viewAllFromUser": "Весь архив этого человека",
+};
+
+export const UK = {
+  "home.title": "Огляд",
+  "home.loading": "Завантаження...",
+  "home.error": "Не вдалося завантажити зведення.",
+  "home.connected": "Бот підключений",
+  "home.notConnected": "Бот не підключений",
+  "home.notConnectedHint": "Підключіть у Telegram: Налаштування → Telegram Business → Чат-боти.",
+  "home.modulesEnabled": "Модулів увімкнено",
+  "home.commandsTotal": "Всього команд",
+  "home.mirror": "Дзеркало",
+  "home.emojiStatus": "Emoji-статус",
+  "home.recentDeleted": "Нещодавно видалено повідомлення",
+  "home.recentEdited": "Нещодавно змінено повідомлення",
+  "home.viewFullArchive": "Открыть весь архив",
+};

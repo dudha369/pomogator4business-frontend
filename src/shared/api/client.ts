@@ -1,8 +1,8 @@
 import { retrieveRawInitData } from "@tma.js/sdk-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
-function initDataHeader(): Record<string, string> {
+export function initDataHeader(): Record<string, string> {
   try {
     const raw = retrieveRawInitData();
     return raw ? { "X-Telegram-Init-Data": raw } : {};

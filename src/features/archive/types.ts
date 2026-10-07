@@ -15,3 +15,9 @@ export interface ArchivePage {
   has_more: boolean;
   next_before_id: number | null;
 }
+
+export interface ArchiveFilters {
+  event: ArchiveEventType | null;
+  search: string;
+  chatId: number | null;
+}
