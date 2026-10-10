@@ -1,5 +1,6 @@
 import { useLocale } from "@/i18n";
 import { useChatInfo } from "../hooks/useChatInfo";
+import { ArchiveDateSortBar } from "./ArchiveDateSortBar";
 import type { ArchiveEventType, ArchiveFilters as Filters } from "../types";
 
 interface Props {
@@ -48,6 +49,8 @@ export function ArchiveFiltersBar({ filters, onChange }: Props) {
         placeholder={t("archive.searchPlaceholder")}
         value={filters.search}
       />
+
+      <ArchiveDateSortBar filters={filters} onChange={onChange} />
     </div>
   );
 }

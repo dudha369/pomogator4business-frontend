@@ -3,6 +3,7 @@ import { formatRelativeTime } from "@/shared/utils/relativeTime";
 import { useChatInfo } from "../hooks/useChatInfo";
 import type { ArchiveEntry } from "../types";
 import { ArchiveAvatar } from "./ArchiveAvatar";
+import { MEDIA_ICONS } from "./ArchiveMedia";
 
 interface Props {
   entry: ArchiveEntry;
@@ -25,6 +26,7 @@ export function ArchiveEntryCard({ entry, onOpen }: Props) {
           <span className="archive-entry__icon">{isDeleted ? "🗑" : "✏️"}</span>
         </div>
         <p className="archive-entry__preview">
+          {entry.media_type && `${MEDIA_ICONS[entry.media_type]} `}
           {(isDeleted ? entry.old_text : entry.new_text) || t("archive.mediaPlaceholder")}
         </p>
         <span className="archive-entry__time">

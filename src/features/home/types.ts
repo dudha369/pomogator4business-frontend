@@ -9,5 +9,14 @@ export interface HomeSummary {
   modulesEnabled: number;
   modulesTotal: number;
   emojiStatusEnabled: boolean;
+  emojiStatusGranted: boolean;
+  stats: HomeStats | null;
   recentArchiveEntries: ArchiveEntry[];
+}
+
+export interface HomeStats {
+  todayTotal: number;
+  todayIncoming: number;
+  weekTotal: number;
+  weekIncoming: number;
 }

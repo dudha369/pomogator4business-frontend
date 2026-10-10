@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* Токены темы из index.css (--bg, --card-bg, ...) как цвета Tailwind:
+   bg-card, text-fg, text-hint, text-accent, border-line и т.д.
+   Значения не копируются, а ссылаются на CSS-переменные, поэтому
+   светлая/тёмная тема и цветовая схема подхватываются автоматически. */
+@theme inline {
+  --color-page: var(--bg);
+  --color-card: var(--card-bg);
+  --color-fg: var(--text);
+  --color-hint: var(--hint);
+  --color-accent: var(--accent);
+  --color-line: var(--border);
+}

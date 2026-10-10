@@ -9,6 +9,11 @@ export interface Command {
   owner_only: boolean;
 }
 
+export interface UserAlias {
+  alias: string;
+  command: string;
+}
+
 export interface ModuleState {
   name: string;
   enabled: boolean;

@@ -4,7 +4,9 @@ import { Link } from "react-router-dom";
 import { useLocale } from "@/i18n";
 import { fetchHomeSummary } from "./api";
 import type { HomeSummary } from "./types";
-import {RecentActivityItem} from "@/features/home/components/RecentActivityItem.tsx";
+import { HomeCounters } from "./components/HomeCounters";
+import { HomeQuickToggles } from "./components/HomeQuickToggles";
+import { RecentActivityItem } from "./components/RecentActivityItem";
 
 type LoadState = "loading" | "ready" | "error";
 
@@ -59,6 +61,14 @@ export function HomePage() {
           {!summary.connected && <p className="home-hero__hint">{t("home.notConnectedHint")}</p>}
         </div>
       </div>
+
+      {summary.stats && <HomeCounters stats={summary.stats} />}
+
+      <HomeQuickToggles
+        emojiStatusEnabled={summary.emojiStatusEnabled}
+        emojiStatusGranted={summary.emojiStatusGranted}
+        mirrorConnected={summary.mirrorConnected}
+      />
 
       <div className="home-stats">
         <div className="home-stat">

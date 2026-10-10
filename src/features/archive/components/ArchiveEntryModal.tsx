@@ -3,6 +3,7 @@ import { BottomSheet } from "@/shared/ui/BottomSheet/BottomSheet";
 import { useChatInfo } from "../hooks/useChatInfo";
 import type { ArchiveEntry } from "../types";
 import { ArchiveAvatar } from "./ArchiveAvatar";
+import { ArchiveMedia } from "./ArchiveMedia";
 
 interface Props {
   entry: ArchiveEntry | null;
@@ -33,6 +34,12 @@ export function ArchiveEntryModal({ entry, onClose }: Props) {
             {isDeleted ? t("archive.eventDeleted") : t("archive.eventEdited")} ·{" "}
             {new Date(entry.created_at * 1000).toLocaleString(locale)}
           </p>
+
+          {entry.media_type && (
+            <div className="my-3">
+              <ArchiveMedia logId={entry.log_id} mediaType={entry.media_type} />
+            </div>
+          )}
 
           {isDeleted ? (
             <p className="archive-modal__text">

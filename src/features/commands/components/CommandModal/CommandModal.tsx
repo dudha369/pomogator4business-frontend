@@ -4,7 +4,10 @@ import { apiPost } from "@/shared/api/client";
 import { BottomSheet } from "@/shared/ui/BottomSheet/BottomSheet";
 import { Switch } from "@/shared/ui/Switch";
 import { useLocale } from "@/i18n";
-import type { Command } from "../../types";
+import { ApiError } from "@/shared/api/client";
+import { createUserAlias, deleteUserAlias } from "../../api";
+import type { Command, UserAlias } from "../../types";
+import { UserAliasesSection } from "./UserAliasesSection";
 
 import "./commandmodal.css";
 
@@ -13,9 +16,18 @@ interface Props {
   moduleEnabled: boolean;
   onClose: () => void;
   onModuleToggle: (moduleName: string, enabled: boolean) => void;
+  userAliases: UserAlias[];
+  onUserAliasesChange: (aliases: UserAlias[]) => void;
 }
 
-export function CommandModal({ command, moduleEnabled, onClose, onModuleToggle }: Props) {
+export function CommandModal({
+  command,
+  moduleEnabled,
+  onClose,
+  onModuleToggle,
+  userAliases,
+  onUserAliasesChange,
+}: Props) {
   const { t } = useLocale();
   const [toggling, setToggling] = useState(false);
 
@@ -29,6 +41,31 @@ export function CommandModal({ command, moduleEnabled, onClose, onModuleToggle }
       onModuleToggle(command.module, !enabled);
     } finally {
       setToggling(false);
+    }
+  }
+
+  async function handleAddAlias(alias: string): Promise<string | null> {
+    if (!command) return null;
+    try {
+      const created = await createUserAlias(command.name, alias);
+      onUserAliasesChange([...userAliases, created]);
+      return null;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.status === 409) return "commandModal.aliasTaken";
+        if (error.status === 400) return "commandModal.aliasInvalid";
+      }
+      return "commandModal.aliasFailed";
+    }
+  }
+
+  async function handleRemoveAlias(alias: string) {
+    const previous = userAliases;
+    onUserAliasesChange(previous.filter((a) => a.alias !== alias));
+    try {
+      await deleteUserAlias(alias);
+    } catch {
+      onUserAliasesChange(previous);
     }
   }
 
@@ -69,6 +106,12 @@ export function CommandModal({ command, moduleEnabled, onClose, onModuleToggle }
               <code className="command-modal__usage">{command.usage}</code>
             </section>
           )}
+
+          <UserAliasesSection
+            aliases={userAliases.filter((a) => a.command === command.name)}
+            onAdd={handleAddAlias}
+            onRemove={handleRemoveAlias}
+          />
 
           {command.owner_only && (
             <p className="command-modal__hint">{t("commandModal.ownerOnly")}</p>

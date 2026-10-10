@@ -6,6 +6,7 @@ import { fetchArchivePage } from "./api";
 import { ArchiveEntryCard } from "./components/ArchiveEntryCard";
 import { ArchiveEntryModal } from "./components/ArchiveEntryModal";
 import { ArchiveFiltersBar } from "./components/ArchiveFilters";
+import { DEFAULT_ARCHIVE_FILTERS } from "./types";
 import type { ArchiveEntry, ArchiveFilters } from "./types";
 
 type LoadState = "loading" | "ready" | "error";
@@ -15,7 +16,7 @@ export function ArchivePage() {
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<ArchiveFilters>(() => {
     const chatId = searchParams.get("chat_id");
-    return { event: null, search: "", chatId: chatId ? Number(chatId) : null };
+    return { ...DEFAULT_ARCHIVE_FILTERS, chatId: chatId ? Number(chatId) : null };
   });
   const [entries, setEntries] = useState<ArchiveEntry[]>([]);
   const [state, setState] = useState<LoadState>("loading");

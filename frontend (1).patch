@@ -1,0 +1,1499 @@
+diff --git a/src/app/App.tsx b/src/app/App.tsx
+index 9aaa23f..e0ba8b7 100644
+--- a/src/app/App.tsx
++++ b/src/app/App.tsx
+@@ -7,6 +7,7 @@ import { ColorSchemeProvider } from "./providers/ColorSchemeProvider";
+ import { ThemeProvider } from "./providers/ThemeProvider";
+ import { AccountPage } from "@/features/account/AccountPage";
+ import { ArchivePage } from "@/features/archive/ArchivePage";
++import { ChatsPage } from "@/features/chats/ChatsPage";
+ import { CommandsPage } from "@/features/commands/CommandsPage";
+ import { HomePage } from "@/features/home/HomePage";
+ import { SettingsPage } from "@/features/settings/SettingsPage";
+@@ -24,6 +25,7 @@ export function App() {
+                   <Route element={<HomePage />} path="/" />
+                   <Route element={<CommandsPage />} path="/commands" />
+                   <Route element={<ArchivePage />} path="/archive" />
++                  <Route element={<ChatsPage />} path="/chats" />
+                   <Route element={<SettingsPage />} path="/settings" />
+                   <Route element={<AccountPage />} path="/account" />
+                 </Routes>
+diff --git a/src/features/archive/ArchivePage.tsx b/src/features/archive/ArchivePage.tsx
+index 662fb04..e6d1ddd 100644
+--- a/src/features/archive/ArchivePage.tsx
++++ b/src/features/archive/ArchivePage.tsx
+@@ -6,6 +6,7 @@ import { fetchArchivePage } from "./api";
+ import { ArchiveEntryCard } from "./components/ArchiveEntryCard";
+ import { ArchiveEntryModal } from "./components/ArchiveEntryModal";
+ import { ArchiveFiltersBar } from "./components/ArchiveFilters";
++import { DEFAULT_ARCHIVE_FILTERS } from "./types";
+ import type { ArchiveEntry, ArchiveFilters } from "./types";
+ 
+ type LoadState = "loading" | "ready" | "error";
+@@ -15,7 +16,7 @@ export function ArchivePage() {
+   const [searchParams] = useSearchParams();
+   const [filters, setFilters] = useState<ArchiveFilters>(() => {
+     const chatId = searchParams.get("chat_id");
+-    return { event: null, search: "", chatId: chatId ? Number(chatId) : null };
++    return { ...DEFAULT_ARCHIVE_FILTERS, chatId: chatId ? Number(chatId) : null };
+   });
+   const [entries, setEntries] = useState<ArchiveEntry[]>([]);
+   const [state, setState] = useState<LoadState>("loading");
+diff --git a/src/features/archive/api.ts b/src/features/archive/api.ts
+index 0fdab63..0f7d715 100644
+--- a/src/features/archive/api.ts
++++ b/src/features/archive/api.ts
+@@ -1,6 +1,16 @@
+ import { apiGet } from "@/shared/api/client";
+ import type { ArchiveFilters, ArchivePage } from "./types";
+ 
++/** "YYYY-MM-DD" → unix-время начала/конца этого дня в часовом поясе устройства. */
++function dayBoundary(value: string, endOfDay: boolean): number | null {
++  const [year, month, day] = value.split("-").map(Number);
++  if (!year || !month || !day) return null;
++  const date = endOfDay
++    ? new Date(year, month - 1, day, 23, 59, 59)
++    : new Date(year, month - 1, day, 0, 0, 0);
++  return Math.floor(date.getTime() / 1000);
++}
++
+ export async function fetchArchivePage(
+   filters: ArchiveFilters,
+   beforeId?: number,
+@@ -12,5 +22,10 @@ export async function fetchArchivePage(
+   if (filters.event) params.set("event", filters.event);
+   if (filters.search.trim()) params.set("search", filters.search.trim());
+   if (filters.chatId !== null) params.set("chat_id", String(filters.chatId));
++  const from = filters.dateFrom ? dayBoundary(filters.dateFrom, false) : null;
++  const to = filters.dateTo ? dayBoundary(filters.dateTo, true) : null;
++  if (from !== null) params.set("date_from", String(from));
++  if (to !== null) params.set("date_to", String(to));
++  params.set("sort", filters.sort);
+   return apiGet<ArchivePage>(`/api/archive?${params.toString()}`);
+ }
+diff --git a/src/features/archive/components/ArchiveDateSortBar.tsx b/src/features/archive/components/ArchiveDateSortBar.tsx
+new file mode 100644
+index 0000000..727f4d9
+--- /dev/null
++++ b/src/features/archive/components/ArchiveDateSortBar.tsx
+@@ -0,0 +1,65 @@
++import { useLocale } from "@/i18n";
++import type { ArchiveFilters } from "../types";
++
++interface Props {
++  filters: ArchiveFilters;
++  onChange: (filters: ArchiveFilters) => void;
++}
++
++const FIELD =
++  "min-w-0 flex-1 rounded-xl border border-line bg-card px-3 py-2 text-sm text-fg outline-none focus:border-accent";
++
++export function ArchiveDateSortBar({ filters, onChange }: Props) {
++  const { t } = useLocale();
++  const hasDates = filters.dateFrom !== "" || filters.dateTo !== "";
++
++  return (
++    <div className="mt-2 flex flex-col gap-2">
++      <div className="flex items-center gap-2">
++        <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-hint">
++          {t("archive.dateFrom")}
++          <input
++            className={FIELD}
++            max={filters.dateTo || undefined}
++            onChange={(e) => onChange({ ...filters, dateFrom: e.target.value })}
++            type="date"
++            value={filters.dateFrom}
++          />
++        </label>
++        <label className="flex min-w-0 flex-1 flex-col gap-1 text-xs text-hint">
++          {t("archive.dateTo")}
++          <input
++            className={FIELD}
++            min={filters.dateFrom || undefined}
++            onChange={(e) => onChange({ ...filters, dateTo: e.target.value })}
++            type="date"
++            value={filters.dateTo}
++          />
++        </label>
++      </div>
++
++      <div className="flex items-center justify-between gap-2">
++        <button
++          className="rounded-full border border-line bg-card px-3 py-1.5 text-sm text-fg active:opacity-70"
++          onClick={() =>
++            onChange({ ...filters, sort: filters.sort === "desc" ? "asc" : "desc" })
++          }
++          type="button"
++        >
++          {filters.sort === "desc" ? "↓ " : "↑ "}
++          {filters.sort === "desc" ? t("archive.sortNewest") : t("archive.sortOldest")}
++        </button>
++
++        {hasDates && (
++          <button
++            className="px-2 py-1.5 text-sm text-accent active:opacity-70"
++            onClick={() => onChange({ ...filters, dateFrom: "", dateTo: "" })}
++            type="button"
++          >
++            {t("archive.clearDates")}
++          </button>
++        )}
++      </div>
++    </div>
++  );
++}
+diff --git a/src/features/archive/components/ArchiveEntryCard.tsx b/src/features/archive/components/ArchiveEntryCard.tsx
+index e290fef..fd1db33 100644
+--- a/src/features/archive/components/ArchiveEntryCard.tsx
++++ b/src/features/archive/components/ArchiveEntryCard.tsx
+@@ -3,6 +3,7 @@ import { formatRelativeTime } from "@/shared/utils/relativeTime";
+ import { useChatInfo } from "../hooks/useChatInfo";
+ import type { ArchiveEntry } from "../types";
+ import { ArchiveAvatar } from "./ArchiveAvatar";
++import { MEDIA_ICONS } from "./ArchiveMedia";
+ 
+ interface Props {
+   entry: ArchiveEntry;
+@@ -25,6 +26,7 @@ export function ArchiveEntryCard({ entry, onOpen }: Props) {
+           <span className="archive-entry__icon">{isDeleted ? "🗑" : "✏️"}</span>
+         </div>
+         <p className="archive-entry__preview">
++          {entry.media_type && `${MEDIA_ICONS[entry.media_type]} `}
+           {(isDeleted ? entry.old_text : entry.new_text) || t("archive.mediaPlaceholder")}
+         </p>
+         <span className="archive-entry__time">
+diff --git a/src/features/archive/components/ArchiveEntryModal.tsx b/src/features/archive/components/ArchiveEntryModal.tsx
+index e4562f2..a1d614e 100644
+--- a/src/features/archive/components/ArchiveEntryModal.tsx
++++ b/src/features/archive/components/ArchiveEntryModal.tsx
+@@ -3,6 +3,7 @@ import { BottomSheet } from "@/shared/ui/BottomSheet/BottomSheet";
+ import { useChatInfo } from "../hooks/useChatInfo";
+ import type { ArchiveEntry } from "../types";
+ import { ArchiveAvatar } from "./ArchiveAvatar";
++import { ArchiveMedia } from "./ArchiveMedia";
+ 
+ interface Props {
+   entry: ArchiveEntry | null;
+@@ -34,6 +35,12 @@ export function ArchiveEntryModal({ entry, onClose }: Props) {
+             {new Date(entry.created_at * 1000).toLocaleString(locale)}
+           </p>
+ 
++          {entry.media_type && (
++            <div className="my-3">
++              <ArchiveMedia logId={entry.log_id} mediaType={entry.media_type} />
++            </div>
++          )}
++
+           {isDeleted ? (
+             <p className="archive-modal__text">
+               {entry.old_text || t("archive.mediaPlaceholder")}
+diff --git a/src/features/archive/components/ArchiveFilters.tsx b/src/features/archive/components/ArchiveFilters.tsx
+index 0607334..1b464d8 100644
+--- a/src/features/archive/components/ArchiveFilters.tsx
++++ b/src/features/archive/components/ArchiveFilters.tsx
+@@ -1,5 +1,6 @@
+ import { useLocale } from "@/i18n";
+ import { useChatInfo } from "../hooks/useChatInfo";
++import { ArchiveDateSortBar } from "./ArchiveDateSortBar";
+ import type { ArchiveEventType, ArchiveFilters as Filters } from "../types";
+ 
+ interface Props {
+@@ -48,6 +49,8 @@ export function ArchiveFiltersBar({ filters, onChange }: Props) {
+         placeholder={t("archive.searchPlaceholder")}
+         value={filters.search}
+       />
++
++      <ArchiveDateSortBar filters={filters} onChange={onChange} />
+     </div>
+   );
+ }
+diff --git a/src/features/archive/components/ArchiveMedia.tsx b/src/features/archive/components/ArchiveMedia.tsx
+new file mode 100644
+index 0000000..4dcd8b5
+--- /dev/null
++++ b/src/features/archive/components/ArchiveMedia.tsx
+@@ -0,0 +1,58 @@
++import { useLocale } from "@/i18n";
++import { useArchiveMedia } from "../hooks/useArchiveMedia";
++import type { ArchiveMediaType } from "../types";
++
++interface Props {
++  logId: number;
++  mediaType: ArchiveMediaType;
++}
++
++export function ArchiveMedia({ logId, mediaType }: Props) {
++  const { t } = useLocale();
++  const media = useArchiveMedia(logId);
++
++  if (media.status === "loading") {
++    return <div className="py-6 text-center text-sm text-hint">{t("archive.mediaLoading")}</div>;
++  }
++  if (media.status === "error") {
++    return <div className="py-6 text-center text-sm text-hint">{t("archive.mediaUnavailable")}</div>;
++  }
++
++  if (mediaType === "photo") {
++    return (
++      <img
++        alt=""
++        className="max-h-96 w-full rounded-2xl border border-line object-contain"
++        src={media.url}
++      />
++    );
++  }
++  if (mediaType === "voice") {
++    return <audio className="w-full" controls src={media.url} />;
++  }
++  if (mediaType === "video_note") {
++    return (
++      <video
++        className="mx-auto size-64 rounded-full border border-line object-cover"
++        controls
++        playsInline
++        src={media.url}
++      />
++    );
++  }
++  return (
++    <video
++      className="max-h-96 w-full rounded-2xl border border-line bg-black"
++      controls
++      playsInline
++      src={media.url}
++    />
++  );
++}
++
++export const MEDIA_ICONS: Record<ArchiveMediaType, string> = {
++  photo: "🖼",
++  video: "🎬",
++  voice: "🎤",
++  video_note: "⭕",
++};
+diff --git a/src/features/archive/hooks/useArchiveMedia.ts b/src/features/archive/hooks/useArchiveMedia.ts
+new file mode 100644
+index 0000000..1218d25
+--- /dev/null
++++ b/src/features/archive/hooks/useArchiveMedia.ts
+@@ -0,0 +1,43 @@
++import { useEffect, useState } from "react";
++
++import { apiGetBlob } from "@/shared/api/client";
++
++type MediaState =
++  | { status: "loading" }
++  | { status: "ready"; url: string }
++  | { status: "error" };
++
++const cache = new Map<number, string>();
++
++/** Медиа архива нельзя положить в <img src> напрямую — нужен заголовок
++ * авторизации, поэтому грузим байты через fetch и отдаём object URL. */
++export function useArchiveMedia(logId: number): MediaState {
++  const [state, setState] = useState<MediaState>(() => {
++    const cached = cache.get(logId);
++    return cached ? { status: "ready", url: cached } : { status: "loading" };
++  });
++
++  useEffect(() => {
++    const cached = cache.get(logId);
++    if (cached) {
++      setState({ status: "ready", url: cached });
++      return;
++    }
++    let cancelled = false;
++    setState({ status: "loading" });
++    apiGetBlob(`/api/archive/${logId}/media`)
++      .then((blob) => {
++        const url = URL.createObjectURL(blob);
++        cache.set(logId, url);
++        if (!cancelled) setState({ status: "ready", url });
++      })
++      .catch(() => {
++        if (!cancelled) setState({ status: "error" });
++      });
++    return () => {
++      cancelled = true;
++    };
++  }, [logId]);
++
++  return state;
++}
+diff --git a/src/features/archive/locales/archive.ts b/src/features/archive/locales/archive.ts
+index 03937ef..bbe479e 100644
+--- a/src/features/archive/locales/archive.ts
++++ b/src/features/archive/locales/archive.ts
+@@ -1,4 +1,11 @@
+ export const RU = {
++  "archive.dateFrom": "С даты",
++  "archive.dateTo": "По дату",
++  "archive.sortNewest": "Сначала новые",
++  "archive.sortOldest": "Сначала старые",
++  "archive.clearDates": "Сбросить даты",
++  "archive.mediaLoading": "Загружаю медиа...",
++  "archive.mediaUnavailable": "Медиа недоступно: файл не сохранился или удалён по сроку хранения.",
+   "archive.title": "Архив",
+   "archive.loading": "Загрузка...",
+   "archive.error": "Не удалось загрузить архив.",
+@@ -15,6 +22,13 @@ export const RU = {
+ };
+ 
+ export const EN = {
++  "archive.dateFrom": "From",
++  "archive.dateTo": "To",
++  "archive.sortNewest": "Newest first",
++  "archive.sortOldest": "Oldest first",
++  "archive.clearDates": "Clear dates",
++  "archive.mediaLoading": "Loading media...",
++  "archive.mediaUnavailable": "Media unavailable: the file wasn't saved or has expired.",
+   "archive.title": "Archive",
+   "archive.loading": "Loading...",
+   "archive.error": "Couldn't load the archive.",
+@@ -31,6 +45,13 @@ export const EN = {
+ };
+ 
+ export const UK = {
++  "archive.dateFrom": "З дати",
++  "archive.dateTo": "По дату",
++  "archive.sortNewest": "Спочатку нові",
++  "archive.sortOldest": "Спочатку старі",
++  "archive.clearDates": "Скинути дати",
++  "archive.mediaLoading": "Завантажую медіа...",
++  "archive.mediaUnavailable": "Медіа недоступне: файл не збережено або видалено за терміном зберігання.",
+   "archive.title": "Архів",
+   "archive.loading": "Завантаження...",
+   "archive.error": "Не вдалося завантажити архів.",
+diff --git a/src/features/archive/types.ts b/src/features/archive/types.ts
+index 920ecae..9b0ebab 100644
+--- a/src/features/archive/types.ts
++++ b/src/features/archive/types.ts
+@@ -1,5 +1,8 @@
+ export type ArchiveEventType = "edited" | "deleted";
+ 
++export type ArchiveMediaType = "photo" | "video" | "voice" | "video_note";
++export type ArchiveSort = "desc" | "asc";
++
+ export interface ArchiveEntry {
+   log_id: number;
+   chat_id: number;
+@@ -8,6 +11,7 @@ export interface ArchiveEntry {
+   old_text: string | null;
+   new_text: string | null;
+   created_at: number;
++  media_type: ArchiveMediaType | null;
+ }
+ 
+ export interface ArchivePage {
+@@ -20,4 +24,17 @@ export interface ArchiveFilters {
+   event: ArchiveEventType | null;
+   search: string;
+   chatId: number | null;
++  /** YYYY-MM-DD в локальном времени пользователя, "" — без ограничения */
++  dateFrom: string;
++  dateTo: string;
++  sort: ArchiveSort;
+ }
++
++export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
++  event: null,
++  search: "",
++  chatId: null,
++  dateFrom: "",
++  dateTo: "",
++  sort: "desc",
++};
+diff --git a/src/features/chats/ChatsPage.tsx b/src/features/chats/ChatsPage.tsx
+new file mode 100644
+index 0000000..9bb79c8
+--- /dev/null
++++ b/src/features/chats/ChatsPage.tsx
+@@ -0,0 +1,75 @@
++import { useEffect, useState } from "react";
++
++import { useLocale } from "@/i18n";
++import { fetchChats, setFavorite } from "./api";
++import { ChatRow } from "./components/ChatRow";
++import { ReadAllPanel } from "./components/ReadAllPanel";
++import type { ChatItem } from "./types";
++
++type LoadState = "loading" | "ready" | "error";
++
++export function ChatsPage() {
++  const { t } = useLocale();
++  const [chats, setChats] = useState<ChatItem[]>([]);
++  const [state, setState] = useState<LoadState>("loading");
++
++  useEffect(() => {
++    let cancelled = false;
++    fetchChats()
++      .then((items) => {
++        if (cancelled) return;
++        setChats(items);
++        setState("ready");
++      })
++      .catch(() => {
++        if (!cancelled) setState("error");
++      });
++    return () => {
++      cancelled = true;
++    };
++  }, []);
++
++  async function handleToggleFavorite(chat: ChatItem) {
++    const next = !chat.favorite;
++    const apply = (value: boolean) =>
++      setChats((prev) =>
++        prev.map((c) => (c.chat_id === chat.chat_id ? { ...c, favorite: value } : c))
++      );
++    apply(next);
++    try {
++      await setFavorite(chat.chat_id, next);
++    } catch {
++      apply(!next);
++    }
++  }
++
++  // избранные сверху, внутри групп порядок «свежие сверху» сохраняется
++  const sorted = [...chats].sort((a, b) => Number(b.favorite) - Number(a.favorite));
++
++  return (
++    <div className="page">
++      <header className="page__header">
++        <h1>{t("chats.title")}</h1>
++        {state === "ready" && <span className="page__count">{chats.length}</span>}
++      </header>
++
++      <ReadAllPanel />
++
++      {state === "loading" && <div className="page__status">{t("chats.loading")}</div>}
++      {state === "error" && (
++        <div className="page__status page__status--error">{t("chats.error")}</div>
++      )}
++      {state === "ready" && chats.length === 0 && (
++        <div className="page__status">{t("chats.empty")}</div>
++      )}
++
++      {state === "ready" && chats.length > 0 && (
++        <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
++          {sorted.map((chat) => (
++            <ChatRow chat={chat} key={chat.chat_id} onToggleFavorite={handleToggleFavorite} />
++          ))}
++        </div>
++      )}
++    </div>
++  );
++}
+diff --git a/src/features/chats/api.ts b/src/features/chats/api.ts
+new file mode 100644
+index 0000000..1b3873e
+--- /dev/null
++++ b/src/features/chats/api.ts
+@@ -0,0 +1,15 @@
++import { apiGet, apiPost } from "@/shared/api/client";
++import type { ChatItem, ReadAllRequest, ReadAllResult } from "./types";
++
++export async function fetchChats(): Promise<ChatItem[]> {
++  const res = await apiGet<{ chats: ChatItem[] }>("/api/chats");
++  return res.chats;
++}
++
++export async function setFavorite(chatId: number, favorite: boolean): Promise<void> {
++  await apiPost("/api/favorites", { chat_id: chatId, favorite });
++}
++
++export function readAll(request: ReadAllRequest): Promise<ReadAllResult> {
++  return apiPost<ReadAllResult>("/api/readall", request);
++}
+diff --git a/src/features/chats/components/ChatRow.tsx b/src/features/chats/components/ChatRow.tsx
+new file mode 100644
+index 0000000..49ebb63
+--- /dev/null
++++ b/src/features/chats/components/ChatRow.tsx
+@@ -0,0 +1,46 @@
++import { Star } from "lucide-react";
++
++import { ArchiveAvatar } from "@/features/archive/components/ArchiveAvatar";
++import { useChatInfo } from "@/features/archive/hooks/useChatInfo";
++import { useLocale } from "@/i18n";
++import { formatRelativeTime } from "@/shared/utils/relativeTime";
++import type { ChatItem } from "../types";
++
++interface Props {
++  chat: ChatItem;
++  onToggleFavorite: (chat: ChatItem) => void;
++}
++
++export function ChatRow({ chat, onToggleFavorite }: Props) {
++  const { t, locale } = useLocale();
++  const info = useChatInfo(chat.chat_id);
++  const name = info?.full_name || t("archive.unknownSender");
++
++  return (
++    <div className="flex items-center gap-3 px-4 py-3">
++      <ArchiveAvatar fallbackLabel={name} userId={chat.chat_id} />
++      <div className="flex min-w-0 flex-1 flex-col">
++        <span className="truncate text-fg">{name}</span>
++        <span className="truncate text-xs text-hint">
++          {info?.username ? `@${info.username} · ` : ""}
++          {chat.last_incoming_at !== null
++            ? t("chats.lastIncoming", { time: formatRelativeTime(chat.last_incoming_at, locale) })
++            : t("chats.noIncoming")}
++        </span>
++      </div>
++      <button
++        aria-label={chat.favorite ? t("chats.favoriteRemove") : t("chats.favoriteAdd")}
++        aria-pressed={chat.favorite}
++        className="flex size-10 items-center justify-center rounded-full active:opacity-60"
++        onClick={() => onToggleFavorite(chat)}
++        type="button"
++      >
++        <Star
++          className={chat.favorite ? "text-accent" : "text-hint"}
++          fill={chat.favorite ? "currentColor" : "none"}
++          size={22}
++        />
++      </button>
++    </div>
++  );
++}
+diff --git a/src/features/chats/components/ReadAllPanel.tsx b/src/features/chats/components/ReadAllPanel.tsx
+new file mode 100644
+index 0000000..af5d7ee
+--- /dev/null
++++ b/src/features/chats/components/ReadAllPanel.tsx
+@@ -0,0 +1,149 @@
++import { useEffect, useState } from "react";
++
++import { useLocale } from "@/i18n";
++import { Switch } from "@/shared/ui/Switch";
++import { readAll } from "../api";
++import type { ReadAllRequest, ReadAllResult, ReadMode, ReadUnit } from "../types";
++
++const MODES: ReadMode[] = ["all", "last", "older"];
++
++const FIELD =
++  "w-20 rounded-xl border border-line bg-page px-3 py-2 text-fg outline-none focus:border-accent";
++
++function buildRequest(
++  mode: ReadMode,
++  amount: number,
++  unit: ReadUnit,
++  excludeFavorites: boolean
++): ReadAllRequest {
++  const hours = Math.max(1, Math.floor(amount)) * (unit === "d" ? 24 : 1);
++  return {
++    last_hours: mode === "last" ? hours : undefined,
++    older_hours: mode === "older" ? hours : undefined,
++    exclude_favorites: excludeFavorites,
++  };
++}
++
++export function ReadAllPanel() {
++  const { t } = useLocale();
++  const [mode, setMode] = useState<ReadMode>("all");
++  const [amount, setAmount] = useState(6);
++  const [unit, setUnit] = useState<ReadUnit>("h");
++  const [excludeFavorites, setExcludeFavorites] = useState(false);
++  const [matched, setMatched] = useState<number | null>(null);
++  const [running, setRunning] = useState(false);
++  const [result, setResult] = useState<ReadAllResult | "error" | null>(null);
++
++  const amountValid = mode === "all" || (Number.isFinite(amount) && amount >= 1);
++
++  // Предпросмотр: сколько чатов подойдёт под фильтр (с дебаунсом)
++  useEffect(() => {
++    if (!amountValid) {
++      setMatched(null);
++      return;
++    }
++    let cancelled = false;
++    const timer = setTimeout(() => {
++      readAll({ ...buildRequest(mode, amount, unit, excludeFavorites), dry_run: true })
++        .then((res) => {
++          if (!cancelled) setMatched(res.matched);
++        })
++        .catch(() => {
++          if (!cancelled) setMatched(null);
++        });
++    }, 300);
++    return () => {
++      cancelled = true;
++      clearTimeout(timer);
++    };
++  }, [mode, amount, unit, excludeFavorites, amountValid]);
++
++  async function run() {
++    setRunning(true);
++    setResult(null);
++    try {
++      setResult(await readAll(buildRequest(mode, amount, unit, excludeFavorites)));
++    } catch {
++      setResult("error");
++    } finally {
++      setRunning(false);
++    }
++  }
++
++  function resultText(): string | null {
++    if (result === null) return null;
++    if (result === "error" || (result.matched > 0 && result.done === 0)) {
++      return t("chats.resultFail");
++    }
++    if (result.matched === 0) return t("chats.resultNothing");
++    if (result.failed > 0) {
++      return t("chats.resultPartial", { done: result.done, total: result.matched });
++    }
++    return t("chats.resultOk", { done: result.done });
++  }
++
++  const message = resultText();
++
++  return (
++    <section className="mb-5 rounded-2xl border border-line bg-card p-4">
++      <h2 className="mb-3 text-base font-semibold text-fg">{t("chats.readTitle")}</h2>
++
++      <div className="mb-3 flex gap-2">
++        {MODES.map((m) => (
++          <button
++            className={`flex-1 rounded-full border px-3 py-1.5 text-sm ${
++              mode === m ? "border-accent bg-accent text-white" : "border-line text-fg"
++            }`}
++            key={m}
++            onClick={() => setMode(m)}
++            type="button"
++          >
++            {t(`chats.mode.${m}`)}
++          </button>
++        ))}
++      </div>
++
++      {mode !== "all" && (
++        <div className="mb-3 flex items-center gap-2">
++          <input
++            className={FIELD}
++            inputMode="numeric"
++            min={1}
++            onChange={(e) => setAmount(Number(e.target.value))}
++            type="number"
++            value={Number.isFinite(amount) ? amount : ""}
++          />
++          <select
++            className="rounded-xl border border-line bg-page px-3 py-2 text-fg outline-none focus:border-accent"
++            onChange={(e) => setUnit(e.target.value as ReadUnit)}
++            value={unit}
++          >
++            <option value="h">{t("chats.unitHours")}</option>
++            <option value="d">{t("chats.unitDays")}</option>
++          </select>
++        </div>
++      )}
++
++      <div className="mb-3 flex items-center justify-between gap-3">
++        <span className="text-fg">{t("chats.excludeFavorites")}</span>
++        <Switch checked={excludeFavorites} onChange={setExcludeFavorites} />
++      </div>
++
++      <p className="mb-3 text-sm text-hint">
++        {matched === null ? "…" : t("chats.matched", { count: matched })}
++      </p>
++
++      <button
++        className="w-full rounded-xl bg-accent px-4 py-3 font-medium text-white disabled:opacity-40"
++        disabled={running || !amountValid || matched === 0}
++        onClick={run}
++        type="button"
++      >
++        {running ? t("chats.reading") : t("chats.readButton")}
++      </button>
++
++      {message && <p className="mt-3 text-sm text-fg">{message}</p>}
++      <p className="mt-3 text-xs text-hint">{t("chats.hint")}</p>
++    </section>
++  );
++}
+diff --git a/src/features/chats/locales/chats.ts b/src/features/chats/locales/chats.ts
+new file mode 100644
+index 0000000..c38eeb2
+--- /dev/null
++++ b/src/features/chats/locales/chats.ts
+@@ -0,0 +1,77 @@
++export const RU = {
++  "chats.title": "Чаты",
++  "chats.loading": "Загрузка...",
++  "chats.error": "Не удалось загрузить чаты.",
++  "chats.empty": "Пока нет чатов: бот видит только те, где были сообщения после подключения.",
++  "chats.readTitle": "Прочитать чаты",
++  "chats.mode.all": "Все",
++  "chats.mode.last": "За последние",
++  "chats.mode.older": "Старше",
++  "chats.unitHours": "часов",
++  "chats.unitDays": "дней",
++  "chats.excludeFavorites": "Кроме избранных",
++  "chats.matched": "Подходит чатов: {count}",
++  "chats.readButton": "Прочитать",
++  "chats.reading": "Читаю...",
++  "chats.resultOk": "Прочитано чатов: {done}.",
++  "chats.resultPartial": "Прочитано {done} из {total} чатов. Остальные Telegram не принял.",
++  "chats.resultNothing": "Нет чатов, подходящих под фильтр.",
++  "chats.resultFail": "Не удалось прочитать чаты. Проверьте, что у бота есть право читать сообщения.",
++  "chats.hint": "Бот знает только чаты, где видел входящие сообщения после подключения. «Старше» и «За последние» считаются от последнего входящего сообщения.",
++  "chats.lastIncoming": "входящее {time}",
++  "chats.noIncoming": "нет входящих",
++  "chats.favoriteAdd": "В избранное",
++  "chats.favoriteRemove": "Убрать из избранного",
++};
++
++export const EN = {
++  "chats.title": "Chats",
++  "chats.loading": "Loading...",
++  "chats.error": "Couldn't load chats.",
++  "chats.empty": "No chats yet: the bot only sees chats with messages since it was connected.",
++  "chats.readTitle": "Mark chats as read",
++  "chats.mode.all": "All",
++  "chats.mode.last": "Within last",
++  "chats.mode.older": "Older than",
++  "chats.unitHours": "hours",
++  "chats.unitDays": "days",
++  "chats.excludeFavorites": "Except favorites",
++  "chats.matched": "Matching chats: {count}",
++  "chats.readButton": "Mark as read",
++  "chats.reading": "Marking...",
++  "chats.resultOk": "Chats marked as read: {done}.",
++  "chats.resultPartial": "Marked {done} of {total} chats as read. Telegram rejected the rest.",
++  "chats.resultNothing": "No chats match the filter.",
++  "chats.resultFail": "Couldn't mark chats as read. Check that the bot has the right to read messages.",
++  "chats.hint": "The bot only knows chats where it has seen incoming messages since connecting. \"Older than\" and \"Within last\" are measured from the last incoming message.",
++  "chats.lastIncoming": "incoming {time}",
++  "chats.noIncoming": "no incoming",
++  "chats.favoriteAdd": "Add to favorites",
++  "chats.favoriteRemove": "Remove from favorites",
++};
++
++export const UK = {
++  "chats.title": "Чати",
++  "chats.loading": "Завантаження...",
++  "chats.error": "Не вдалося завантажити чати.",
++  "chats.empty": "Поки немає чатів: бот бачить лише ті, де були повідомлення після підключення.",
++  "chats.readTitle": "Прочитати чати",
++  "chats.mode.all": "Усі",
++  "chats.mode.last": "За останні",
++  "chats.mode.older": "Старші за",
++  "chats.unitHours": "годин",
++  "chats.unitDays": "днів",
++  "chats.excludeFavorites": "Крім обраних",
++  "chats.matched": "Підходить чатів: {count}",
++  "chats.readButton": "Прочитати",
++  "chats.reading": "Читаю...",
++  "chats.resultOk": "Прочитано чатів: {done}.",
++  "chats.resultPartial": "Прочитано {done} із {total} чатів. Решту Telegram не прийняв.",
++  "chats.resultNothing": "Немає чатів, що підходять під фільтр.",
++  "chats.resultFail": "Не вдалося прочитати чати. Перевірте, що бот має право читати повідомлення.",
++  "chats.hint": "Бот знає лише чати, де бачив вхідні повідомлення після підключення. «Старші за» та «За останні» рахуються від останнього вхідного повідомлення.",
++  "chats.lastIncoming": "вхідне {time}",
++  "chats.noIncoming": "немає вхідних",
++  "chats.favoriteAdd": "В обране",
++  "chats.favoriteRemove": "Прибрати з обраного",
++};
+diff --git a/src/features/chats/types.ts b/src/features/chats/types.ts
+new file mode 100644
+index 0000000..7f263cf
+--- /dev/null
++++ b/src/features/chats/types.ts
+@@ -0,0 +1,22 @@
++export interface ChatItem {
++  chat_id: number;
++  last_at: number;
++  last_incoming_at: number | null;
++  favorite: boolean;
++}
++
++export type ReadMode = "all" | "last" | "older";
++export type ReadUnit = "h" | "d";
++
++export interface ReadAllRequest {
++  last_hours?: number;
++  older_hours?: number;
++  exclude_favorites: boolean;
++  dry_run?: boolean;
++}
++
++export interface ReadAllResult {
++  matched: number;
++  done: number;
++  failed: number;
++}
+diff --git a/src/features/commands/CommandsPage.tsx b/src/features/commands/CommandsPage.tsx
+index b4fbd31..15f8dc2 100644
+--- a/src/features/commands/CommandsPage.tsx
++++ b/src/features/commands/CommandsPage.tsx
+@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
+ import { useLocale } from "@/i18n";
+ import { CommandCard } from "./components/CommandCard";
+ import { CommandModal } from "./components/CommandModal/CommandModal";
+-import { fetchCommands, fetchModuleStates } from "./api";
+-import type { Command, ModuleState } from "./types";
++import { fetchCommands, fetchModuleStates, fetchUserAliases } from "./api";
++import type { Command, ModuleState, UserAlias } from "./types";
+ 
+ type LoadState = "loading" | "ready" | "error";
+ 
+@@ -14,6 +14,7 @@ export function CommandsPage() {
+   const [modules, setModules] = useState<ModuleState[]>([]);
+   const [state, setState] = useState<LoadState>("loading");
+   const [selected, setSelected] = useState<Command | null>(null);
++  const [userAliases, setUserAliases] = useState<UserAlias[]>([]);
+ 
+   useEffect(() => {
+     let cancelled = false;
+@@ -30,6 +31,13 @@ export function CommandsPage() {
+       if (!cancelled) setState("error");
+     });
+ 
++    // алиасы — необязательная часть: если запрос упал, список просто пуст
++    fetchUserAliases()
++    .then((aliases) => {
++      if (!cancelled) setUserAliases(aliases);
++    })
++    .catch(() => {});
++
+     return () => {
+       cancelled = true;
+     };
+@@ -73,6 +81,8 @@ export function CommandsPage() {
+         moduleEnabled={selected ? isModuleEnabled(selected.module) : true}
+         onClose={() => setSelected(null)}
+         onModuleToggle={handleModuleToggle}
++        onUserAliasesChange={setUserAliases}
++        userAliases={userAliases}
+       />
+     </div>
+   );
+diff --git a/src/features/commands/api.ts b/src/features/commands/api.ts
+index 8d0afa5..cbb0881 100644
+--- a/src/features/commands/api.ts
++++ b/src/features/commands/api.ts
+@@ -1,5 +1,5 @@
+-import { apiGet } from "@/shared/api/client";
+-import type { Command, ModuleState } from "./types";
++import { apiDelete, apiGet, apiPost } from "@/shared/api/client";
++import type { Command, ModuleState, UserAlias } from "./types";
+ 
+ export async function fetchCommands(locale: string): Promise<Command[]> {
+   const res = await apiGet<{ commands: Command[] }>(`/api/commands?locale=${locale}`);
+@@ -9,4 +9,17 @@ export async function fetchCommands(locale: string): Promise<Command[]> {
+ export async function fetchModuleStates(): Promise<ModuleState[]> {
+   const res = await apiGet<{ prefix: string; modules: ModuleState[] }>("/api/settings");
+   return res.modules;
+-}
+\ No newline at end of file
++}
++
++export async function fetchUserAliases(): Promise<UserAlias[]> {
++  const res = await apiGet<{ aliases: UserAlias[] }>("/api/aliases");
++  return res.aliases;
++}
++
++export async function createUserAlias(command: string, alias: string): Promise<UserAlias> {
++  return apiPost<UserAlias>("/api/aliases", { command, alias });
++}
++
++export async function deleteUserAlias(alias: string): Promise<void> {
++  await apiDelete(`/api/aliases/${encodeURIComponent(alias)}`);
++}
+diff --git a/src/features/commands/components/CommandModal/CommandModal.tsx b/src/features/commands/components/CommandModal/CommandModal.tsx
+index 259f464..7f41e6b 100644
+--- a/src/features/commands/components/CommandModal/CommandModal.tsx
++++ b/src/features/commands/components/CommandModal/CommandModal.tsx
+@@ -4,7 +4,10 @@ import { apiPost } from "@/shared/api/client";
+ import { BottomSheet } from "@/shared/ui/BottomSheet/BottomSheet";
+ import { Switch } from "@/shared/ui/Switch";
+ import { useLocale } from "@/i18n";
+-import type { Command } from "../../types";
++import { ApiError } from "@/shared/api/client";
++import { createUserAlias, deleteUserAlias } from "../../api";
++import type { Command, UserAlias } from "../../types";
++import { UserAliasesSection } from "./UserAliasesSection";
+ 
+ import "./commandmodal.css";
+ 
+@@ -13,9 +16,18 @@ interface Props {
+   moduleEnabled: boolean;
+   onClose: () => void;
+   onModuleToggle: (moduleName: string, enabled: boolean) => void;
++  userAliases: UserAlias[];
++  onUserAliasesChange: (aliases: UserAlias[]) => void;
+ }
+ 
+-export function CommandModal({ command, moduleEnabled, onClose, onModuleToggle }: Props) {
++export function CommandModal({
++  command,
++  moduleEnabled,
++  onClose,
++  onModuleToggle,
++  userAliases,
++  onUserAliasesChange,
++}: Props) {
+   const { t } = useLocale();
+   const [toggling, setToggling] = useState(false);
+ 
+@@ -32,6 +44,31 @@ export function CommandModal({ command, moduleEnabled, onClose, onModuleToggle }
+     }
+   }
+ 
++  async function handleAddAlias(alias: string): Promise<string | null> {
++    if (!command) return null;
++    try {
++      const created = await createUserAlias(command.name, alias);
++      onUserAliasesChange([...userAliases, created]);
++      return null;
++    } catch (error) {
++      if (error instanceof ApiError) {
++        if (error.status === 409) return "commandModal.aliasTaken";
++        if (error.status === 400) return "commandModal.aliasInvalid";
++      }
++      return "commandModal.aliasFailed";
++    }
++  }
++
++  async function handleRemoveAlias(alias: string) {
++    const previous = userAliases;
++    onUserAliasesChange(previous.filter((a) => a.alias !== alias));
++    try {
++      await deleteUserAlias(alias);
++    } catch {
++      onUserAliasesChange(previous);
++    }
++  }
++
+   return (
+     <BottomSheet open={command !== null} onClose={onClose}>
+       {command && (
+@@ -70,6 +107,20 @@ export function CommandModal({ command, moduleEnabled, onClose, onModuleToggle }
+             </section>
+           )}
+ 
++          {command.scope !== "chat" && (
++            <p className="mt-4 rounded-xl border border-line bg-card px-3 py-2 text-sm text-fg">
++              {command.scope === "bot"
++                ? t("commandModal.dmOnly", { name: command.name })
++                : t("commandModal.dmToo", { name: command.name })}
++            </p>
++          )}
++
++          <UserAliasesSection
++            aliases={userAliases.filter((a) => a.command === command.name)}
++            onAdd={handleAddAlias}
++            onRemove={handleRemoveAlias}
++          />
++
+           {command.owner_only && (
+             <p className="command-modal__hint">{t("commandModal.ownerOnly")}</p>
+           )}
+diff --git a/src/features/commands/components/CommandModal/UserAliasesSection.tsx b/src/features/commands/components/CommandModal/UserAliasesSection.tsx
+new file mode 100644
+index 0000000..7b088e8
+--- /dev/null
++++ b/src/features/commands/components/CommandModal/UserAliasesSection.tsx
+@@ -0,0 +1,82 @@
++import { useState } from "react";
++
++import { useLocale } from "@/i18n";
++import type { UserAlias } from "../../types";
++
++interface Props {
++  aliases: UserAlias[];
++  /** Возвращает ключ перевода ошибки или null, если алиас добавлен. */
++  onAdd: (alias: string) => Promise<string | null>;
++  onRemove: (alias: string) => void;
++}
++
++export function UserAliasesSection({ aliases, onAdd, onRemove }: Props) {
++  const { t } = useLocale();
++  const [value, setValue] = useState("");
++  const [errorKey, setErrorKey] = useState<string | null>(null);
++  const [busy, setBusy] = useState(false);
++
++  async function submit() {
++    const alias = value.trim();
++    if (!alias || busy) return;
++    setBusy(true);
++    const error = await onAdd(alias);
++    setBusy(false);
++    setErrorKey(error);
++    if (!error) setValue("");
++  }
++
++  return (
++    <section className="mt-5">
++      <h3 className="mb-2 text-sm font-semibold text-hint">{t("commandModal.myAliases")}</h3>
++
++      {aliases.length > 0 && (
++        <div className="mb-3 flex flex-wrap gap-2">
++          {aliases.map((item) => (
++            <span
++              className="inline-flex items-center gap-1.5 rounded-full border border-line bg-card py-1 pl-3 pr-2 text-sm text-fg"
++              key={item.alias}
++            >
++              .{item.alias}
++              <button
++                aria-label={t("commandModal.aliasRemove")}
++                className="flex size-5 items-center justify-center rounded-full text-hint active:opacity-60"
++                onClick={() => onRemove(item.alias)}
++                type="button"
++              >
++                ✕
++              </button>
++            </span>
++          ))}
++        </div>
++      )}
++
++      <div className="flex gap-2">
++        <input
++          className="min-w-0 flex-1 rounded-xl border border-line bg-card px-3 py-2 text-fg outline-none focus:border-accent"
++          maxLength={32}
++          onChange={(e) => {
++            setValue(e.target.value);
++            setErrorKey(null);
++          }}
++          onKeyDown={(e) => {
++            if (e.key === "Enter") submit();
++          }}
++          placeholder={t("commandModal.aliasPlaceholder")}
++          value={value}
++        />
++        <button
++          className="rounded-xl bg-accent px-4 py-2 font-medium text-white disabled:opacity-40"
++          disabled={busy || value.trim() === ""}
++          onClick={submit}
++          type="button"
++        >
++          {t("commandModal.aliasAdd")}
++        </button>
++      </div>
++
++      {errorKey && <p className="mt-2 text-sm text-red-500">{t(errorKey)}</p>}
++      <p className="mt-2 text-xs text-hint">{t("commandModal.aliasHint")}</p>
++    </section>
++  );
++}
+diff --git a/src/features/commands/locales/commands.ts b/src/features/commands/locales/commands.ts
+index 5ffabe9..d499b92 100644
+--- a/src/features/commands/locales/commands.ts
++++ b/src/features/commands/locales/commands.ts
+@@ -1,4 +1,14 @@
+ export const RU = {
++  "commandModal.dmOnly": "Работает только в личке с ботом: /{name} или .{name}.",
++  "commandModal.dmToo": "Работает и в личке с ботом: /{name} или .{name}.",
++  "commandModal.myAliases": "Мои алиасы",
++  "commandModal.aliasPlaceholder": "Например, п",
++  "commandModal.aliasAdd": "Добавить",
++  "commandModal.aliasRemove": "Удалить алиас",
++  "commandModal.aliasHint": "Работает как встроенные: префикс + алиас. До 30 алиасов, без пробелов.",
++  "commandModal.aliasTaken": "Такой алиас уже занят — другой командой или вами.",
++  "commandModal.aliasInvalid": "Алиас: от 1 до 32 символов без пробелов, или достигнут лимит.",
++  "commandModal.aliasFailed": "Не удалось сохранить алиас. Попробуйте позже.",
+   "commands.title": "Команды",
+   "commands.loading": "Загрузка...",
+   "commands.error": "Не удалось загрузить список команд. Проверьте подключение к серверу.",
+@@ -9,6 +19,16 @@ export const RU = {
+ };
+ 
+ export const EN = {
++  "commandModal.dmOnly": "Only works in the bot DM: /{name} or .{name}.",
++  "commandModal.dmToo": "Also works in the bot DM: /{name} or .{name}.",
++  "commandModal.myAliases": "My aliases",
++  "commandModal.aliasPlaceholder": "For example, p",
++  "commandModal.aliasAdd": "Add",
++  "commandModal.aliasRemove": "Remove alias",
++  "commandModal.aliasHint": "Works like the built-in ones: prefix + alias. Up to 30 aliases, no spaces.",
++  "commandModal.aliasTaken": "This alias is already taken — by another command or by you.",
++  "commandModal.aliasInvalid": "Alias: 1 to 32 characters without spaces, or the limit is reached.",
++  "commandModal.aliasFailed": "Couldn't save the alias. Try again later.",
+   "commands.title": "Commands",
+   "commands.loading": "Loading...",
+   "commands.error": "Couldn't load the command list. Check your connection to the server.",
+@@ -19,6 +39,16 @@ export const EN = {
+ };
+ 
+ export const UK = {
++  "commandModal.dmOnly": "Працює лише в приваті з ботом: /{name} або .{name}.",
++  "commandModal.dmToo": "Працює і в приваті з ботом: /{name} або .{name}.",
++  "commandModal.myAliases": "Мої аліаси",
++  "commandModal.aliasPlaceholder": "Наприклад, п",
++  "commandModal.aliasAdd": "Додати",
++  "commandModal.aliasRemove": "Видалити аліас",
++  "commandModal.aliasHint": "Працює як вбудовані: префікс + аліас. До 30 аліасів, без пробілів.",
++  "commandModal.aliasTaken": "Такий аліас уже зайнятий — іншою командою або вами.",
++  "commandModal.aliasInvalid": "Аліас: від 1 до 32 символів без пробілів, або досягнуто ліміт.",
++  "commandModal.aliasFailed": "Не вдалося зберегти аліас. Спробуйте пізніше.",
+   "commands.title": "Команди",
+   "commands.loading": "Завантаження...",
+   "commands.error": "Не вдалося завантажити список команд. Перевірте з'єднання із сервером.",
+diff --git a/src/features/commands/types.ts b/src/features/commands/types.ts
+index 47a846f..63cfffb 100644
+--- a/src/features/commands/types.ts
++++ b/src/features/commands/types.ts
+@@ -7,6 +7,13 @@ export interface Command {
+   long_description: string;
+   usage: string;
+   owner_only: boolean;
++  /** где работает: "chat" — бизнес-чаты, "bot" — личка с ботом, "both" — везде */
++  scope: "chat" | "bot" | "both";
++}
++
++export interface UserAlias {
++  alias: string;
++  command: string;
+ }
+ 
+ export interface ModuleState {
+diff --git a/src/features/home/HomePage.tsx b/src/features/home/HomePage.tsx
+index 4f428a2..e1712b4 100644
+--- a/src/features/home/HomePage.tsx
++++ b/src/features/home/HomePage.tsx
+@@ -4,7 +4,9 @@ import { Link } from "react-router-dom";
+ import { useLocale } from "@/i18n";
+ import { fetchHomeSummary } from "./api";
+ import type { HomeSummary } from "./types";
+-import {RecentActivityItem} from "@/features/home/components/RecentActivityItem.tsx";
++import { HomeCounters } from "./components/HomeCounters";
++import { HomeQuickToggles } from "./components/HomeQuickToggles";
++import { RecentActivityItem } from "./components/RecentActivityItem";
+ 
+ type LoadState = "loading" | "ready" | "error";
+ 
+@@ -60,6 +62,22 @@ export function HomePage() {
+         </div>
+       </div>
+ 
++      {summary.stats && <HomeCounters stats={summary.stats} />}
++
++      <Link
++        className="mb-4 flex items-center justify-between rounded-2xl border border-line bg-card px-4 py-3 text-fg active:opacity-70"
++        to="/chats"
++      >
++        <span>{t("home.chatsLink")}</span>
++        <span className="text-sm text-accent">→</span>
++      </Link>
++
++      <HomeQuickToggles
++        emojiStatusEnabled={summary.emojiStatusEnabled}
++        emojiStatusGranted={summary.emojiStatusGranted}
++        mirrorConnected={summary.mirrorConnected}
++      />
++
+       <div className="home-stats">
+         <div className="home-stat">
+           <span className="home-stat__value">
+diff --git a/src/features/home/api.ts b/src/features/home/api.ts
+index caade3e..22a20c7 100644
+--- a/src/features/home/api.ts
++++ b/src/features/home/api.ts
+@@ -1,7 +1,8 @@
+ import { apiGet } from "@/shared/api/client";
+ import { fetchArchivePage } from "@/features/archive/api";
++import { DEFAULT_ARCHIVE_FILTERS } from "@/features/archive/types";
+ import type { ArchiveEntry } from "@/features/archive/types";
+-import type { HomeSummary } from "./types";
++import type { HomeStats, HomeSummary } from "./types";
+ 
+ interface AccountApiResponse {
+   connection: { owner_name: string | null; owner_username: string | null } | null;
+@@ -15,21 +16,36 @@ interface SettingsApiResponse {
+   prefix: string;
+   modules: { name: string; enabled: boolean }[];
+ }
++interface StatsApiResponse {
++  today: { total: number; incoming: number };
++  week: { total: number; incoming: number };
++}
+ interface CommandsApiResponse {
+   commands: unknown[];
+ }
+ 
+ export async function fetchHomeSummary(): Promise<HomeSummary> {
+-  const [account, mirror, settings, commands, archive] = await Promise.all([
++  const [account, mirror, settings, commands, archive, stats] = await Promise.all([
+     apiGet<AccountApiResponse>("/api/account"),
+     apiGet<MirrorApiResponse>("/api/mirror"),
+     apiGet<SettingsApiResponse>("/api/settings"),
+     apiGet<CommandsApiResponse>("/api/commands"),
+-    fetchArchivePage({ event: null, search: "", chatId: null }, undefined, 3).catch(() => ({
++    fetchArchivePage(DEFAULT_ARCHIVE_FILTERS, undefined, 3).catch(() => ({
+       entries: [] as ArchiveEntry[],
+       has_more: false,
+       next_before_id: null,
+     })),
++    // счётчики — необязательная часть: без них главная всё равно открывается
++    apiGet<StatsApiResponse>("/api/stats")
++      .then(
++        (s): HomeStats => ({
++          todayTotal: s.today.total,
++          todayIncoming: s.today.incoming,
++          weekTotal: s.week.total,
++          weekIncoming: s.week.incoming,
++        })
++      )
++      .catch(() => null),
+   ]);
+ 
+   return {
+@@ -41,6 +57,8 @@ export async function fetchHomeSummary(): Promise<HomeSummary> {
+     modulesEnabled: settings.modules.filter((m) => m.enabled).length,
+     modulesTotal: settings.modules.length,
+     emojiStatusEnabled: account.emoji_status.granted && account.emoji_status.enabled,
++    emojiStatusGranted: account.emoji_status.granted,
++    stats,
+     recentArchiveEntries: archive.entries,
+   };
+ }
+diff --git a/src/features/home/components/HomeCounters.tsx b/src/features/home/components/HomeCounters.tsx
+new file mode 100644
+index 0000000..938f26c
+--- /dev/null
++++ b/src/features/home/components/HomeCounters.tsx
+@@ -0,0 +1,27 @@
++import { useLocale } from "@/i18n";
++import type { HomeStats } from "../types";
++
++interface Props {
++  stats: HomeStats;
++}
++
++function Counter({ label, total, incoming }: { label: string; total: number; incoming: number }) {
++  const { t } = useLocale();
++  return (
++    <div className="flex flex-1 flex-col gap-1 rounded-2xl border border-line bg-card p-4">
++      <span className="text-xs text-hint">{label}</span>
++      <span className="text-3xl font-semibold leading-none text-fg">{total}</span>
++      <span className="text-xs text-hint">{t("home.incomingCount", { count: incoming })}</span>
++    </div>
++  );
++}
++
++export function HomeCounters({ stats }: Props) {
++  const { t } = useLocale();
++  return (
++    <div className="mb-4 flex gap-3">
++      <Counter incoming={stats.todayIncoming} label={t("home.messagesToday")} total={stats.todayTotal} />
++      <Counter incoming={stats.weekIncoming} label={t("home.messagesWeek")} total={stats.weekTotal} />
++    </div>
++  );
++}
+diff --git a/src/features/home/components/HomeQuickToggles.tsx b/src/features/home/components/HomeQuickToggles.tsx
+new file mode 100644
+index 0000000..74f2779
+--- /dev/null
++++ b/src/features/home/components/HomeQuickToggles.tsx
+@@ -0,0 +1,59 @@
++import { useState } from "react";
++import { Link } from "react-router-dom";
++
++import { toggleEmojiStatus } from "@/features/account/api";
++import { useLocale } from "@/i18n";
++import { Switch } from "@/shared/ui/Switch";
++
++interface Props {
++  emojiStatusGranted: boolean;
++  emojiStatusEnabled: boolean;
++  mirrorConnected: boolean;
++}
++
++const ROW = "flex items-center justify-between gap-3 px-4 py-3";
++
++export function HomeQuickToggles({ emojiStatusGranted, emojiStatusEnabled, mirrorConnected }: Props) {
++  const { t } = useLocale();
++  const [emojiOn, setEmojiOn] = useState(emojiStatusEnabled);
++  const [busy, setBusy] = useState(false);
++
++  async function handleEmojiToggle(next: boolean) {
++    setEmojiOn(next);
++    setBusy(true);
++    try {
++      setEmojiOn(await toggleEmojiStatus(next));
++    } catch {
++      setEmojiOn(!next);
++    } finally {
++      setBusy(false);
++    }
++  }
++
++  return (
++    <div className="mb-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
++      <div className={ROW}>
++        <div className="flex min-w-0 flex-col">
++          <span className="text-fg">{t("home.emojiStatus")}</span>
++          {!emojiStatusGranted && (
++            <Link className="text-xs text-accent" to="/account">
++              {t("home.emojiNeedsAccess")}
++            </Link>
++          )}
++        </div>
++        <Switch
++          checked={emojiStatusGranted && emojiOn}
++          disabled={!emojiStatusGranted || busy}
++          onChange={handleEmojiToggle}
++        />
++      </div>
++
++      <Link className={ROW} to="/account">
++        <span className="text-fg">{t("home.mirror")}</span>
++        <span className={mirrorConnected ? "text-sm text-accent" : "text-sm text-hint"}>
++          {mirrorConnected ? t("home.mirrorOn") : t("home.mirrorSetup")} →
++        </span>
++      </Link>
++    </div>
++  );
++}
+diff --git a/src/features/home/locales/home.ts b/src/features/home/locales/home.ts
+index 2258ab4..5c54c9c 100644
+--- a/src/features/home/locales/home.ts
++++ b/src/features/home/locales/home.ts
+@@ -1,4 +1,13 @@
+ export const RU = {
++  "home.chatsLink": "Чаты и прочтение",
++  "home.viewAllFromUser": "Весь архив этого человека",
++  "home.viewFullArchive": "Открыть весь архив",
++  "home.messagesToday": "Сообщений сегодня",
++  "home.messagesWeek": "За 7 дней",
++  "home.incomingCount": "входящих: {count}",
++  "home.emojiNeedsAccess": "Нужно разрешение — открыть Аккаунт",
++  "home.mirrorOn": "Подключено",
++  "home.mirrorSetup": "Настроить",
+   "home.title": "Обзор",
+   "home.loading": "Загрузка...",
+   "home.error": "Не удалось загрузить сводку.",
+@@ -15,6 +24,16 @@ export const RU = {
+ };
+ 
+ export const EN = {
++  "home.chatsLink": "Chats and mark as read",
++  "home.recentActivity": "Recent activity",
++  "home.viewAllFromUser": "Full archive for this person",
++  "home.viewFullArchive": "Open full archive",
++  "home.messagesToday": "Messages today",
++  "home.messagesWeek": "Last 7 days",
++  "home.incomingCount": "incoming: {count}",
++  "home.emojiNeedsAccess": "Access needed — open Account",
++  "home.mirrorOn": "Connected",
++  "home.mirrorSetup": "Set up",
+   "home.title": "Overview",
+   "home.loading": "Loading...",
+   "home.error": "Couldn't load the summary.",
+@@ -27,10 +46,19 @@ export const EN = {
+   "home.emojiStatus": "Emoji status",
+   "home.recentDeleted": "A message was recently deleted",
+   "home.recentEdited": "A message was recently edited",
+-  "home.viewAllFromUser": "Весь архив этого человека",
+ };
+ 
+ export const UK = {
++  "home.chatsLink": "Чати та прочитання",
++  "home.recentActivity": "Остання активність",
++  "home.viewAllFromUser": "Весь архів цієї людини",
++  "home.viewFullArchive": "Відкрити весь архів",
++  "home.messagesToday": "Повідомлень сьогодні",
++  "home.messagesWeek": "За 7 днів",
++  "home.incomingCount": "вхідних: {count}",
++  "home.emojiNeedsAccess": "Потрібен дозвіл — відкрити Акаунт",
++  "home.mirrorOn": "Підключено",
++  "home.mirrorSetup": "Налаштувати",
+   "home.title": "Огляд",
+   "home.loading": "Завантаження...",
+   "home.error": "Не вдалося завантажити зведення.",
+@@ -43,5 +71,4 @@ export const UK = {
+   "home.emojiStatus": "Emoji-статус",
+   "home.recentDeleted": "Нещодавно видалено повідомлення",
+   "home.recentEdited": "Нещодавно змінено повідомлення",
+-  "home.viewFullArchive": "Открыть весь архив",
+ };
+\ No newline at end of file
+diff --git a/src/features/home/types.ts b/src/features/home/types.ts
+index 584b7cb..0e19631 100644
+--- a/src/features/home/types.ts
++++ b/src/features/home/types.ts
+@@ -9,5 +9,14 @@ export interface HomeSummary {
+   modulesEnabled: number;
+   modulesTotal: number;
+   emojiStatusEnabled: boolean;
++  emojiStatusGranted: boolean;
++  stats: HomeStats | null;
+   recentArchiveEntries: ArchiveEntry[];
+ }
++
++export interface HomeStats {
++  todayTotal: number;
++  todayIncoming: number;
++  weekTotal: number;
++  weekIncoming: number;
++}
+diff --git a/src/shared/api/client.ts b/src/shared/api/client.ts
+index e6dc427..f7a5b6d 100644
+--- a/src/shared/api/client.ts
++++ b/src/shared/api/client.ts
+@@ -11,9 +11,18 @@ export function initDataHeader(): Record<string, string> {
+   }
+ }
+ 
++export class ApiError extends Error {
++  status: number;
++
++  constructor(status: number) {
++    super(`API error ${status}`);
++    this.status = status;
++  }
++}
++
+ async function handleResponse<T>(response: Response): Promise<T> {
+   if (!response.ok) {
+-    throw new Error(`API error ${response.status}`);
++    throw new ApiError(response.status);
+   }
+   return response.json() as Promise<T>;
+ }
+@@ -36,3 +45,22 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
+   });
+   return handleResponse<T>(response);
+ }
++
++export async function apiDelete<T>(path: string): Promise<T> {
++  const response = await fetch(`${API_BASE_URL}${path}`, {
++    method: "DELETE",
++    headers: { ...initDataHeader() },
++  });
++  return handleResponse<T>(response);
++}
++
++/** Для бинарных ответов (<img>/<video> не умеют слать заголовок авторизации). */
++export async function apiGetBlob(path: string): Promise<Blob> {
++  const response = await fetch(`${API_BASE_URL}${path}`, {
++    headers: { ...initDataHeader() },
++  });
++  if (!response.ok) {
++    throw new ApiError(response.status);
++  }
++  return response.blob();
++}
+diff --git a/src/styles/tailwind.css b/src/styles/tailwind.css
+index a461c50..af8d59b 100644
+--- a/src/styles/tailwind.css
++++ b/src/styles/tailwind.css
+@@ -1 +1,14 @@
+-@import "tailwindcss";
+\ No newline at end of file
++@import "tailwindcss";
++
++/* Токены темы из index.css (--bg, --card-bg, ...) как цвета Tailwind:
++   bg-card, text-fg, text-hint, text-accent, border-line и т.д.
++   Значения не копируются, а ссылаются на CSS-переменные, поэтому
++   светлая/тёмная тема и цветовая схема подхватываются автоматически. */
++@theme inline {
++  --color-page: var(--bg);
++  --color-card: var(--card-bg);
++  --color-fg: var(--text);
++  --color-hint: var(--hint);
++  --color-accent: var(--accent);
++  --color-line: var(--border);
++}

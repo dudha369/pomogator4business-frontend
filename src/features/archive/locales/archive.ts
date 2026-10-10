@@ -1,4 +1,11 @@
 export const RU = {
+  "archive.dateFrom": "С даты",
+  "archive.dateTo": "По дату",
+  "archive.sortNewest": "Сначала новые",
+  "archive.sortOldest": "Сначала старые",
+  "archive.clearDates": "Сбросить даты",
+  "archive.mediaLoading": "Загружаю медиа...",
+  "archive.mediaUnavailable": "Медиа недоступно: файл не сохранился или удалён по сроку хранения.",
   "archive.title": "Архив",
   "archive.loading": "Загрузка...",
   "archive.error": "Не удалось загрузить архив.",
@@ -15,6 +22,13 @@ export const RU = {
 };
 
 export const EN = {
+  "archive.dateFrom": "From",
+  "archive.dateTo": "To",
+  "archive.sortNewest": "Newest first",
+  "archive.sortOldest": "Oldest first",
+  "archive.clearDates": "Clear dates",
+  "archive.mediaLoading": "Loading media...",
+  "archive.mediaUnavailable": "Media unavailable: the file wasn't saved or has expired.",
   "archive.title": "Archive",
   "archive.loading": "Loading...",
   "archive.error": "Couldn't load the archive.",
@@ -31,6 +45,13 @@ export const EN = {
 };
 
 export const UK = {
+  "archive.dateFrom": "З дати",
+  "archive.dateTo": "По дату",
+  "archive.sortNewest": "Спочатку нові",
+  "archive.sortOldest": "Спочатку старі",
+  "archive.clearDates": "Скинути дати",
+  "archive.mediaLoading": "Завантажую медіа...",
+  "archive.mediaUnavailable": "Медіа недоступне: файл не збережено або видалено за терміном зберігання.",
   "archive.title": "Архів",
   "archive.loading": "Завантаження...",
   "archive.error": "Не вдалося завантажити архів.",

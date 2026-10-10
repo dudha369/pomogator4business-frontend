@@ -1,4 +1,12 @@
 export const RU = {
+  "home.viewAllFromUser": "Весь архив этого человека",
+  "home.viewFullArchive": "Открыть весь архив",
+  "home.messagesToday": "Сообщений сегодня",
+  "home.messagesWeek": "За 7 дней",
+  "home.incomingCount": "входящих: {count}",
+  "home.emojiNeedsAccess": "Нужно разрешение — открыть Аккаунт",
+  "home.mirrorOn": "Подключено",
+  "home.mirrorSetup": "Настроить",
   "home.title": "Обзор",
   "home.loading": "Загрузка...",
   "home.error": "Не удалось загрузить сводку.",
@@ -15,6 +23,15 @@ export const RU = {
 };
 
 export const EN = {
+  "home.recentActivity": "Recent activity",
+  "home.viewAllFromUser": "Full archive for this person",
+  "home.viewFullArchive": "Open full archive",
+  "home.messagesToday": "Messages today",
+  "home.messagesWeek": "Last 7 days",
+  "home.incomingCount": "incoming: {count}",
+  "home.emojiNeedsAccess": "Access needed — open Account",
+  "home.mirrorOn": "Connected",
+  "home.mirrorSetup": "Set up",
   "home.title": "Overview",
   "home.loading": "Loading...",
   "home.error": "Couldn't load the summary.",
@@ -27,10 +44,18 @@ export const EN = {
   "home.emojiStatus": "Emoji status",
   "home.recentDeleted": "A message was recently deleted",
   "home.recentEdited": "A message was recently edited",
-  "home.viewAllFromUser": "Весь архив этого человека",
 };
 
 export const UK = {
+  "home.recentActivity": "Остання активність",
+  "home.viewAllFromUser": "Весь архів цієї людини",
+  "home.viewFullArchive": "Відкрити весь архів",
+  "home.messagesToday": "Повідомлень сьогодні",
+  "home.messagesWeek": "За 7 днів",
+  "home.incomingCount": "вхідних: {count}",
+  "home.emojiNeedsAccess": "Потрібен дозвіл — відкрити Акаунт",
+  "home.mirrorOn": "Підключено",
+  "home.mirrorSetup": "Налаштувати",
   "home.title": "Огляд",
   "home.loading": "Завантаження...",
   "home.error": "Не вдалося завантажити зведення.",
@@ -43,5 +68,4 @@ export const UK = {
   "home.emojiStatus": "Emoji-статус",
   "home.recentDeleted": "Нещодавно видалено повідомлення",
   "home.recentEdited": "Нещодавно змінено повідомлення",
-  "home.viewFullArchive": "Открыть весь архив",
 };

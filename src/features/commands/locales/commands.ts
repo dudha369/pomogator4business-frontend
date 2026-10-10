@@ -1,4 +1,12 @@
 export const RU = {
+  "commandModal.myAliases": "Мои алиасы",
+  "commandModal.aliasPlaceholder": "Например, п",
+  "commandModal.aliasAdd": "Добавить",
+  "commandModal.aliasRemove": "Удалить алиас",
+  "commandModal.aliasHint": "Работает как встроенные: префикс + алиас. До 30 алиасов, без пробелов.",
+  "commandModal.aliasTaken": "Такой алиас уже занят — другой командой или вами.",
+  "commandModal.aliasInvalid": "Алиас: от 1 до 32 символов без пробелов, или достигнут лимит.",
+  "commandModal.aliasFailed": "Не удалось сохранить алиас. Попробуйте позже.",
   "commands.title": "Команды",
   "commands.loading": "Загрузка...",
   "commands.error": "Не удалось загрузить список команд. Проверьте подключение к серверу.",
@@ -9,6 +17,14 @@ export const RU = {
 };
 
 export const EN = {
+  "commandModal.myAliases": "My aliases",
+  "commandModal.aliasPlaceholder": "For example, p",
+  "commandModal.aliasAdd": "Add",
+  "commandModal.aliasRemove": "Remove alias",
+  "commandModal.aliasHint": "Works like the built-in ones: prefix + alias. Up to 30 aliases, no spaces.",
+  "commandModal.aliasTaken": "This alias is already taken — by another command or by you.",
+  "commandModal.aliasInvalid": "Alias: 1 to 32 characters without spaces, or the limit is reached.",
+  "commandModal.aliasFailed": "Couldn't save the alias. Try again later.",
   "commands.title": "Commands",
   "commands.loading": "Loading...",
   "commands.error": "Couldn't load the command list. Check your connection to the server.",
@@ -19,6 +35,14 @@ export const EN = {
 };
 
 export const UK = {
+  "commandModal.myAliases": "Мої аліаси",
+  "commandModal.aliasPlaceholder": "Наприклад, п",
+  "commandModal.aliasAdd": "Додати",
+  "commandModal.aliasRemove": "Видалити аліас",
+  "commandModal.aliasHint": "Працює як вбудовані: префікс + аліас. До 30 аліасів, без пробілів.",
+  "commandModal.aliasTaken": "Такий аліас уже зайнятий — іншою командою або вами.",
+  "commandModal.aliasInvalid": "Аліас: від 1 до 32 символів без пробілів, або досягнуто ліміт.",
+  "commandModal.aliasFailed": "Не вдалося зберегти аліас. Спробуйте пізніше.",
   "commands.title": "Команди",
   "commands.loading": "Завантаження...",
   "commands.error": "Не вдалося завантажити список команд. Перевірте з'єднання із сервером.",

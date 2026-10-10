@@ -11,9 +11,18 @@ export function initDataHeader(): Record<string, string> {
   }
 }
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(status: number) {
+    super(`API error ${status}`);
+    this.status = status;
+  }
+}
+
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    throw new Error(`API error ${response.status}`);
+    throw new ApiError(response.status);
   }
   return response.json() as Promise<T>;
 }
@@ -35,4 +44,23 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
     body: JSON.stringify(body),
   });
   return handleResponse<T>(response);
+}
+
+export async function apiDelete<T>(path: string): Promise<T> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "DELETE",
+    headers: { ...initDataHeader() },
+  });
+  return handleResponse<T>(response);
+}
+
+/** Для бинарных ответов (<img>/<video> не умеют слать заголовок авторизации). */
+export async function apiGetBlob(path: string): Promise<Blob> {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    headers: { ...initDataHeader() },
+  });
+  if (!response.ok) {
+    throw new ApiError(response.status);
+  }
+  return response.blob();
 }
