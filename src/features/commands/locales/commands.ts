@@ -1,4 +1,6 @@
 export const RU = {
+  "commandModal.dmOnly": "Работает только в личке с ботом: /{name} или .{name}.",
+  "commandModal.dmToo": "Работает и в личке с ботом: /{name} или .{name}.",
   "commandModal.myAliases": "Мои алиасы",
   "commandModal.aliasPlaceholder": "Например, п",
   "commandModal.aliasAdd": "Добавить",
@@ -17,6 +19,8 @@ export const RU = {
 };
 
 export const EN = {
+  "commandModal.dmOnly": "Only works in the bot DM: /{name} or .{name}.",
+  "commandModal.dmToo": "Also works in the bot DM: /{name} or .{name}.",
   "commandModal.myAliases": "My aliases",
   "commandModal.aliasPlaceholder": "For example, p",
   "commandModal.aliasAdd": "Add",
@@ -35,6 +39,8 @@ export const EN = {
 };
 
 export const UK = {
+  "commandModal.dmOnly": "Працює лише в приваті з ботом: /{name} або .{name}.",
+  "commandModal.dmToo": "Працює і в приваті з ботом: /{name} або .{name}.",
   "commandModal.myAliases": "Мої аліаси",
   "commandModal.aliasPlaceholder": "Наприклад, п",
   "commandModal.aliasAdd": "Додати",

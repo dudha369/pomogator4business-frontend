@@ -1,4 +1,5 @@
 export const RU = {
+  "home.chatsLink": "Чаты и прочтение",
   "home.viewAllFromUser": "Весь архив этого человека",
   "home.viewFullArchive": "Открыть весь архив",
   "home.messagesToday": "Сообщений сегодня",
@@ -23,6 +24,7 @@ export const RU = {
 };
 
 export const EN = {
+  "home.chatsLink": "Chats and mark as read",
   "home.recentActivity": "Recent activity",
   "home.viewAllFromUser": "Full archive for this person",
   "home.viewFullArchive": "Open full archive",
@@ -47,6 +49,7 @@ export const EN = {
 };
 
 export const UK = {
+  "home.chatsLink": "Чати та прочитання",
   "home.recentActivity": "Остання активність",
   "home.viewAllFromUser": "Весь архів цієї людини",
   "home.viewFullArchive": "Відкрити весь архів",

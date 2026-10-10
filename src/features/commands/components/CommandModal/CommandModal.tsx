@@ -107,6 +107,14 @@ export function CommandModal({
             </section>
           )}
 
+          {command.scope !== "chat" && (
+            <p className="mt-4 rounded-xl border border-line bg-card px-3 py-2 text-sm text-fg">
+              {command.scope === "bot"
+                ? t("commandModal.dmOnly", { name: command.name })
+                : t("commandModal.dmToo", { name: command.name })}
+            </p>
+          )}
+
           <UserAliasesSection
             aliases={userAliases.filter((a) => a.command === command.name)}
             onAdd={handleAddAlias}

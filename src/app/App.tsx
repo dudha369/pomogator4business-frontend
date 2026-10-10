@@ -7,6 +7,7 @@ import { ColorSchemeProvider } from "./providers/ColorSchemeProvider";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import { AccountPage } from "@/features/account/AccountPage";
 import { ArchivePage } from "@/features/archive/ArchivePage";
+import { ChatsPage } from "@/features/chats/ChatsPage";
 import { CommandsPage } from "@/features/commands/CommandsPage";
 import { HomePage } from "@/features/home/HomePage";
 import { SettingsPage } from "@/features/settings/SettingsPage";
@@ -24,6 +25,7 @@ export function App() {
                   <Route element={<HomePage />} path="/" />
                   <Route element={<CommandsPage />} path="/commands" />
                   <Route element={<ArchivePage />} path="/archive" />
+                  <Route element={<ChatsPage />} path="/chats" />
                   <Route element={<SettingsPage />} path="/settings" />
                   <Route element={<AccountPage />} path="/account" />
                 </Routes>

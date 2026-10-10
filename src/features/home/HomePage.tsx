@@ -64,6 +64,14 @@ export function HomePage() {
 
       {summary.stats && <HomeCounters stats={summary.stats} />}
 
+      <Link
+        className="mb-4 flex items-center justify-between rounded-2xl border border-line bg-card px-4 py-3 text-fg active:opacity-70"
+        to="/chats"
+      >
+        <span>{t("home.chatsLink")}</span>
+        <span className="text-sm text-accent">→</span>
+      </Link>
+
       <HomeQuickToggles
         emojiStatusEnabled={summary.emojiStatusEnabled}
         emojiStatusGranted={summary.emojiStatusGranted}
