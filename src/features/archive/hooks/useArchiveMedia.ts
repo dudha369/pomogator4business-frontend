@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { apiGetBlob } from "@/shared/api/client";
+import { apiGetBlob } from '@/shared/api/client';
 
 type MediaState =
-  | { status: "loading" }
-  | { status: "ready"; url: string }
-  | { status: "error" };
+  | { status: 'loading' }
+  | { status: 'ready'; url: string }
+  | { status: 'error' };
 
 const cache = new Map<number, string>();
 
@@ -14,25 +14,25 @@ const cache = new Map<number, string>();
 export function useArchiveMedia(logId: number): MediaState {
   const [state, setState] = useState<MediaState>(() => {
     const cached = cache.get(logId);
-    return cached ? { status: "ready", url: cached } : { status: "loading" };
+    return cached ? { status: 'ready', url: cached } : { status: 'loading' };
   });
 
   useEffect(() => {
     const cached = cache.get(logId);
     if (cached) {
-      setState({ status: "ready", url: cached });
+      setState({ status: 'ready', url: cached });
       return;
     }
     let cancelled = false;
-    setState({ status: "loading" });
+    setState({ status: 'loading' });
     apiGetBlob(`/api/archive/${logId}/media`)
       .then((blob) => {
         const url = URL.createObjectURL(blob);
         cache.set(logId, url);
-        if (!cancelled) setState({ status: "ready", url });
+        if (!cancelled) setState({ status: 'ready', url });
       })
       .catch(() => {
-        if (!cancelled) setState({ status: "error" });
+        if (!cancelled) setState({ status: 'error' });
       });
     return () => {
       cancelled = true;

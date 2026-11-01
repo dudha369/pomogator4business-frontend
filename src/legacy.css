@@ -1,60 +1,17 @@
 /*
- * Источник истины по теме — ThemeProvider (src/theme/ThemeContext.tsx):
- * он ставит <html data-theme="light|dark"> по реальной теме Telegram, а вне
- * Telegram — по системной. --tg-theme-* переменные заполняет
- * themeParams.bindCssVars() из ThemeProvider; ниже только фолбэки на случай,
- * когда их ещё нет (самый первый рендер, до монтирования SDK).
+ * Тема теперь приходит из ThemeProvider через переменные --tg-*, а старые
+ * имена (--bg, --card-bg, --text, --hint, --accent, --border) — просто
+ * алиасы на них. Переписали страницу на Tailwind — удалите её классы отсюда;
+ * когда файл опустеет, удалите его и @import в index.css.
  */
 :root {
-  --bg: var(--tg-theme-bg-color, #f2f2f7);
-  --card-bg: var(--tg-theme-section-bg-color, var(--tg-theme-secondary-bg-color, #ffffff));
-  --text: var(--tg-theme-text-color, #0f0f0f);
-  --hint: var(--tg-theme-hint-color, #8e8e93);
-  --accent: var(--tg-theme-link-color, #2f88ff);
+  --bg: var(--tg-bg-color);
+  --card-bg: var(--tg-section-bg-color);
+  --text: var(--tg-text-color);
+  --hint: var(--tg-hint-color);
+  --accent: var(--tg-accent-color);
   --accent-glow: color-mix(in srgb, var(--accent) 55%, transparent);
-  --border: rgba(0, 0, 0, 0.06);
-  color-scheme: light dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: var(--tg-theme-bg-color, #0e0e10);
-    --card-bg: var(--tg-theme-section-bg-color, var(--tg-theme-secondary-bg-color, #1c1c1e));
-    --text: var(--tg-theme-text-color, #f2f2f2);
-    --hint: var(--tg-theme-hint-color, #9a9a9e);
-    --accent: var(--tg-theme-link-color, #5aa4ff);
-    --border: rgba(255, 255, 255, 0.08);
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: var(--tg-theme-bg-color, #0e0e10);
-  --card-bg: var(--tg-theme-section-bg-color, var(--tg-theme-secondary-bg-color, #1c1c1e));
-  --text: var(--tg-theme-text-color, #f2f2f2);
-  --hint: var(--tg-theme-hint-color, #9a9a9e);
-  --accent: var(--tg-theme-link-color, #5aa4ff);
-  --border: rgba(255, 255, 255, 0.08);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-#root {
-  min-height: 100vh;
+  --border: color-mix(in srgb, var(--tg-text-color) 8%, transparent);
 }
 
 .page {
@@ -142,14 +99,14 @@ body {
 }
 
 .command-card__trigger {
-  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
   font-weight: 700;
   font-size: 15px;
   color: var(--accent);
 }
 
 .command-card__alias {
-  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
   font-size: 12px;
   color: var(--hint);
   background: var(--bg);
@@ -162,17 +119,6 @@ body {
   font-size: 14px;
   line-height: 1.45;
   color: var(--hint);
-}
-
-.app-shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.app-shell__content {
-  flex: 1 1 auto;
-  padding-bottom: calc(104px + env(safe-area-inset-bottom));
 }
 
 .section {
@@ -261,7 +207,7 @@ body {
 }
 
 .module-list__name {
-  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
   font-size: 14px;
   font-weight: 600;
 }
@@ -711,29 +657,6 @@ body {
   text-decoration-color: rgba(255, 91, 91, 0.4);
 }
 
-:root[data-accent="blue"] { --accent: #2f88ff; }
-:root[data-theme="dark"][data-accent="blue"] { --accent: #5aa4ff; }
-
-:root[data-accent="purple"] { --accent: #7b5cff; }
-:root[data-theme="dark"][data-accent="purple"] { --accent: #9a85ff; }
-
-:root[data-accent="green"] { --accent: #2fb350; }
-:root[data-theme="dark"][data-accent="green"] { --accent: #34c759; }
-
-:root[data-accent="orange"] { --accent: #e08600; }
-:root[data-theme="dark"][data-accent="orange"] { --accent: #ff9f0a; }
-
-:root[data-accent="pink"] { --accent: #e0245e; }
-:root[data-theme="dark"][data-accent="pink"] { --accent: #ff2d78; }
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"])[data-accent="blue"] { --accent: #5aa4ff; }
-  :root:not([data-theme="light"])[data-accent="purple"] { --accent: #9a85ff; }
-  :root:not([data-theme="light"])[data-accent="green"] { --accent: #34c759; }
-  :root:not([data-theme="light"])[data-accent="orange"] { --accent: #ff9f0a; }
-  :root:not([data-theme="light"])[data-accent="pink"] { --accent: #ff2d78; }
-}
-
 .color-scheme-row {
   display: flex;
   gap: 12px;
@@ -747,7 +670,9 @@ body {
   transition: box-shadow 0.15s ease;
 }
 .color-swatch--active {
-  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text);
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 4px var(--text);
 }
 
 .archive-filters__chip {

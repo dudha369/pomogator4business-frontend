@@ -30,7 +30,9 @@
   --lens-fill: rgb(255 255 255 / 0.06);
   --lens-backdrop: saturate(1.2);
   --lens-band: rgb(18 32 80 / 0.34); /* полосы кольца сверху/снизу */
-  --lens-band-edge: rgb(255 255 255 / 0.9); /* светлая линия по внутреннему краю */
+  --lens-band-edge: rgb(
+    255 255 255 / 0.9
+  ); /* светлая линия по внутреннему краю */
   --lens-arc: rgb(255 255 255 / 0.5); /* светлые дуги на торцах */
   --lens-glint: 0.32;
 
@@ -47,7 +49,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .navbar {
+  :root:not([data-theme='light']) .navbar {
     --nav-tint-top: rgb(96 98 108 / 0.5);
     --nav-tint-bottom: rgb(66 68 76 / 0.46);
     --nav-rim-hi: rgb(255 255 255 / 0.5);
@@ -65,7 +67,7 @@
     --lens-glint: 0.4;
   }
 }
-:root[data-theme="dark"] .navbar {
+:root[data-theme='dark'] .navbar {
   --nav-tint-top: rgb(96 98 108 / 0.5);
   --nav-tint-bottom: rgb(66 68 76 / 0.46);
   --nav-rim-hi: rgb(255 255 255 / 0.5);
@@ -98,33 +100,45 @@
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: linear-gradient(180deg, var(--nav-tint-top), var(--nav-tint-bottom));
+  background: linear-gradient(
+    180deg,
+    var(--nav-tint-top),
+    var(--nav-tint-bottom)
+  );
   -webkit-backdrop-filter: blur(22px) saturate(1.25);
   backdrop-filter: blur(22px) saturate(1.25);
-  box-shadow: 0 10px 30px var(--nav-shadow), 0 2px 8px rgb(0 0 0 / 0.08);
+  box-shadow:
+    0 10px 30px var(--nav-shadow),
+    0 2px 8px rgb(0 0 0 / 0.08);
 }
 
 .navbar__glass::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   padding: 1px;
   background: linear-gradient(
-      135deg,
-      var(--nav-rim-hi) 0%,
-      var(--nav-rim-lo) 24%,
-      var(--nav-rim-lo) 62%,
-      var(--nav-rim-hi) 100%
+    135deg,
+    var(--nav-rim-hi) 0%,
+    var(--nav-rim-lo) 24%,
+    var(--nav-rim-lo) 62%,
+    var(--nav-rim-hi) 100%
   );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   mask-composite: exclude;
   pointer-events: none;
 }
 
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
   .navbar__glass {
     background: var(--card-bg);
   }
@@ -185,9 +199,9 @@
 .navbar__row--zoom .navbar__item {
   transition: none;
   color: color-mix(
-      in srgb,
-      var(--nav-lens-text) calc(var(--g, 0) * 100%),
-      var(--item-base)
+    in srgb,
+    var(--nav-lens-text) calc(var(--g, 0) * 100%),
+    var(--item-base)
   );
 }
 .navbar__item:focus-visible {
@@ -223,7 +237,7 @@
 }
 
 .navbar__lens::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
@@ -232,8 +246,8 @@
   -webkit-backdrop-filter: var(--lens-backdrop);
   backdrop-filter: var(--lens-backdrop);
   box-shadow:
-      0 0 0 0.75px var(--lens-outline),
-      0 6px 18px var(--lens-drop);
+    0 0 0 0.75px var(--lens-outline),
+    0 6px 18px var(--lens-drop);
 }
 
 .navbar__lens-clip {
@@ -245,7 +259,7 @@
 }
 
 .navbar__lens::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
@@ -254,40 +268,44 @@
   opacity: clamp(0, calc(var(--g) * 1.7), 1);
   background:
     /* радужные блики: на нативе они живут на диагональных дугах */
-      conic-gradient(
-          from 0deg at 50% 50%,
-          transparent 0 6%,
-          rgb(255 215 120 / var(--lens-glint)) 9%,
-          rgb(255 110 190 / var(--lens-glint)) 12%,
-          rgb(120 190 255 / var(--lens-glint)) 15%,
-          transparent 19% 53%,
-          rgb(120 255 200 / var(--lens-glint)) 57%,
-          rgb(255 215 120 / var(--lens-glint)) 61%,
-          rgb(190 120 255 / var(--lens-glint)) 65%,
-          transparent 70%
+    conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0 6%,
+      rgb(255 215 120 / var(--lens-glint)) 9%,
+      rgb(255 110 190 / var(--lens-glint)) 12%,
+      rgb(120 190 255 / var(--lens-glint)) 15%,
+      transparent 19% 53%,
+      rgb(120 255 200 / var(--lens-glint)) 57%,
+      rgb(255 215 120 / var(--lens-glint)) 61%,
+      rgb(190 120 255 / var(--lens-glint)) 65%,
+      transparent 70%
+    ),
+    /* светлые дуги на торцах */
+    linear-gradient(
+        90deg,
+        var(--lens-arc) 0,
+        transparent calc(var(--ring) * 2.2) calc(100% - var(--ring) * 2.2),
+        var(--lens-arc) 100%
       ),
-        /* светлые дуги на торцах */
-      linear-gradient(
-          90deg,
-          var(--lens-arc) 0,
-          transparent calc(var(--ring) * 2.2) calc(100% - var(--ring) * 2.2),
-          var(--lens-arc) 100%
-      ),
-        /* плоские полосы сверху и снизу + светлая линия по внутреннему краю */
-      linear-gradient(
-          180deg,
-          var(--lens-band) 0,
-          var(--lens-band) calc(var(--ring) - 1.2px),
-          var(--lens-band-edge) var(--ring),
-          transparent calc(var(--ring) + 1px),
-          transparent calc(100% - var(--ring) - 1px),
-          var(--lens-band-edge) calc(100% - var(--ring)),
-          var(--lens-band) calc(100% - var(--ring) + 1.2px),
-          var(--lens-band) 100%
+    /* плоские полосы сверху и снизу + светлая линия по внутреннему краю */
+    linear-gradient(
+        180deg,
+        var(--lens-band) 0,
+        var(--lens-band) calc(var(--ring) - 1.2px),
+        var(--lens-band-edge) var(--ring),
+        transparent calc(var(--ring) + 1px),
+        transparent calc(100% - var(--ring) - 1px),
+        var(--lens-band-edge) calc(100% - var(--ring)),
+        var(--lens-band) calc(100% - var(--ring) + 1.2px),
+        var(--lens-band) 100%
       );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   mask-composite: exclude;
 }
 

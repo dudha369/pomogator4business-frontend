@@ -1,6 +1,6 @@
-import { hapticFeedback } from "@tma.js/sdk-react";
+import { hapticFeedback } from '@tma.js/sdk-react';
 
-type Impact = "light" | "medium" | "heavy" | "rigid" | "soft";
+type Impact = 'light' | 'medium' | 'heavy' | 'rigid' | 'soft';
 
 /**
  * Тактильный отклик Telegram (на iOS это Taptic Engine). navigator.vibrate на
@@ -8,7 +8,7 @@ type Impact = "light" | "medium" | "heavy" | "rigid" | "soft";
  * Вне Telegram / на старых клиентах молча ничего не делает.
  */
 export const haptic = {
-  impact(style: Impact = "light") {
+  impact(style: Impact = 'light') {
     try {
       if (hapticFeedback.isSupported()) hapticFeedback.impactOccurred(style);
       else navigator.vibrate?.(8);

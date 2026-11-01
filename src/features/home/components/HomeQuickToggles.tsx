@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import { toggleEmojiStatus } from "@/features/account/api";
-import { useLocale } from "@/i18n";
-import { Switch } from "@/shared/ui/Switch";
+import { toggleEmojiStatus } from '@/features/account/api';
+import { useLocale } from '@/i18n';
+import { Switch } from '@/shared/ui/Switch';
 
 interface Props {
   emojiStatusGranted: boolean;
@@ -11,9 +11,13 @@ interface Props {
   mirrorConnected: boolean;
 }
 
-const ROW = "flex items-center justify-between gap-3 px-4 py-3";
+const ROW = 'flex items-center justify-between gap-3 px-4 py-3';
 
-export function HomeQuickToggles({ emojiStatusGranted, emojiStatusEnabled, mirrorConnected }: Props) {
+export function HomeQuickToggles({
+  emojiStatusGranted,
+  emojiStatusEnabled,
+  mirrorConnected,
+}: Props) {
   const { t } = useLocale();
   const [emojiOn, setEmojiOn] = useState(emojiStatusEnabled);
   const [busy, setBusy] = useState(false);
@@ -31,13 +35,13 @@ export function HomeQuickToggles({ emojiStatusGranted, emojiStatusEnabled, mirro
   }
 
   return (
-    <div className="mb-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
+    <div className="divide-line border-line bg-card mb-4 divide-y overflow-hidden rounded-2xl border">
       <div className={ROW}>
         <div className="flex min-w-0 flex-col">
-          <span className="text-fg">{t("home.emojiStatus")}</span>
+          <span className="text-fg">{t('home.emojiStatus')}</span>
           {!emojiStatusGranted && (
-            <Link className="text-xs text-accent" to="/account">
-              {t("home.emojiNeedsAccess")}
+            <Link className="text-accent text-xs" to="/account">
+              {t('home.emojiNeedsAccess')}
             </Link>
           )}
         </div>
@@ -49,9 +53,13 @@ export function HomeQuickToggles({ emojiStatusGranted, emojiStatusEnabled, mirro
       </div>
 
       <Link className={ROW} to="/account">
-        <span className="text-fg">{t("home.mirror")}</span>
-        <span className={mirrorConnected ? "text-sm text-accent" : "text-sm text-hint"}>
-          {mirrorConnected ? t("home.mirrorOn") : t("home.mirrorSetup")} →
+        <span className="text-fg">{t('home.mirror')}</span>
+        <span
+          className={
+            mirrorConnected ? 'text-accent text-sm' : 'text-hint text-sm'
+          }
+        >
+          {mirrorConnected ? t('home.mirrorOn') : t('home.mirrorSetup')} →
         </span>
       </Link>
     </div>

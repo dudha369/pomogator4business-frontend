@@ -1,5 +1,5 @@
 // src/features/archive/components/ArchiveAvatar.tsx
-import { useAvatar } from "../hooks/useAvatar";
+import { useAvatar } from '../hooks/useAvatar';
 
 interface Props {
   userId: number;

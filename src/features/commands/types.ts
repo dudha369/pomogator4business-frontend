@@ -8,7 +8,7 @@ export interface Command {
   usage: string;
   owner_only: boolean;
   /** где работает: "chat" — бизнес-чаты, "bot" — личка с ботом, "both" — везде */
-  scope: "chat" | "bot" | "both";
+  scope: 'chat' | 'bot' | 'both';
 }
 
 export interface UserAlias {

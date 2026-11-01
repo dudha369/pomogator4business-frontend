@@ -1,42 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { useLocale } from "@/i18n";
-import { CommandCard } from "./components/CommandCard";
-import { CommandModal } from "./components/CommandModal/CommandModal";
-import { fetchCommands, fetchModuleStates, fetchUserAliases } from "./api";
-import type { Command, ModuleState, UserAlias } from "./types";
+import { useLocale } from '@/i18n';
+import { CommandCard } from './components/CommandCard';
+import { CommandModal } from './components/CommandModal/CommandModal';
+import { fetchCommands, fetchModuleStates, fetchUserAliases } from './api';
+import type { Command, ModuleState, UserAlias } from './types';
 
-type LoadState = "loading" | "ready" | "error";
+type LoadState = 'loading' | 'ready' | 'error';
 
 export function CommandsPage() {
   const { t, locale } = useLocale();
   const [commands, setCommands] = useState<Command[]>([]);
   const [modules, setModules] = useState<ModuleState[]>([]);
-  const [state, setState] = useState<LoadState>("loading");
+  const [state, setState] = useState<LoadState>('loading');
   const [selected, setSelected] = useState<Command | null>(null);
   const [userAliases, setUserAliases] = useState<UserAlias[]>([]);
 
   useEffect(() => {
     let cancelled = false;
-    setState("loading");
+    setState('loading');
 
     Promise.all([fetchCommands(locale), fetchModuleStates()])
-    .then(([commandsRes, modulesRes]) => {
-      if (cancelled) return;
-      setCommands(commandsRes);
-      setModules(modulesRes);
-      setState("ready");
-    })
-    .catch(() => {
-      if (!cancelled) setState("error");
-    });
+      .then(([commandsRes, modulesRes]) => {
+        if (cancelled) return;
+        setCommands(commandsRes);
+        setModules(modulesRes);
+        setState('ready');
+      })
+      .catch(() => {
+        if (!cancelled) setState('error');
+      });
 
     // алиасы — необязательная часть: если запрос упал, список просто пуст
     fetchUserAliases()
-    .then((aliases) => {
-      if (!cancelled) setUserAliases(aliases);
-    })
-    .catch(() => {});
+      .then((aliases) => {
+        if (!cancelled) setUserAliases(aliases);
+      })
+      .catch(() => {});
 
     return () => {
       cancelled = true;
@@ -48,22 +48,30 @@ export function CommandsPage() {
   }
 
   function handleModuleToggle(moduleName: string, enabled: boolean) {
-    setModules((prev) => prev.map((m) => (m.name === moduleName ? { ...m, enabled } : m)));
+    setModules((prev) =>
+      prev.map((m) => (m.name === moduleName ? { ...m, enabled } : m)),
+    );
   }
 
   return (
     <div className="page">
       <header className="page__header">
-        <h1>{t("commands.title")}</h1>
-        {state === "ready" && <span className="page__count">{commands.length}</span>}
+        <h1>{t('commands.title')}</h1>
+        {state === 'ready' && (
+          <span className="page__count">{commands.length}</span>
+        )}
       </header>
 
-      {state === "loading" && <div className="page__status">{t("commands.loading")}</div>}
-      {state === "error" && (
-        <div className="page__status page__status--error">{t("commands.error")}</div>
+      {state === 'loading' && (
+        <div className="page__status">{t('commands.loading')}</div>
+      )}
+      {state === 'error' && (
+        <div className="page__status page__status--error">
+          {t('commands.error')}
+        </div>
       )}
 
-      {state === "ready" && (
+      {state === 'ready' && (
         <div className="command-list">
           {commands.map((command) => (
             <CommandCard

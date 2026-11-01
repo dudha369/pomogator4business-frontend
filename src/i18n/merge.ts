@@ -1,12 +1,12 @@
-import type { LocaleCode } from "./types";
-import { COMMON } from "./common";
+import type { LocaleCode } from './types';
+import { COMMON } from './common';
 
 type Dict = Record<string, string>;
 type FeatureLocaleModule = { RU?: Dict; EN?: Dict; UK?: Dict };
 
 const featureModules = import.meta.glob<FeatureLocaleModule>(
-  "../features/**/locales/*.ts",
-  { eager: true }
+  '../features/**/locales/*.ts',
+  { eager: true },
 );
 
 function buildTranslations(): Record<LocaleCode, Dict> {

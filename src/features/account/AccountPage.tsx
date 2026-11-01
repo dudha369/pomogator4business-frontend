@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
-import { postEvent, requestEmojiStatusAccess } from "@tma.js/sdk-react";
+import { useEffect, useState } from 'react';
+import { postEvent, requestEmojiStatusAccess } from '@tma.js/sdk-react';
 
-import { Section } from "@/shared/ui/Section";
-import { Switch } from "@/shared/ui/Switch";
-import { useLocale } from "@/i18n";
-import { fetchAccount, toggleEmojiStatus as apiToggleEmojiStatus, updateTimezone } from "./api";
+import { Section } from '@/shared/ui/Section';
+import { Switch } from '@/shared/ui/Switch';
+import { useLocale } from '@/i18n';
+import {
+  fetchAccount,
+  toggleEmojiStatus as apiToggleEmojiStatus,
+  updateTimezone,
+} from './api';
 import {
   TIMEZONE_OPTIONS,
   closestTimezoneOption,
@@ -12,14 +16,14 @@ import {
   markTimezoneAutoApplied,
   shouldAutoApplyTimezone,
   timezoneLabel,
-} from "./timezone";
-import type { AccountResponse } from "./types";
+} from './timezone';
+import type { AccountResponse } from './types';
 
-type LoadState = "loading" | "ready" | "error";
+type LoadState = 'loading' | 'ready' | 'error';
 
 export function AccountPage() {
   const { t, locale } = useLocale();
-  const [state, setState] = useState<LoadState>("loading");
+  const [state, setState] = useState<LoadState>('loading');
   const [account, setAccount] = useState<AccountResponse | null>(null);
   const [requesting, setRequesting] = useState(false);
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
@@ -27,27 +31,31 @@ export function AccountPage() {
 
   function load() {
     fetchAccount()
-    .then((data) => {
-      setAccount(data);
-      setState("ready");
-      maybeAutoApplyTimezone(data);
-    })
-    .catch(() => setState("error"));
+      .then((data) => {
+        setAccount(data);
+        setState('ready');
+        maybeAutoApplyTimezone(data);
+      })
+      .catch(() => setState('error'));
   }
 
   async function maybeAutoApplyTimezone(data: AccountResponse) {
     if (!(await shouldAutoApplyTimezone())) return;
 
-    const detected = closestTimezoneOption(detectBrowserOffsetMinutes()).offsetMinutes;
+    const detected = closestTimezoneOption(
+      detectBrowserOffsetMinutes(),
+    ).offsetMinutes;
     await markTimezoneAutoApplied();
 
     if (detected === data.timezone_offset_minutes) return;
 
     updateTimezone(detected)
-    .then((offset) => {
-      setAccount((prev) => (prev ? { ...prev, timezone_offset_minutes: offset } : prev));
-    })
-    .catch(() => {});
+      .then((offset) => {
+        setAccount((prev) =>
+          prev ? { ...prev, timezone_offset_minutes: offset } : prev,
+        );
+      })
+      .catch(() => {});
   }
 
   useEffect(load, []);
@@ -57,15 +65,15 @@ export function AccountPage() {
     setAccessMessage(null);
     try {
       const status = await requestEmojiStatusAccess({});
-      if (status === "allowed") {
-        postEvent("web_app_data_send", {
+      if (status === 'allowed') {
+        postEvent('web_app_data_send', {
           data: JSON.stringify({ emoji_status_access: true }),
         });
       } else {
-        setAccessMessage(t("account.accessDenied"));
+        setAccessMessage(t('account.accessDenied'));
       }
     } catch {
-      setAccessMessage(t("account.unsupported"));
+      setAccessMessage(t('account.unsupported'));
     } finally {
       setRequesting(false);
     }
@@ -73,12 +81,20 @@ export function AccountPage() {
 
   async function handleToggleEmojiStatus(enabled: boolean) {
     if (!account) return;
-    setAccount({ ...account, emoji_status: { ...account.emoji_status, enabled } });
+    setAccount({
+      ...account,
+      emoji_status: { ...account.emoji_status, enabled },
+    });
     try {
       await apiToggleEmojiStatus(enabled);
     } catch {
       setAccount((prev) =>
-        prev ? { ...prev, emoji_status: { ...prev.emoji_status, enabled: !enabled } } : prev
+        prev
+          ? {
+              ...prev,
+              emoji_status: { ...prev.emoji_status, enabled: !enabled },
+            }
+          : prev,
       );
     }
   }
@@ -91,42 +107,51 @@ export function AccountPage() {
     try {
       await updateTimezone(offsetMinutes);
     } catch {
-      setAccount((prev) => (prev ? { ...prev, timezone_offset_minutes: previous } : prev));
+      setAccount((prev) =>
+        prev ? { ...prev, timezone_offset_minutes: previous } : prev,
+      );
     } finally {
       setSavingTimezone(false);
     }
   }
 
-  if (state === "loading") {
-    return <div className="page__status">{t("account.loading")}</div>;
+  if (state === 'loading') {
+    return <div className="page__status">{t('account.loading')}</div>;
   }
-  if (state === "error" || !account) {
-    return <div className="page__status page__status--error">{t("account.error")}</div>;
+  if (state === 'error' || !account) {
+    return (
+      <div className="page__status page__status--error">
+        {t('account.error')}
+      </div>
+    );
   }
 
   const grantedRights = Object.entries(account.connection?.rights ?? {}).filter(
-    ([, value]) => value === true
+    ([, value]) => value === true,
   );
 
   return (
     <div className="page">
       <header className="page__header">
-        <h1>{t("account.title")}</h1>
+        <h1>{t('account.title')}</h1>
       </header>
 
-      <Section title={t("account.connectionSection")}>
+      <Section title={t('account.connectionSection')}>
         {account.connection ? (
           <>
             <div className="info-row">
-              <span className="info-row__label">{t("account.owner")}</span>
+              <span className="info-row__label">{t('account.owner')}</span>
               <span className="info-row__value">
                 {account.connection.owner_name}
-                {account.connection.owner_username && ` (@${account.connection.owner_username})`}
+                {account.connection.owner_username &&
+                  ` (@${account.connection.owner_username})`}
               </span>
             </div>
             <div className="info-row">
-              <span className="info-row__label">{t("account.prefix")}</span>
-              <span className="info-row__value">{account.connection.prefix}</span>
+              <span className="info-row__label">{t('account.prefix')}</span>
+              <span className="info-row__value">
+                {account.connection.prefix}
+              </span>
             </div>
             {grantedRights.length > 0 ? (
               <div className="rights-list">
@@ -137,15 +162,15 @@ export function AccountPage() {
                 ))}
               </div>
             ) : (
-              <p className="section__hint">{t("account.rightsEmpty")}</p>
+              <p className="section__hint">{t('account.rightsEmpty')}</p>
             )}
           </>
         ) : (
-          <p className="section__hint">{t("account.notConnected")}</p>
+          <p className="section__hint">{t('account.notConnected')}</p>
         )}
       </Section>
 
-      <Section title={t("account.timezoneSection")}>
+      <Section title={t('account.timezoneSection')}>
         <select
           className="timezone-select"
           disabled={savingTimezone}
@@ -158,32 +183,41 @@ export function AccountPage() {
             </option>
           ))}
         </select>
-        <p className="section__hint">{t("account.timezoneHint")}</p>
+        <p className="section__hint">{t('account.timezoneHint')}</p>
       </Section>
 
-      <Section title={t("account.emojiSection")}>
+      <Section title={t('account.emojiSection')}>
         {account.emoji_status.granted ? (
           <>
             <div className="info-row">
-              <span className="info-row__label">{t("account.emojiEnabled")}</span>
-              <Switch checked={account.emoji_status.enabled} onChange={handleToggleEmojiStatus} />
+              <span className="info-row__label">
+                {t('account.emojiEnabled')}
+              </span>
+              <Switch
+                checked={account.emoji_status.enabled}
+                onChange={handleToggleEmojiStatus}
+              />
             </div>
-            <p className="section__hint">{t("account.emojiExample")}</p>
-            <p className="section__hint">{t("account.emojiDisableNote")}</p>
+            <p className="section__hint">{t('account.emojiExample')}</p>
+            <p className="section__hint">{t('account.emojiDisableNote')}</p>
           </>
         ) : (
           <>
-            <p className="section__hint">{t("account.emojiHint")}</p>
-            <p className="section__hint">{t("account.emojiExample")}</p>
+            <p className="section__hint">{t('account.emojiHint')}</p>
+            <p className="section__hint">{t('account.emojiExample')}</p>
             <button
               className="prefix-editor__save"
               disabled={requesting}
               onClick={handleRequestAccess}
               type="button"
             >
-              {requesting ? t("account.requesting") : t("account.requestAccess")}
+              {requesting
+                ? t('account.requesting')
+                : t('account.requestAccess')}
             </button>
-            {accessMessage && <p className="prefix-editor__error">{accessMessage}</p>}
+            {accessMessage && (
+              <p className="prefix-editor__error">{accessMessage}</p>
+            )}
           </>
         )}
       </Section>

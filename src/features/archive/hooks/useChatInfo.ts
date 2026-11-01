@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { apiGet } from "@/shared/api/client";
+import { apiGet } from '@/shared/api/client';
 
 export interface ChatInfo {
   full_name: string;
@@ -11,7 +11,7 @@ const cache = new Map<number, ChatInfo>();
 
 export function useChatInfo(userId: number | null): ChatInfo | null {
   const [info, setInfo] = useState<ChatInfo | null>(
-    userId !== null ? (cache.get(userId) ?? null) : null
+    userId !== null ? (cache.get(userId) ?? null) : null,
   );
 
   useEffect(() => {
@@ -26,12 +26,12 @@ export function useChatInfo(userId: number | null): ChatInfo | null {
     }
     let cancelled = false;
     apiGet<ChatInfo>(`/api/chat-info/${userId}`)
-    .then((data) => {
-      if (cancelled) return;
-      cache.set(userId, data);
-      setInfo(data);
-    })
-    .catch(() => {});
+      .then((data) => {
+        if (cancelled) return;
+        cache.set(userId, data);
+        setInfo(data);
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
     };

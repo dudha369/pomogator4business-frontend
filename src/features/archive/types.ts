@@ -1,7 +1,7 @@
-export type ArchiveEventType = "edited" | "deleted";
+export type ArchiveEventType = 'edited' | 'deleted';
 
-export type ArchiveMediaType = "photo" | "video" | "voice" | "video_note";
-export type ArchiveSort = "desc" | "asc";
+export type ArchiveMediaType = 'photo' | 'video' | 'voice' | 'video_note';
+export type ArchiveSort = 'desc' | 'asc';
 
 export interface ArchiveEntry {
   log_id: number;
@@ -32,9 +32,9 @@ export interface ArchiveFilters {
 
 export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   event: null,
-  search: "",
+  search: '',
   chatId: null,
-  dateFrom: "",
-  dateTo: "",
-  sort: "desc",
+  dateFrom: '',
+  dateTo: '',
+  sort: 'desc',
 };

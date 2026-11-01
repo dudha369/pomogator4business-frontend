@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+@import 'legacy.css';
+
+/*
+ * Цвета темы — переменные --tg-*, которые выставляет ThemeProvider
+ * (живая тема Telegram + акцент из настроек). Здесь они становятся
+ * утилитами Tailwind: bg-page, bg-card, text-fg, text-hint, bg-accent,
+ * border-line ... Значения не копируются, а ссылаются на переменные,
+ * поэтому смена темы/акцента подхватывается автоматически.
+ *
+ * В JS то же самое доступно через `const theme = useTheme()`.
+ */
+@theme inline {
+  --color-page: var(--tg-bg-color);
+  --color-card: var(--tg-section-bg-color);
+  --color-secondary: var(--tg-secondary-bg-color);
+  --color-fg: var(--tg-text-color);
+  --color-hint: var(--tg-hint-color);
+  --color-subtitle: var(--tg-subtitle-text-color);
+  --color-accent: var(--tg-accent-color);
+  --color-on-accent: var(--tg-button-text-color);
+  --color-link: var(--tg-link-color);
+  --color-destructive: var(--tg-destructive-text-color);
+  --color-line: var(--tg-section-separator-color);
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+
+    -webkit-user-select: none;
+    user-select: none;
+
+    touch-action: none;
+
+    overscroll-behavior: none;
+  }
+
+  html {
+    background-color: var(--tg-bg-color);
+    overflow: hidden;
+  }
+
+  body {
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+      sans-serif;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  button, input, textarea {
+    font: inherit;
+    color: inherit;
+    border: none;
+    background: none;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  input {
+    padding: 0;
+    margin: 0;
+    appearance: 0;
+  }
+
+  textarea, input {
+    outline: none;
+  }
+
+  textarea {
+    resize: none;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+}

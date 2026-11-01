@@ -8,14 +8,18 @@
  * Рисуем через canvas, а не SVG data-URI: feImage с SVG-картинкой не вычисляет
  * CSS-свойства (blur, mix-blend-mode), а растр — работает везде одинаково.
  */
-export function buildLensMap(w: number, h: number, bezel: number): string | null {
+export function buildLensMap(
+  w: number,
+  h: number,
+  bezel: number,
+): string | null {
   const dpr = 2;
   const cw = Math.max(1, Math.round(w * dpr));
   const ch = Math.max(1, Math.round(h * dpr));
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
   canvas.width = cw;
   canvas.height = ch;
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
   const img = ctx.createImageData(cw, ch);
@@ -49,7 +53,7 @@ export function buildLensMap(w: number, h: number, bezel: number): string | null
   }
   ctx.putImageData(img, 0, 0);
   try {
-    return canvas.toDataURL("image/png");
+    return canvas.toDataURL('image/png');
   } catch {
     return null;
   }

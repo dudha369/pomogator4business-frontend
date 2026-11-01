@@ -1,4 +1,4 @@
-import type { Command } from "../types";
+import type { Command } from '../types';
 
 interface Props {
   command: Command;
@@ -9,7 +9,9 @@ interface Props {
 export function CommandCard({ command, enabled, onOpen }: Props) {
   return (
     <button className="command-card" onClick={onOpen} type="button">
-      <div className={`command-card__badge ${enabled ? "" : "command-card__badge--disabled"}`}>
+      <div
+        className={`command-card__badge ${enabled ? '' : 'command-card__badge--disabled'}`}
+      >
         {command.name.charAt(0).toUpperCase()}
       </div>
       <div className="command-card__body">

@@ -34,13 +34,13 @@
   gap: 6px;
 }
 .command-modal__trigger {
-  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
   font-weight: 700;
   font-size: 14px;
   color: var(--accent);
 }
 .command-modal__alias {
-  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
   font-size: 12px;
   color: var(--hint);
   background: var(--bg);
@@ -80,7 +80,7 @@
 }
 .command-modal__usage {
   display: block;
-  font-family: "SFMono-Regular", Consolas, Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
   font-size: 14px;
   background: var(--bg);
   border-radius: 10px;

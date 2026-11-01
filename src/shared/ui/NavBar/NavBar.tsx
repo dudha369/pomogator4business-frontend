@@ -5,20 +5,20 @@ import {
   useRef,
   type CSSProperties,
   type PointerEvent,
-} from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+} from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
   Archive,
   Blocks,
   UserCircle2,
   type LucideIcon,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { useLocale } from "@/i18n/LocaleContext";
-import { haptic } from "../../telegram/haptics";
+import { useLocale } from '@/i18n';
+import { haptic } from '../../telegram/haptics';
 
-import "./navbar.css";
+import './navbar.css';
 
 type NavItem = {
   to: string;
@@ -110,10 +110,10 @@ export function NavBar() {
   const navigate = useNavigate();
 
   const items: NavItem[] = [
-    { to: "/", label: t("nav.home"), icon: Home, end: true },
-    { to: "/commands", label: t("nav.commands"), icon: Blocks },
-    { to: "/archive", label: t("nav.archive"), icon: Archive },
-    { to: "/account", label: t("nav.account"), icon: UserCircle2 },
+    { to: '/', label: t('nav.home'), icon: Home, end: true },
+    { to: '/commands', label: t('nav.commands'), icon: Blocks },
+    { to: '/archive', label: t('nav.archive'), icon: Archive },
+    { to: '/account', label: t('nav.account'), icon: UserCircle2 },
   ];
   const n = items.length;
 
@@ -162,12 +162,12 @@ export function NavBar() {
 
   const reducedMotion = useRef(false);
   useEffect(() => {
-    const mq = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    const mq = window.matchMedia?.('(prefers-reduced-motion: reduce)');
     if (!mq) return;
     const apply = () => (reducedMotion.current = mq.matches);
     apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
   }, []);
 
   /** Записывает физическое состояние в DOM (без ререндеров React). */
@@ -191,7 +191,7 @@ export function NavBar() {
     bar.style.transform =
       p.u > 0.001
         ? `scale(${f2(1 + INFLATE_X * p.u)},${f2(1 + INFLATE_Y * p.u)})`
-        : "";
+        : '';
 
     // плоская капсула
     capsule.style.width = `${W}px`;
@@ -199,20 +199,22 @@ export function NavBar() {
     capsule.style.opacity = String(clamp(1 - g * 2, 0, 1));
 
     if (!visible) {
-      lens.style.visibility = "hidden";
-      row.style.clipPath = "";
-      (row.style as CSSStyleDeclaration & { webkitClipPath: string }).webkitClipPath = "";
+      lens.style.visibility = 'hidden';
+      row.style.clipPath = '';
+      (
+        row.style as CSSStyleDeclaration & { webkitClipPath: string }
+      ).webkitClipPath = '';
       return;
     }
 
     // линза
-    lens.style.visibility = "visible";
+    lens.style.visibility = 'visible';
     lens.style.width = `${W}px`;
     lens.style.height = `${H}px`;
     lens.style.transform = `translate3d(${p.a}px,${top}px,0)`;
-    lens.style.setProperty("--g", String(f2(g)));
+    lens.style.setProperty('--g', String(f2(g)));
     lens.style.setProperty(
-      "--ring",
+      '--ring',
       `${f2(RING_TAP + (RING_HOLD - RING_TAP) * b)}px`,
     );
 
@@ -233,7 +235,9 @@ export function NavBar() {
       `M${x0} ${y0}H${x1}A${f2(r)} ${f2(r)} 0 0 1 ${x1} ${y1}H${x0}` +
       `A${f2(r)} ${f2(r)} 0 0 1 ${x0} ${y0}Z")`;
     row.style.clipPath = path;
-    (row.style as CSSStyleDeclaration & { webkitClipPath: string }).webkitClipPath = path;
+    (
+      row.style as CSSStyleDeclaration & { webkitClipPath: string }
+    ).webkitClipPath = path;
   }, []);
 
   const step = useCallback(
@@ -392,7 +396,7 @@ export function NavBar() {
   };
 
   const onPointerDown = (e: PointerEvent) => {
-    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     trackRef.current?.setPointerCapture(e.pointerId);
     const idx = Math.round(posFromX(e.clientX));
     gesture.current = { startX: e.clientX, downIdx: idx, lastIdx: idx };
@@ -400,7 +404,7 @@ export function NavBar() {
     p.holding = true;
     p.moved = false;
     p.holdStart = performance.now();
-    haptic.impact("light");
+    haptic.impact('light');
     setTarget(idx);
   };
 
@@ -480,7 +484,7 @@ export function NavBar() {
     <nav
       className="navbar"
       aria-label="Main"
-      style={{ "--n": n } as CSSProperties}
+      style={{ '--n': n } as CSSProperties}
     >
       <div ref={barRef} className="navbar__bar">
         {/* стекло панели — сосед, а не предок линзы */}

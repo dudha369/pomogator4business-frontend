@@ -1,4 +1,4 @@
-import type { ArchiveEntry } from "@/features/archive/types";
+import type { ArchiveEntry } from '@/features/archive/types';
 
 export interface HomeSummary {
   connected: boolean;

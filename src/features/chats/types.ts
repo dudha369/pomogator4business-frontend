@@ -5,8 +5,8 @@ export interface ChatItem {
   favorite: boolean;
 }
 
-export type ReadMode = "all" | "last" | "older";
-export type ReadUnit = "h" | "d";
+export type ReadMode = 'all' | 'last' | 'older';
+export type ReadUnit = 'h' | 'd';
 
 export interface ReadAllRequest {
   last_hours?: number;

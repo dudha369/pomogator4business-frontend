@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { API_BASE_URL, initDataHeader } from "@/shared/api/client";
+import { API_BASE_URL, initDataHeader } from '@/shared/api/client';
 
 const cache = new Map<number, string>();
 
@@ -18,14 +18,14 @@ export function useAvatar(userId: number): string | null {
     }
     let cancelled = false;
     fetch(`${API_BASE_URL}/api/avatar/${userId}`, { headers: initDataHeader() })
-    .then((res) => (res.ok ? res.blob() : null))
-    .then((blob) => {
-      if (cancelled || !blob) return;
-      const objectUrl = URL.createObjectURL(blob);
-      cache.set(userId, objectUrl);
-      setUrl(objectUrl);
-    })
-    .catch(() => {});
+      .then((res) => (res.ok ? res.blob() : null))
+      .then((blob) => {
+        if (cancelled || !blob) return;
+        const objectUrl = URL.createObjectURL(blob);
+        cache.set(userId, objectUrl);
+        setUrl(objectUrl);
+      })
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
