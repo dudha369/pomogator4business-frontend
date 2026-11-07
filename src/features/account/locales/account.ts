@@ -15,6 +15,7 @@ export const RU = {
     'При выключении статус снимается полностью. Вернуть точно тот же статус, что стоял до включения, невозможно — Telegram не даёт боту узнать, что там было.',
   'account.emojiSection': 'Часы в эмодзи-статусе',
   'account.emojiEnabled': 'Включены',
+  'account.clockStyle': 'Вид часов',
   'account.emojiHint':
     'Разрешите боту обновлять ваш эмодзи-статус текущим временем каждую минуту.',
   'account.requestAccess': 'Запросить доступ',
@@ -59,6 +60,7 @@ export const EN = {
     "Turning this off clears the status entirely. Restoring exactly what was there before isn't possible — Telegram doesn't let a bot read a user's current status.",
   'account.emojiSection': 'Emoji-status clock',
   'account.emojiEnabled': 'Enabled',
+  'account.clockStyle': 'Clock style',
   'account.emojiHint':
     'Let the bot update your emoji status with the current time every minute.',
   'account.requestAccess': 'Request access',
@@ -104,6 +106,7 @@ export const UK = {
     'При вимкненні статус знімається повністю. Повернути точно той самий статус, що був до увімкнення, неможливо — Telegram не дає боту дізнатися, що там було.',
   'account.emojiSection': 'Годинник в emoji-статусі',
   'account.emojiEnabled': 'Увімкнено',
+  'account.clockStyle': 'Вигляд годинника',
   'account.emojiHint':
     'Дозвольте боту оновлювати ваш emoji-статус поточним часом щохвилини.',
   'account.requestAccess': 'Запросити доступ',

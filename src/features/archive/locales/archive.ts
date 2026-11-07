@@ -21,6 +21,62 @@ export const RU = {
   'archive.searchPlaceholder': 'Поиск по тексту...',
   'archive.before': 'Было',
   'archive.after': 'Стало',
+  'archive.forwardedFrom': 'Переслано от',
+  'archive.file': 'Файл',
+  'archive.tooLarge':
+    'Файл слишком большой, чтобы показать его здесь — он доступен в чате с ботом.',
+  'archive.kind.photo': 'Фото',
+  'archive.kind.video': 'Видео',
+  'archive.kind.voice': 'Голосовое сообщение',
+  'archive.kind.video_note': 'Видео-кружок',
+  'archive.kind.animation': 'GIF',
+  'archive.kind.audio': 'Аудио',
+  'archive.kind.sticker': 'Стикер',
+  'archive.kind.document': 'Файл',
+  'archive.kind.text': 'Сообщение',
+  'archive.kind.location': 'Геолокация',
+  'archive.kind.venue': 'Место',
+  'archive.kind.contact': 'Контакт',
+  'archive.kind.poll': 'Опрос',
+  'archive.kind.dice': 'Выпало',
+  'archive.kind.gift': 'Подарок',
+  'archive.kind.unique_gift': 'Уникальный подарок',
+  'archive.kind.story': 'История',
+  'archive.kind.checklist': 'Чек-лист',
+  'archive.kind.paid_media': 'Платное медиа',
+  'archive.kind.live_photo': 'Живое фото',
+  'archive.kind.other': 'Сообщение',
+  'archive.transcript': 'Расшифровка',
+  'archive.settings.title': 'Оформление уведомлений',
+  'archive.settings.subtitle':
+    'Как бот присылает вам удалённые и изменённые сообщения.',
+  'archive.settings.rich': 'Rich-сообщения',
+  'archive.settings.richHint':
+    'Одно красивое сообщение вместо нескольких. Выключите, если клиент показывает его неудобно.',
+  'archive.settings.albumStyle': 'Альбом',
+  'archive.settings.style.slideshow': 'Карусель',
+  'archive.settings.style.collage': 'Плитка',
+  'archive.settings.style.list': 'Подряд',
+  'archive.settings.kinds': 'Что показывать в Rich',
+  'archive.settings.kindsHint':
+    'Остальное придёт обычным сообщением с подписью.',
+  'archive.settings.details': 'Подробности',
+  'archive.settings.collapse': 'Сворачивать вложения',
+  'archive.settings.collapseHint':
+    'Файлы прячутся в блок «Вложения», сообщение получается короче.',
+  'archive.settings.history': 'История правок в одном сообщении',
+  'archive.settings.historyHint':
+    'Каждая новая правка обновляет прежнее уведомление, а не присылает новое.',
+  'archive.settings.captionMedia': 'Показывать файл при правке подписи',
+  'archive.settings.captionMediaHint':
+    'Файл над «Было» и «Стало», чтобы было понятно, о чём речь.',
+  'archive.settings.map': 'Геолокация картой',
+  'archive.settings.mapHint':
+    'Карта прямо в уведомлении вместо отдельной геометки.',
+  'archive.settings.voice': 'Голосовые',
+  'archive.settings.transcriptHint':
+    'Текст появится в уведомлении об удалении. Распознавание идёт через внешний сервис.',
+  'archive.settings.transcript': 'Расшифровывать голосовые',
 };
 
 export const EN = {
@@ -45,6 +101,62 @@ export const EN = {
   'archive.searchPlaceholder': 'Search text...',
   'archive.before': 'Before',
   'archive.after': 'After',
+  'archive.forwardedFrom': 'Forwarded from',
+  'archive.file': 'File',
+  'archive.tooLarge':
+    'The file is too large to show here — it is available in the bot chat.',
+  'archive.kind.photo': 'Photo',
+  'archive.kind.video': 'Video',
+  'archive.kind.voice': 'Voice message',
+  'archive.kind.video_note': 'Video note',
+  'archive.kind.animation': 'GIF',
+  'archive.kind.audio': 'Audio',
+  'archive.kind.sticker': 'Sticker',
+  'archive.kind.document': 'File',
+  'archive.kind.text': 'Message',
+  'archive.kind.location': 'Location',
+  'archive.kind.venue': 'Venue',
+  'archive.kind.contact': 'Contact',
+  'archive.kind.poll': 'Poll',
+  'archive.kind.dice': 'Rolled',
+  'archive.kind.gift': 'Gift',
+  'archive.kind.unique_gift': 'Unique gift',
+  'archive.kind.story': 'Story',
+  'archive.kind.checklist': 'Checklist',
+  'archive.kind.paid_media': 'Paid media',
+  'archive.kind.live_photo': 'Live photo',
+  'archive.kind.other': 'Message',
+  'archive.transcript': 'Transcript',
+  'archive.settings.title': 'Notification style',
+  'archive.settings.subtitle':
+    'How the bot sends you deleted and edited messages.',
+  'archive.settings.rich': 'Rich messages',
+  'archive.settings.richHint':
+    'One nicer message instead of several. Turn off if your client shows it badly.',
+  'archive.settings.albumStyle': 'Album',
+  'archive.settings.style.slideshow': 'Carousel',
+  'archive.settings.style.collage': 'Collage',
+  'archive.settings.style.list': 'In a row',
+  'archive.settings.kinds': 'What to show as Rich',
+  'archive.settings.kindsHint':
+    'Everything else is sent as a regular message with a caption.',
+  'archive.settings.details': 'Details',
+  'archive.settings.collapse': 'Collapse attachments',
+  'archive.settings.collapseHint':
+    'Files go into an "Attachments" block and the message gets shorter.',
+  'archive.settings.history': 'Edit history in one message',
+  'archive.settings.historyHint':
+    'Each new edit updates the previous notice instead of sending a new one.',
+  'archive.settings.captionMedia': 'Show the file when a caption is edited',
+  'archive.settings.captionMediaHint':
+    'The file appears above "Was" and "Now" so it is clear what changed.',
+  'archive.settings.map': 'Location as a map',
+  'archive.settings.mapHint':
+    'A map inside the notice instead of a separate location.',
+  'archive.settings.voice': 'Voice messages',
+  'archive.settings.transcriptHint':
+    'The text appears in the deletion notice. Recognition uses an external service.',
+  'archive.settings.transcript': 'Transcribe voice messages',
 };
 
 export const UK = {
@@ -70,4 +182,60 @@ export const UK = {
   'archive.searchPlaceholder': 'Пошук по тексту...',
   'archive.before': 'Було',
   'archive.after': 'Стало',
+  'archive.forwardedFrom': 'Переслано від',
+  'archive.file': 'Файл',
+  'archive.tooLarge':
+    'Файл завеликий, щоб показати його тут — він доступний у чаті з ботом.',
+  'archive.kind.photo': 'Фото',
+  'archive.kind.video': 'Відео',
+  'archive.kind.voice': 'Голосове повідомлення',
+  'archive.kind.video_note': 'Відеокружок',
+  'archive.kind.animation': 'GIF',
+  'archive.kind.audio': 'Аудіо',
+  'archive.kind.sticker': 'Стікер',
+  'archive.kind.document': 'Файл',
+  'archive.kind.text': 'Повідомлення',
+  'archive.kind.location': 'Геолокація',
+  'archive.kind.venue': 'Місце',
+  'archive.kind.contact': 'Контакт',
+  'archive.kind.poll': 'Опитування',
+  'archive.kind.dice': 'Випало',
+  'archive.kind.gift': 'Подарунок',
+  'archive.kind.unique_gift': 'Унікальний подарунок',
+  'archive.kind.story': 'Історія',
+  'archive.kind.checklist': 'Чек-лист',
+  'archive.kind.paid_media': 'Платне медіа',
+  'archive.kind.live_photo': 'Жива фотографія',
+  'archive.kind.other': 'Повідомлення',
+  'archive.transcript': 'Розшифровка',
+  'archive.settings.title': 'Оформлення сповіщень',
+  'archive.settings.subtitle':
+    'Як бот надсилає вам видалені та змінені повідомлення.',
+  'archive.settings.rich': 'Rich-повідомлення',
+  'archive.settings.richHint':
+    'Одне гарне повідомлення замість кількох. Вимкніть, якщо клієнт показує його незручно.',
+  'archive.settings.albumStyle': 'Альбом',
+  'archive.settings.style.slideshow': 'Карусель',
+  'archive.settings.style.collage': 'Плитка',
+  'archive.settings.style.list': 'Підряд',
+  'archive.settings.kinds': 'Що показувати в Rich',
+  'archive.settings.kindsHint':
+    'Решта прийде звичайним повідомленням з підписом.',
+  'archive.settings.details': 'Подробиці',
+  'archive.settings.collapse': 'Згортати вкладення',
+  'archive.settings.collapseHint':
+    'Файли ховаються в блок «Вкладення», повідомлення стає коротшим.',
+  'archive.settings.history': 'Історія змін в одному повідомленні',
+  'archive.settings.historyHint':
+    'Кожна нова зміна оновлює попереднє сповіщення, а не надсилає нове.',
+  'archive.settings.captionMedia': 'Показувати файл при зміні підпису',
+  'archive.settings.captionMediaHint':
+    'Файл над «Було» і «Стало», щоб було зрозуміло, про що мова.',
+  'archive.settings.map': 'Геолокація картою',
+  'archive.settings.mapHint':
+    'Карта прямо в сповіщенні замість окремої геоточки.',
+  'archive.settings.voice': 'Голосові',
+  'archive.settings.transcriptHint':
+    'Текст з’явиться у сповіщенні про видалення. Розпізнавання йде через зовнішній сервіс.',
+  'archive.settings.transcript': 'Розшифровувати голосові',
 };

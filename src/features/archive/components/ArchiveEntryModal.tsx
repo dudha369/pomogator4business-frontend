@@ -3,14 +3,16 @@ import { BottomSheet } from '@/shared/ui/BottomSheet/BottomSheet';
 import { useChatInfo } from '../hooks/useChatInfo';
 import type { ArchiveEntry } from '../types';
 import { ArchiveAvatar } from './ArchiveAvatar';
-import { ArchiveMedia } from './ArchiveMedia';
+import { ArchiveContentView, contentOf } from './ArchiveContentView';
 
 interface Props {
-  entry: ArchiveEntry | null;
+  /** выбранная запись; у удалённого альбома — все его сообщения */
+  entries: ArchiveEntry[] | null;
   onClose: () => void;
 }
 
-export function ArchiveEntryModal({ entry, onClose }: Props) {
+export function ArchiveEntryModal({ entries, onClose }: Props) {
+  const entry = entries?.[0] ?? null;
   const { t, locale } = useLocale();
   const info = useChatInfo(entry?.chat_id ?? null);
   const displayName = info?.full_name || t('archive.unknownSender');
@@ -37,28 +39,41 @@ export function ArchiveEntryModal({ entry, onClose }: Props) {
             {new Date(entry.created_at * 1000).toLocaleString(locale)}
           </p>
 
-          {entry.media_type && (
-            <div className="my-3">
-              <ArchiveMedia logId={entry.log_id} mediaType={entry.media_type} />
-            </div>
-          )}
-
           {isDeleted ? (
-            <p className="archive-modal__text">
-              {entry.old_text || t('archive.mediaPlaceholder')}
-            </p>
+            <div className="space-y-3">
+              {entries!.map((item, index) => (
+                <ArchiveContentView
+                  content={contentOf(item, 'old')}
+                  entry={item}
+                  hideForward={index > 0}
+                  key={item.log_id}
+                  logId={item.log_id}
+                  which="old"
+                />
+              ))}
+            </div>
           ) : (
             <>
               <h3 className="command-modal__section-title">
                 {t('archive.before')}
               </h3>
-              <p className="archive-modal__text archive-modal__text--old">
-                {entry.old_text}
-              </p>
+              <div className="opacity-80">
+                <ArchiveContentView
+                  content={contentOf(entry, 'old')}
+                  entry={entry}
+                  logId={entry.log_id}
+                  which="old"
+                />
+              </div>
               <h3 className="command-modal__section-title">
                 {t('archive.after')}
               </h3>
-              <p className="archive-modal__text">{entry.new_text}</p>
+              <ArchiveContentView
+                content={contentOf(entry, 'new')}
+                entry={entry}
+                logId={entry.log_id}
+                which="new"
+              />
             </>
           )}
         </div>

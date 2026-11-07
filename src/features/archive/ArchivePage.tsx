@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SlidersHorizontal } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
 import { useLocale } from '@/i18n';
@@ -6,6 +7,8 @@ import { fetchArchivePage } from './api';
 import { ArchiveEntryCard } from './components/ArchiveEntryCard';
 import { ArchiveEntryModal } from './components/ArchiveEntryModal';
 import { ArchiveFiltersBar } from './components/ArchiveFilters';
+import { ArchiveSettingsSheet } from './components/ArchiveSettingsSheet';
+import { groupAlbums } from './groupAlbums';
 import { DEFAULT_ARCHIVE_FILTERS } from './types';
 import type { ArchiveEntry, ArchiveFilters } from './types';
 
@@ -26,7 +29,8 @@ export function ArchivePage() {
   const [hasMore, setHasMore] = useState(false);
   const [nextBeforeId, setNextBeforeId] = useState<number | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [selected, setSelected] = useState<ArchiveEntry | null>(null);
+  const [selected, setSelected] = useState<ArchiveEntry[] | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Перезагрузка с нуля при смене фильтров (дебаунс 300 мс — чтобы не бить
@@ -36,16 +40,16 @@ export function ArchivePage() {
     const timer = setTimeout(() => {
       setState('loading');
       fetchArchivePage(filters)
-        .then((page) => {
-          if (cancelled) return;
-          setEntries(page.entries);
-          setHasMore(page.has_more);
-          setNextBeforeId(page.next_before_id);
-          setState('ready');
-        })
-        .catch(() => {
-          if (!cancelled) setState('error');
-        });
+      .then((page) => {
+        if (cancelled) return;
+        setEntries(page.entries);
+        setHasMore(page.has_more);
+        setNextBeforeId(page.next_before_id);
+        setState('ready');
+      })
+      .catch(() => {
+        if (!cancelled) setState('error');
+      });
     }, 300);
     return () => {
       cancelled = true;
@@ -84,9 +88,21 @@ export function ArchivePage() {
 
   return (
     <div className="page">
-      <header className="page__header">
+      <header className="page__header flex items-center justify-between">
         <h1>{t('archive.title')}</h1>
+        <button
+          aria-label={t('archive.settings.title')}
+          className="text-hint p-2"
+          onClick={() => setSettingsOpen(true)}
+          type="button"
+        >
+          <SlidersHorizontal className="size-5" />
+        </button>
       </header>
+      <ArchiveSettingsSheet
+        onClose={() => setSettingsOpen(false)}
+        open={settingsOpen}
+      />
 
       <ArchiveFiltersBar filters={filters} onChange={setFilters} />
 
@@ -104,11 +120,11 @@ export function ArchivePage() {
 
       {state === 'ready' && entries.length > 0 && (
         <div className="archive-list">
-          {entries.map((entry) => (
+          {groupAlbums(entries).map((group) => (
             <ArchiveEntryCard
-              entry={entry}
-              key={entry.log_id}
-              onOpen={() => setSelected(entry)}
+              entries={group.entries}
+              key={group.key}
+              onOpen={() => setSelected(group.entries)}
             />
           ))}
           {hasMore && <div className="archive-sentinel" ref={sentinelRef} />}
@@ -118,7 +134,7 @@ export function ArchivePage() {
         </div>
       )}
 
-      <ArchiveEntryModal entry={selected} onClose={() => setSelected(null)} />
+      <ArchiveEntryModal entries={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }

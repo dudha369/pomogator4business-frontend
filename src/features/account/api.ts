@@ -15,6 +15,14 @@ export async function updateTimezone(offsetMinutes: number): Promise<number> {
   return res.offset_minutes;
 }
 
+export async function updateEmojiStatusStyle(style: string): Promise<string> {
+  const res = await apiPost<{ style: string }>(
+    '/api/settings/emoji-status/style',
+    { style },
+  );
+  return res.style;
+}
+
 export async function toggleEmojiStatus(enabled: boolean): Promise<boolean> {
   const res = await apiPost<{ enabled: boolean }>(
     '/api/settings/emoji-status',

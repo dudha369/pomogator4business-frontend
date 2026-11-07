@@ -5,9 +5,17 @@ export interface AccountConnection {
   rights: Record<string, boolean | null>;
 }
 
+export interface ClockStyleInfo {
+  id: string;
+  titles: Record<string, string>;
+  available: boolean;
+}
+
 export interface AccountEmojiStatus {
   granted: boolean;
   enabled: boolean;
+  style: string;
+  styles: ClockStyleInfo[];
 }
 
 export interface AccountResponse {
