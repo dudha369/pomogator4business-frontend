@@ -1,15 +1,15 @@
 import { useEffect, useRef } from 'react';
 import {
+  backButton,
   init,
   initData,
-  retrieveLaunchParams,
-  viewport,
-  themeParams,
-  swipeBehavior,
-  settingsButton,
   mainButton,
+  retrieveLaunchParams,
   secondaryButton,
-  backButton,
+  settingsButton,
+  swipeBehavior,
+  themeParams,
+  viewport,
 } from '@tma.js/sdk-react';
 import { isMobileDevice } from '../lib/device';
 

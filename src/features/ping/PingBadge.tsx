@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useLocale } from '@/i18n';
-import { fetchDeepPing, type DeepPing } from './api';
+import { type DeepPing, fetchDeepPing } from './api';
 import { usePing } from './usePing';
 
 function dotClass(ms: number | null, loading: boolean): string {

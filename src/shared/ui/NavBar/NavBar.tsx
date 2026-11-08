@@ -1,18 +1,18 @@
 import {
+  type CSSProperties,
+  type PointerEvent,
   useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
-  type CSSProperties,
-  type PointerEvent,
 } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Home,
   Archive,
   Blocks,
-  UserCircle2,
+  Home,
   type LucideIcon,
+  UserCircle2,
 } from 'lucide-react';
 
 import { useLocale } from '@/i18n';

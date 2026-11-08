@@ -13,12 +13,12 @@ function loadAvatar(userId: number): Promise<string | null> {
     request = fetch(`${API_BASE_URL}/api/avatar/${userId}`, {
       headers: initDataHeader(),
     })
-    .then((res) => (res.ok ? res.blob() : null))
-    .then((blob) => (blob ? URL.createObjectURL(blob) : null))
-    .catch(() => {
-      requests.delete(userId); // сетевой сбой — пусть следующая попытка повторит
-      return null;
-    });
+      .then((res) => (res.ok ? res.blob() : null))
+      .then((blob) => (blob ? URL.createObjectURL(blob) : null))
+      .catch(() => {
+        requests.delete(userId); // сетевой сбой — пусть следующая попытка повторит
+        return null;
+      });
     requests.set(userId, request);
   }
   return request;

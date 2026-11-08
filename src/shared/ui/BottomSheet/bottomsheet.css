@@ -7,9 +7,11 @@
   justify-content: center;
   background: rgba(0, 0, 0, 0.45);
 }
+
 .sheet-backdrop--open {
   animation: sheet-fade-in 0.22s ease both;
 }
+
 .sheet-backdrop--closing {
   animation: sheet-fade-out 0.22s ease both;
 }
@@ -22,6 +24,7 @@
     opacity: 1;
   }
 }
+
 @keyframes sheet-fade-out {
   from {
     opacity: 1;
@@ -44,9 +47,11 @@
   overflow: hidden;
   touch-action: none;
 }
+
 .sheet--open {
   animation: sheet-slide-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
+
 .sheet--closing {
   animation: sheet-slide-out 0.22s cubic-bezier(0.4, 0, 1, 1) both;
 }
@@ -59,6 +64,7 @@
     transform: translateY(0);
   }
 }
+
 @keyframes sheet-slide-out {
   from {
     transform: translateY(0);
@@ -76,6 +82,7 @@
   cursor: grab;
   touch-action: none;
 }
+
 .sheet__handle {
   width: 36px;
   height: 4px;
@@ -83,6 +90,7 @@
   background: var(--hint);
   opacity: 0.5;
 }
+
 .sheet__content {
   flex: 1 1 auto;
   overflow-y: auto;

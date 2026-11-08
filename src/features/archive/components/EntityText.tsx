@@ -77,8 +77,8 @@ function renderRange(
   prefix: string,
 ): ReactNode[] {
   const sorted = entities
-  .filter((e) => e.offset >= start && e.offset + e.length <= end)
-  .sort((a, b) => a.offset - b.offset || b.length - a.length);
+    .filter((e) => e.offset >= start && e.offset + e.length <= end)
+    .sort((a, b) => a.offset - b.offset || b.length - a.length);
   const out: ReactNode[] = [];
   let pos = start;
   sorted.forEach((entity, index) => {
@@ -103,9 +103,9 @@ function renderRange(
 
 /** Текст с форматированием Telegram (жирный, ссылки, спойлеры, цитаты…). */
 export function EntityText({
-                             text,
-                             entities,
-                           }: {
+  text,
+  entities,
+}: {
   text: string;
   entities: ArchiveEntity[] | null;
 }) {

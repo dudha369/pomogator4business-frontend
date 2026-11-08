@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { localeApi } from '../api/locale';
 import { onUnauthorized } from '../api/request';
 import { isInTelegram } from '../lib/telegramEnv';
-import { getApiStatus, getApiReason, isNetworkError } from '../lib/apiErrors';
+import { getApiReason, getApiStatus, isNetworkError } from '../lib/apiErrors';
 import type { LocaleCode } from '@/i18n/types';
 
 export const SESSION_QUERY_KEY = ['session'] as const;

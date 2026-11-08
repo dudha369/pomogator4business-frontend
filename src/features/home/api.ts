@@ -1,7 +1,7 @@
 import { apiGet } from '@/shared/api/client';
 import { fetchArchivePage } from '@/features/archive/api';
-import { DEFAULT_ARCHIVE_FILTERS } from '@/features/archive/types';
 import type { ArchiveEntry } from '@/features/archive/types';
+import { DEFAULT_ARCHIVE_FILTERS } from '@/features/archive/types';
 import type { HomeStats, HomeSummary } from './types';
 
 interface AccountApiResponse {

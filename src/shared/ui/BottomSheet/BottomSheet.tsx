@@ -1,10 +1,10 @@
 import {
+  type PointerEvent,
+  type ReactNode,
   useCallback,
   useEffect,
   useRef,
   useState,
-  type PointerEvent,
-  type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
 

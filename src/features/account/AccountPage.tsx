@@ -12,11 +12,11 @@ import {
   updateTimezone,
 } from './api';
 import {
-  TIMEZONE_OPTIONS,
   closestTimezoneOption,
   detectBrowserOffsetMinutes,
   markTimezoneAutoApplied,
   shouldAutoApplyTimezone,
+  TIMEZONE_OPTIONS,
   timezoneLabel,
 } from './timezone';
 import type { AccountResponse } from './types';
@@ -52,12 +52,12 @@ export function AccountPage() {
 
   function load() {
     fetchAccount()
-    .then((data) => {
-      setAccount(data);
-      setState('ready');
-      maybeAutoApplyTimezone(data);
-    })
-    .catch(() => setState('error'));
+      .then((data) => {
+        setAccount(data);
+        setState('ready');
+        maybeAutoApplyTimezone(data);
+      })
+      .catch(() => setState('error'));
   }
 
   async function maybeAutoApplyTimezone(data: AccountResponse) {
@@ -71,12 +71,12 @@ export function AccountPage() {
     if (detected === data.timezone_offset_minutes) return;
 
     updateTimezone(detected)
-    .then((offset) => {
-      setAccount((prev) =>
-        prev ? { ...prev, timezone_offset_minutes: offset } : prev,
-      );
-    })
-    .catch(() => {});
+      .then((offset) => {
+        setAccount((prev) =>
+          prev ? { ...prev, timezone_offset_minutes: offset } : prev,
+        );
+      })
+      .catch(() => {});
   }
 
   useEffect(load, []);
@@ -112,9 +112,9 @@ export function AccountPage() {
       setAccount((prev) =>
         prev
           ? {
-            ...prev,
-            emoji_status: { ...prev.emoji_status, enabled: !enabled },
-          }
+              ...prev,
+              emoji_status: { ...prev.emoji_status, enabled: !enabled },
+            }
           : prev,
       );
     }
@@ -134,9 +134,9 @@ export function AccountPage() {
       setAccount((prev) =>
         prev
           ? {
-            ...prev,
-            emoji_status: { ...prev.emoji_status, style: previous },
-          }
+              ...prev,
+              emoji_status: { ...prev.emoji_status, style: previous },
+            }
           : prev,
       );
     } finally {

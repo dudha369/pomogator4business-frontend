@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
-import { apiPost } from '@/shared/api/client';
+import { ApiError, apiPost } from '@/shared/api/client';
 import { BottomSheet } from '@/shared/ui/BottomSheet/BottomSheet';
 import { Switch } from '@/shared/ui/Switch';
 import { useLocale } from '@/i18n';
-import { ApiError } from '@/shared/api/client';
 import { createUserAlias, deleteUserAlias } from '../../api';
 import type { Command, UserAlias } from '../../types';
 import { UserAliasesSection } from './UserAliasesSection';

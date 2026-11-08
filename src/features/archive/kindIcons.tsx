@@ -4,8 +4,8 @@ import {
   Camera,
   CircleDot,
   Dices,
-  Film,
   FileText,
+  Film,
   Gift,
   Image,
   ListChecks,
@@ -61,9 +61,9 @@ export const EVENT_ICONS = {
 } as const;
 
 export function KindIcon({
-                           kind,
-                           className = 'size-4',
-                         }: {
+  kind,
+  className = 'size-4',
+}: {
   kind: ArchiveKind;
   className?: string;
 }) {

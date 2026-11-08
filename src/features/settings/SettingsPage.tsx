@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import { Section } from '@/shared/ui/Section';
-import { LANGUAGE_NAMES, useLocale } from '@/i18n';
 import type { LocaleCode } from '@/i18n';
+import { LANGUAGE_NAMES, useLocale } from '@/i18n';
 import {
   connectMirror,
   disconnectMirror,

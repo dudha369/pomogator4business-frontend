@@ -9,8 +9,8 @@ import { ArchiveEntryModal } from './components/ArchiveEntryModal';
 import { ArchiveFiltersBar } from './components/ArchiveFilters';
 import { ArchiveSettingsSheet } from './components/ArchiveSettingsSheet';
 import { groupAlbums } from './groupAlbums';
-import { DEFAULT_ARCHIVE_FILTERS } from './types';
 import type { ArchiveEntry, ArchiveFilters } from './types';
+import { DEFAULT_ARCHIVE_FILTERS } from './types';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -40,16 +40,16 @@ export function ArchivePage() {
     const timer = setTimeout(() => {
       setState('loading');
       fetchArchivePage(filters)
-      .then((page) => {
-        if (cancelled) return;
-        setEntries(page.entries);
-        setHasMore(page.has_more);
-        setNextBeforeId(page.next_before_id);
-        setState('ready');
-      })
-      .catch(() => {
-        if (!cancelled) setState('error');
-      });
+        .then((page) => {
+          if (cancelled) return;
+          setEntries(page.entries);
+          setHasMore(page.has_more);
+          setNextBeforeId(page.next_before_id);
+          setState('ready');
+        })
+        .catch(() => {
+          if (!cancelled) setState('error');
+        });
     }, 300);
     return () => {
       cancelled = true;

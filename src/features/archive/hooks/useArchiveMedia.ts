@@ -32,14 +32,14 @@ export function useArchiveMedia(
     let cancelled = false;
     setState({ status: 'loading' });
     apiGetBlob(`/api/archive/${logId}/media?which=${which}`)
-    .then((blob) => {
-      const url = URL.createObjectURL(blob);
-      cache.set(key, url);
-      if (!cancelled) setState({ status: 'ready', url });
-    })
-    .catch(() => {
-      if (!cancelled) setState({ status: 'error' });
-    });
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        cache.set(key, url);
+        if (!cancelled) setState({ status: 'ready', url });
+      })
+      .catch(() => {
+        if (!cancelled) setState({ status: 'error' });
+      });
     return () => {
       cancelled = true;
     };

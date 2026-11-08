@@ -22,12 +22,12 @@ type BooleanKey = {
 }[keyof ArchivePrefs];
 
 function Row({
-               title,
-               hint,
-               checked,
-               onChange,
-               disabled,
-             }: {
+  title,
+  hint,
+  checked,
+  onChange,
+  disabled,
+}: {
   title: string;
   hint: string;
   checked: boolean;
@@ -67,8 +67,8 @@ export function ArchiveSettingsSheet({ open, onClose }: Props) {
   useEffect(() => {
     if (!open || data) return;
     fetchArchivePrefs()
-    .then(setData)
-    .catch(() => setFailed(true));
+      .then(setData)
+      .catch(() => setFailed(true));
   }, [open, data]);
 
   const prefs = data?.prefs;
@@ -78,17 +78,17 @@ export function ArchiveSettingsSheet({ open, onClose }: Props) {
     const request = ++lastRequest.current;
     setData({ ...data, prefs: { ...data.prefs, ...patch } }); // сразу показываем
     saveArchivePrefs(patch)
-    .then((saved) => {
-      // ответ на старый запрос не должен перебить более свежие переключатели
-      if (request === lastRequest.current) setData(saved);
-    })
-    .catch(() => {
-      // не сохранилось — возвращаем то, что реально хранится на сервере
-      if (request !== lastRequest.current) return;
-      fetchArchivePrefs()
-      .then(setData)
-      .catch(() => setFailed(true));
-    });
+      .then((saved) => {
+        // ответ на старый запрос не должен перебить более свежие переключатели
+        if (request === lastRequest.current) setData(saved);
+      })
+      .catch(() => {
+        // не сохранилось — возвращаем то, что реально хранится на сервере
+        if (request !== lastRequest.current) return;
+        fetchArchivePrefs()
+          .then(setData)
+          .catch(() => setFailed(true));
+      });
   };
 
   const toggle = (key: BooleanKey) => (value: boolean) =>

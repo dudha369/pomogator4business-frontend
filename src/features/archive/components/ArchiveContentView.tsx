@@ -1,7 +1,7 @@
 import { useLocale } from '@/i18n';
 import type {
-  ArchiveEntry,
   ArchiveContent,
+  ArchiveEntry,
   ArchiveForward,
   ArchiveMediaType,
 } from '../types';
@@ -174,11 +174,11 @@ interface Props {
 
 /** Одно «состояние» сообщения: пересылка, файл или данные, текст/подпись. */
 export function ArchiveContentView({
-                                     logId,
-                                     content,
-                                     which,
-                                     hideForward = false,
-                                   }: Props) {
+  logId,
+  content,
+  which,
+  hideForward = false,
+}: Props) {
   const { t } = useLocale();
   const isFile = FILE_KINDS.has(content.kind);
   const isGift = content.kind === 'gift' || content.kind === 'unique_gift';

@@ -15,11 +15,11 @@ interface Props {
 }
 
 export function ArchiveMedia({
-                               logId,
-                               which = 'auto',
-                               mediaType,
-                               content,
-                             }: Props) {
+  logId,
+  which = 'auto',
+  mediaType,
+  content,
+}: Props) {
   const { t } = useLocale();
   const media = useArchiveMedia(logId, which);
 
