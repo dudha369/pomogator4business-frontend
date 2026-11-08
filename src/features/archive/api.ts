@@ -1,5 +1,10 @@
-import { apiGet } from '@/shared/api/client';
-import type { ArchiveFilters, ArchivePage } from './types';
+import { apiGet, apiPost } from '@/shared/api/client';
+import type {
+  ArchiveFilters,
+  ArchivePage,
+  ArchivePrefs,
+  ArchivePrefsResponse,
+} from './types';
 
 /** "YYYY-MM-DD" → unix-время начала/конца этого дня в часовом поясе устройства. */
 function dayBoundary(value: string, endOfDay: boolean): number | null {
@@ -28,4 +33,15 @@ export async function fetchArchivePage(
   if (to !== null) params.set('date_to', String(to));
   params.set('sort', filters.sort);
   return apiGet<ArchivePage>(`/api/archive?${params.toString()}`);
+}
+
+export async function fetchArchivePrefs(): Promise<ArchivePrefsResponse> {
+  return apiGet<ArchivePrefsResponse>('/api/archive/settings');
+}
+
+/** Сохраняет только изменённые настройки; в ответе — полные актуальные. */
+export async function saveArchivePrefs(
+  patch: Partial<ArchivePrefs>,
+): Promise<ArchivePrefsResponse> {
+  return apiPost<ArchivePrefsResponse>('/api/archive/settings', patch);
 }
