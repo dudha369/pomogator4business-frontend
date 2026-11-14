@@ -81,6 +81,8 @@ export interface ArchiveEntry {
   media_type: ArchiveMediaType | null;
   media_available: boolean;
   kind?: ArchiveKind | null;
+  /** автор сообщения: true — вы, false — собеседник (у старых записей false) */
+  is_owner?: boolean;
   edit_kind?: ArchiveEditKind | null;
   /** null у записей, сделанных до перехода на снимки */
   old?: ArchiveContent | null;

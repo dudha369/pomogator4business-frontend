@@ -33,6 +33,9 @@ export function ArchiveEntryCard({ entries, onOpen }: Props) {
           {info?.username && (
             <span className="archive-entry__username">@{info.username}</span>
           )}
+          <span className="text-hint shrink-0 text-xs">
+            {entry.is_owner ? t('archive.authorOwn') : t('archive.authorPeer')}
+          </span>
           <span className="archive-entry__icon">
             <EventIcon className="size-4" />
           </span>
