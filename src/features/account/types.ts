@@ -22,4 +22,6 @@ export interface AccountResponse {
   connection: AccountConnection | null;
   emoji_status: AccountEmojiStatus;
   timezone_offset_minutes: number;
+  /** IANA-имя пояса; null — задано фиксированное смещение вручную. */
+  timezone: string | null;
 }

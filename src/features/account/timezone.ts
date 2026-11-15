@@ -189,11 +189,21 @@ export function closestTimezoneOption(offsetMinutes: number): TimezoneOption {
   );
 }
 
+/** IANA-имя пояса устройства (Europe/Kyiv): по нему сервер учитывает летнее время. */
+export function detectBrowserTimezoneName(): string | null {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+  } catch {
+    return null;
+  }
+}
+
 export function detectBrowserOffsetMinutes(): number {
   return -new Date().getTimezoneOffset();
 }
 
-const STORAGE_KEY = 'calora_tz_auto_applied';
+// один раз на устройство отправляем IANA-имя; дальше ручной выбор не перетираем
+const STORAGE_KEY = 'pomogator_tz_iana_synced';
 
 export async function shouldAutoApplyTimezone(): Promise<boolean> {
   const value = await getStoredValue(STORAGE_KEY);

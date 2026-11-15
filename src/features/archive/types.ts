@@ -126,6 +126,7 @@ export interface ArchivePrefs {
   caption_edit_media: boolean;
   location_map: boolean;
   voice_transcript: boolean;
+  own_edits: boolean;
 }
 
 export interface ArchivePrefsResponse {

@@ -194,6 +194,12 @@ export function ArchiveSettingsSheet({ open, onClose }: Props) {
               title={t('archive.settings.captionMedia')}
             />
             <Row
+              checked={prefs.own_edits}
+              hint={t('archive.settings.ownEditsHint')}
+              onChange={toggle('own_edits')}
+              title={t('archive.settings.ownEdits')}
+            />
+            <Row
               checked={prefs.location_map}
               disabled={!prefs.rich}
               hint={t('archive.settings.mapHint')}

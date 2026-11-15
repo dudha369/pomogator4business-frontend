@@ -79,6 +79,9 @@ export const RU = {
   'archive.settings.transcriptHint':
     'Текст появится в уведомлении об удалении. Распознавание идёт через внешний сервис.',
   'archive.settings.transcript': 'Расшифровывать голосовые',
+  'archive.settings.ownEditsHint':
+    'По умолчанию бот сообщает только об изменениях сообщений собеседника.',
+  'archive.settings.ownEdits': 'Изменения моих сообщений',
 };
 
 export const EN = {
@@ -161,6 +164,9 @@ export const EN = {
   'archive.settings.transcriptHint':
     'The text appears in the deletion notice. Recognition uses an external service.',
   'archive.settings.transcript': 'Transcribe voice messages',
+  'archive.settings.ownEditsHint':
+    'By default the bot reports only edits made by the other person.',
+  'archive.settings.ownEdits': 'Edits of my own messages',
 };
 
 export const UK = {
@@ -244,4 +250,7 @@ export const UK = {
   'archive.settings.transcriptHint':
     'Текст з’явиться у сповіщенні про видалення. Розпізнавання йде через зовнішній сервіс.',
   'archive.settings.transcript': 'Розшифровувати голосові',
+  'archive.settings.ownEditsHint':
+    'За замовчуванням бот повідомляє лише про зміни повідомлень співрозмовника.',
+  'archive.settings.ownEdits': 'Зміни моїх повідомлень',
 };

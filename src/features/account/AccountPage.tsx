@@ -9,11 +9,11 @@ import {
   fetchAccount,
   toggleEmojiStatus as apiToggleEmojiStatus,
   updateEmojiStatusStyle,
+  syncTimezoneName,
   updateTimezone,
 } from './api';
 import {
-  closestTimezoneOption,
-  detectBrowserOffsetMinutes,
+  detectBrowserTimezoneName,
   markTimezoneAutoApplied,
   shouldAutoApplyTimezone,
   TIMEZONE_OPTIONS,
@@ -63,17 +63,21 @@ export function AccountPage() {
   async function maybeAutoApplyTimezone(data: AccountResponse) {
     if (!(await shouldAutoApplyTimezone())) return;
 
-    const detected = closestTimezoneOption(
-      detectBrowserOffsetMinutes(),
-    ).offsetMinutes;
+    const name = detectBrowserTimezoneName();
     await markTimezoneAutoApplied();
 
-    if (detected === data.timezone_offset_minutes) return;
+    if (!name || name === data.timezone) return;
 
-    updateTimezone(detected)
-      .then((offset) => {
+    syncTimezoneName(name)
+      .then((res) => {
         setAccount((prev) =>
-          prev ? { ...prev, timezone_offset_minutes: offset } : prev,
+          prev
+            ? {
+                ...prev,
+                timezone_offset_minutes: res.offset_minutes,
+                timezone: res.timezone,
+              }
+            : prev,
         );
       })
       .catch(() => {});
@@ -147,13 +151,24 @@ export function AccountPage() {
   async function handleTimezoneChange(offsetMinutes: number) {
     if (!account) return;
     const previous = account.timezone_offset_minutes;
-    setAccount({ ...account, timezone_offset_minutes: offsetMinutes });
+    const previousName = account.timezone;
+    setAccount({
+      ...account,
+      timezone_offset_minutes: offsetMinutes,
+      timezone: null,
+    });
     setSavingTimezone(true);
     try {
       await updateTimezone(offsetMinutes);
     } catch {
       setAccount((prev) =>
-        prev ? { ...prev, timezone_offset_minutes: previous } : prev,
+        prev
+          ? {
+              ...prev,
+              timezone_offset_minutes: previous,
+              timezone: previousName,
+            }
+          : prev,
       );
     } finally {
       setSavingTimezone(false);

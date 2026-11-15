@@ -5,6 +5,13 @@ export async function fetchAccount(): Promise<AccountResponse> {
   return apiGet<AccountResponse>('/api/account');
 }
 
+/** Отправить IANA-имя пояса; сервер сам считает смещение с учётом летнего времени. */
+export async function syncTimezoneName(
+  timezone: string,
+): Promise<{ offset_minutes: number; timezone: string | null }> {
+  return apiPost('/api/account/timezone', { timezone });
+}
+
 export async function updateTimezone(offsetMinutes: number): Promise<number> {
   const res = await apiPost<{ offset_minutes: number }>(
     '/api/account/timezone',
