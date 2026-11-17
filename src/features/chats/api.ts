@@ -1,22 +1,23 @@
 import { apiGet, apiPost } from '@/shared/api/client';
-import type { ChatItem, ReadAllRequest, ReadAllResult } from './types';
+import type { Schema } from '@/shared/api/schema';
+import type {
+  ChatItem,
+  ReadAllRequest,
+  ReadAllResult,
+} from '@/features/chats/types';
 
 export async function fetchChats(): Promise<ChatItem[]> {
-  const res = await apiGet<{ chats: ChatItem[] }>('/api/chats');
-  return res.chats;
+  return (await apiGet<Schema<'ChatsOut'>>('/api/chats')).chats;
 }
 
-export async function setFavorite(
-  chatId: number,
-  favorite: boolean,
-): Promise<void> {
-  await apiPost('/api/favorites', { chat_id: chatId, favorite });
-}
+export const setFavorite = (chatId: number, favorite: boolean) =>
+  apiPost<Schema<'FavoriteOut'>>('/api/favorites', {
+    chat_id: chatId,
+    favorite,
+  });
 
-export function fetchReadAllStatus(): Promise<ReadAllResult> {
-  return apiGet<ReadAllResult>('/api/readall/status');
-}
+export const fetchReadAllStatus = () =>
+  apiGet<ReadAllResult>('/api/readall/status');
 
-export function readAll(request: ReadAllRequest): Promise<ReadAllResult> {
-  return apiPost<ReadAllResult>('/api/readall', request);
-}
+export const readAll = (request: ReadAllRequest) =>
+  apiPost<ReadAllResult>('/api/readall', request);

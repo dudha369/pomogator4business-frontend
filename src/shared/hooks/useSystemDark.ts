@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import { readSystemDark } from '../lib/telegramTheme';
+import { readSystemDark } from '@/shared/lib/telegramTheme';
 
 function subscribe(onChange: () => void) {
   const mq = window.matchMedia('(prefers-color-scheme: dark)');

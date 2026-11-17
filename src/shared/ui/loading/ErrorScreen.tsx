@@ -9,9 +9,9 @@ import {
   WifiOff,
   Wrench,
 } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
-import { useLocale } from '@/i18n';
-import { withOpacity } from '../../lib/colors';
+import { useTheme } from '@/shared/context/ThemeContext';
+import { useLocale } from '@/shared/i18n';
+import { withOpacity } from '@/shared/lib/colors';
 
 export type ErrorType =
   | 'network'

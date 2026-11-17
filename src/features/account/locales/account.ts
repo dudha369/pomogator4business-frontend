@@ -43,7 +43,7 @@ export const RU = {
   'rights.can_manage_stories': 'Управлять историями',
 };
 
-export const EN = {
+export const EN: Record<keyof typeof RU, string> = {
   'account.title': 'Account',
   'account.loading': 'Loading...',
   'account.error':
@@ -89,7 +89,7 @@ export const EN = {
   'rights.can_manage_stories': 'Manage stories',
 };
 
-export const UK = {
+export const UK: Record<keyof typeof RU, string> = {
   'account.title': 'Акаунт',
   'account.loading': 'Завантаження...',
   'account.error':

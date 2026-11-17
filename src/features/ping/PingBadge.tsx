@@ -1,8 +1,7 @@
 import { useState } from 'react';
 
-import { useLocale } from '@/i18n';
-import { type DeepPing, fetchDeepPing } from './api';
-import { usePing } from './usePing';
+import { useLocale } from '@/shared/i18n';
+import { useDeepPing, usePing } from '@/features/ping/hooks/usePing';
 
 function dotClass(ms: number | null, loading: boolean): string {
   if (loading) return 'bg-hint';
@@ -16,18 +15,9 @@ export function PingBadge() {
   const { t } = useLocale();
   const ping = usePing();
   const [open, setOpen] = useState(false);
-  const [deep, setDeep] = useState<DeepPing | 'error' | null>(null);
+  const deep = useDeepPing(open);
 
-  function toggle() {
-    const next = !open;
-    setOpen(next);
-    if (next) {
-      setDeep(null);
-      fetchDeepPing()
-        .then(setDeep)
-        .catch(() => setDeep('error'));
-    }
-  }
+  const toggle = () => setOpen((value) => !value);
 
   function ms(value: number | null): string {
     return value === null ? t('ping.failed') : `${value} ms`;
@@ -66,18 +56,18 @@ export function PingBadge() {
 
       {open && (
         <div className="border-line bg-card absolute top-full right-0 z-10 mt-2 w-60 rounded-2xl border p-3 text-sm shadow-lg">
-          {deep === null && <p className="text-hint">{t('ping.checking')}</p>}
-          {deep === 'error' && (
+          {deep.isFetching && <p className="text-hint">{t('ping.checking')}</p>}
+          {!deep.isFetching && deep.isError && (
             <p className="text-red-500">{t('ping.failed')}</p>
           )}
-          {deep !== null && deep !== 'error' && (
+          {!deep.isFetching && deep.data && (
             <dl className="grid grid-cols-[1fr_auto] gap-x-3 gap-y-1.5">
               <dt className="text-hint">{t('ping.telegram')}</dt>
-              <dd className="text-fg">{ms(deep.telegram_ms)}</dd>
+              <dd className="text-fg">{ms(deep.data.telegram_ms)}</dd>
               <dt className="text-hint">{t('ping.db')}</dt>
-              <dd className="text-fg">{ms(deep.db_ms)}</dd>
+              <dd className="text-fg">{ms(deep.data.db_ms)}</dd>
               <dt className="text-hint">{t('ping.uptime')}</dt>
-              <dd className="text-fg">{uptime(deep.uptime_seconds)}</dd>
+              <dd className="text-fg">{uptime(deep.data.uptime_seconds)}</dd>
             </dl>
           )}
         </div>

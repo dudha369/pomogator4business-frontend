@@ -23,7 +23,7 @@ export const RU = {
   'commandModal.ownerOnly': 'Доступно только владельцу аккаунта.',
 };
 
-export const EN = {
+export const EN: Record<keyof typeof RU, string> = {
   'commandModal.dmOnly': 'Only works in the bot DM: /{name} or .{name}.',
   'commandModal.dmToo': 'Also works in the bot DM: /{name} or .{name}.',
   'commandModal.myAliases': 'My aliases',
@@ -47,7 +47,7 @@ export const EN = {
   'commandModal.ownerOnly': 'Only available to the account owner.',
 };
 
-export const UK = {
+export const UK: Record<keyof typeof RU, string> = {
   'commandModal.dmOnly': 'Працює лише в приваті з ботом: /{name} або .{name}.',
   'commandModal.dmToo': 'Працює і в приваті з ботом: /{name} або .{name}.',
   'commandModal.myAliases': 'Мої аліаси',

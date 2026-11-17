@@ -1,19 +1,20 @@
 import { useState } from 'react';
 
-import { useLocale } from '@/i18n';
-import type { UserAlias } from '../../types';
+import { useLocale } from '@/shared/i18n';
+import type { UserAlias } from '@/features/commands/types';
+import type { TranslationKey } from '@/shared/i18n';
 
 interface Props {
   aliases: UserAlias[];
   /** Возвращает ключ перевода ошибки или null, если алиас добавлен. */
-  onAdd: (alias: string) => Promise<string | null>;
+  onAdd: (alias: string) => Promise<TranslationKey | null>;
   onRemove: (alias: string) => void;
 }
 
 export function UserAliasesSection({ aliases, onAdd, onRemove }: Props) {
   const { t } = useLocale();
   const [value, setValue] = useState('');
-  const [errorKey, setErrorKey] = useState<string | null>(null);
+  const [errorKey, setErrorKey] = useState<TranslationKey | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function submit() {

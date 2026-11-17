@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { ScrollContainerContext } from '../context/ScrollContainerContext';
+import { ScrollContainerContext } from '@/shared/context/ScrollContainerContext';
 
 export function useScrollContainer() {
   const ctx = useContext(ScrollContainerContext);

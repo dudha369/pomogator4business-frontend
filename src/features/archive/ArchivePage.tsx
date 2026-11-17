@@ -1,18 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
-import { useLocale } from '@/i18n';
-import { fetchArchivePage } from './api';
-import { ArchiveEntryCard } from './components/ArchiveEntryCard';
-import { ArchiveEntryModal } from './components/ArchiveEntryModal';
-import { ArchiveFiltersBar } from './components/ArchiveFilters';
-import { ArchiveSettingsSheet } from './components/ArchiveSettingsSheet';
-import { groupAlbums } from './groupAlbums';
-import type { ArchiveEntry, ArchiveFilters } from './types';
-import { DEFAULT_ARCHIVE_FILTERS } from './types';
-
-type LoadState = 'loading' | 'ready' | 'error';
+import { useLocale } from '@/shared/i18n';
+import { useArchiveList } from '@/features/archive/hooks/useArchive';
+import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue';
+import { ArchiveEntryCard } from '@/features/archive/components/ArchiveEntryCard';
+import { ArchiveEntryModal } from '@/features/archive/components/ArchiveEntryModal';
+import { ArchiveFiltersBar } from '@/features/archive/components/ArchiveFilters';
+import { ArchiveSettingsSheet } from '@/features/archive/components/ArchiveSettingsSheet';
+import { groupAlbums } from '@/features/archive/groupAlbums';
+import type { ArchiveEntry, ArchiveFilters } from '@/features/archive/types';
+import { DEFAULT_ARCHIVE_FILTERS } from '@/features/archive/types';
 
 export function ArchivePage() {
   const { t } = useLocale();
@@ -24,64 +23,20 @@ export function ArchivePage() {
       chatId: chatId ? Number(chatId) : null,
     };
   });
-  const [entries, setEntries] = useState<ArchiveEntry[]>([]);
-  const [state, setState] = useState<LoadState>('loading');
-  const [hasMore, setHasMore] = useState(false);
-  const [nextBeforeId, setNextBeforeId] = useState<number | null>(null);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [selected, setSelected] = useState<ArchiveEntry[] | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  // Номер «поколения» списка: растёт при каждой смене фильтров. Ответы
-  // loadMore из прошлого поколения игнорируются, иначе записи по старым
-  // фильтрам дописались бы в новый список.
-  const generation = useRef(0);
 
-  // Перезагрузка с нуля при смене фильтров (дебаунс 300 мс — чтобы не бить
-  // запросом на каждую букву в поиске)
-  useEffect(() => {
-    generation.current += 1;
-    // пока идёт дебаунс, старая «страница» не должна подгружать продолжение
-    setHasMore(false);
-    setNextBeforeId(null);
-    setLoadingMore(false);
-    let cancelled = false;
-    const timer = setTimeout(() => {
-      setState('loading');
-      fetchArchivePage(filters)
-        .then((page) => {
-          if (cancelled) return;
-          setEntries(page.entries);
-          setHasMore(page.has_more);
-          setNextBeforeId(page.next_before_id);
-          setState('ready');
-        })
-        .catch(() => {
-          if (!cancelled) setState('error');
-        });
-    }, 300);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [filters]);
-
-  const loadMore = useCallback(async () => {
-    if (nextBeforeId === null || loadingMore) return;
-    const current = generation.current;
-    setLoadingMore(true);
-    try {
-      const page = await fetchArchivePage(filters, nextBeforeId);
-      if (current !== generation.current) return;
-      setEntries((prev) => [...prev, ...page.entries]);
-      setHasMore(page.has_more);
-      setNextBeforeId(page.next_before_id);
-    } catch {
-      // повторится при следующей прокрутке
-    } finally {
-      if (current === generation.current) setLoadingMore(false);
-    }
-  }, [filters, nextBeforeId, loadingMore]);
+  // дебаунс 300 мс — чтобы не бить запросом на каждую букву в поиске
+  const debouncedFilters = useDebouncedValue(filters, 300);
+  const settled = debouncedFilters === filters;
+  const list = useArchiveList(debouncedFilters);
+  const entries = list.data ?? [];
+  const { hasNextPage, isFetchingNextPage, fetchNextPage } = list;
+  // ошибка подгрузки следующей страницы список не заменяет — повторится при прокрутке
+  const failed = list.isError && !list.data;
+  const loading = list.isPending;
+  const hasMore = settled && hasNextPage;
 
   // Автоподгрузка: невидимый сентинел внизу списка + IntersectionObserver
   useEffect(() => {
@@ -89,13 +44,15 @@ export function ArchivePage() {
     if (!node || !hasMore) return;
     const observer = new IntersectionObserver(
       (observed) => {
-        if (observed[0]?.isIntersecting) loadMore();
+        if (observed[0]?.isIntersecting && !isFetchingNextPage) {
+          void fetchNextPage();
+        }
       },
       { rootMargin: '200px' },
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [hasMore, loadMore]);
+  }, [hasMore, isFetchingNextPage, fetchNextPage]);
 
   return (
     <div className="page">
@@ -117,19 +74,17 @@ export function ArchivePage() {
 
       <ArchiveFiltersBar filters={filters} onChange={setFilters} />
 
-      {state === 'loading' && (
-        <div className="page__status">{t('archive.loading')}</div>
-      )}
-      {state === 'error' && (
+      {loading && <div className="page__status">{t('archive.loading')}</div>}
+      {failed && (
         <div className="page__status page__status--error">
           {t('archive.error')}
         </div>
       )}
-      {state === 'ready' && entries.length === 0 && (
+      {!loading && !failed && entries.length === 0 && (
         <div className="page__status">{t('archive.empty')}</div>
       )}
 
-      {state === 'ready' && entries.length > 0 && (
+      {!loading && !failed && entries.length > 0 && (
         <div className="archive-list">
           {groupAlbums(entries).map((group) => (
             <ArchiveEntryCard
@@ -139,7 +94,7 @@ export function ArchivePage() {
             />
           ))}
           {hasMore && <div className="archive-sentinel" ref={sentinelRef} />}
-          {loadingMore && (
+          {isFetchingNextPage && (
             <div className="page__status">{t('archive.loadingMore')}</div>
           )}
         </div>

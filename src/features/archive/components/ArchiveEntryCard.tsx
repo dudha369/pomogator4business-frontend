@@ -1,9 +1,9 @@
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/shared/i18n';
 import { formatRelativeTime } from '@/shared/utils/relativeTime';
-import { useChatInfo } from '../hooks/useChatInfo';
-import { EVENT_ICONS, KindIcon } from '../kindIcons';
-import type { ArchiveEntry } from '../types';
-import { ArchiveAvatar } from './ArchiveAvatar';
+import { useChatInfo } from '@/features/archive/hooks/useChatInfo';
+import { EVENT_ICONS, KindIcon } from '@/features/archive/kindIcons';
+import type { ArchiveEntry } from '@/features/archive/types';
+import { ArchiveAvatar } from '@/features/archive/components/ArchiveAvatar';
 
 interface Props {
   /** одна запись или все сообщения удалённого альбома */

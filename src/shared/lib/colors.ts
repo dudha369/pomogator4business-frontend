@@ -1,4 +1,4 @@
-import type { HexColor } from '../types/Theme';
+import type { HexColor } from '@/shared/types/Theme';
 
 interface Hsl {
   h: number;

@@ -1,4 +1,6 @@
-export type ArchiveEventType = 'edited' | 'deleted';
+import type { Schema } from '@/shared/api/schema';
+
+export type ArchiveEventType = Schema<'ArchiveEntry'>['event'];
 
 export type ArchiveMediaType =
   | 'photo'
@@ -49,51 +51,39 @@ export interface ArchiveForward {
   signature?: string | null;
 }
 
-/** Снимок сообщения «как было» / «как стало». */
-export interface ArchiveContent {
+/** Снимок сообщения «как было» / «как стало». Схема бэкенда отдаёт `kind`, форму
+ * `entities`/`forward` и т.п. как строки и словари — здесь они сужены до известных. */
+export type ArchiveContent = Omit<
+  Schema<'SnapshotView'>,
+  'kind' | 'entities' | 'payload' | 'forward' | 'media_group_id' | 'transcript'
+> & {
   kind: ArchiveKind;
-  text: string | null;
   entities: ArchiveEntity[] | null;
-  show_caption_above: boolean;
-  has_spoiler: boolean;
-  has_file: boolean;
-  file_size: number | null;
-  too_large: boolean;
-  mime: string | null;
-  file_name: string | null;
+  /** форма зависит от типа сообщения Telegram */
   payload: Record<string, any> | null;
   forward: ArchiveForward | null;
   /** общий id у сообщений одного альбома */
   media_group_id?: string | null;
   /** распознанный текст голосового */
   transcript?: string | null;
-}
+};
 type ArchiveSort = 'desc' | 'asc';
 
-export interface ArchiveEntry {
-  log_id: number;
-  chat_id: number;
-  message_id: number;
-  event: ArchiveEventType;
-  old_text: string | null;
-  new_text: string | null;
-  created_at: number;
+export type ArchiveEntry = Omit<
+  Schema<'ArchiveEntry'>,
+  'kind' | 'edit_kind' | 'media_type' | 'old' | 'new'
+> & {
+  kind: ArchiveKind | null;
+  edit_kind: ArchiveEditKind | null;
   media_type: ArchiveMediaType | null;
-  media_available: boolean;
-  kind?: ArchiveKind | null;
-  /** автор сообщения: true — вы, false — собеседник (у старых записей false) */
-  is_owner?: boolean;
-  edit_kind?: ArchiveEditKind | null;
   /** null у записей, сделанных до перехода на снимки */
-  old?: ArchiveContent | null;
-  new?: ArchiveContent | null;
-}
+  old: ArchiveContent | null;
+  new: ArchiveContent | null;
+};
 
-export interface ArchivePage {
+export type ArchivePage = Omit<Schema<'ArchivePage'>, 'entries'> & {
   entries: ArchiveEntry[];
-  has_more: boolean;
-  next_before_id: number | null;
-}
+};
 
 export interface ArchiveFilters {
   event: ArchiveEventType | null;
@@ -117,17 +107,13 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
 export type AlbumStyle = 'slideshow' | 'collage' | 'list';
 
 /** Как владелец хочет видеть уведомления архива в чате с ботом. */
-export interface ArchivePrefs {
-  rich: boolean;
+export type ArchivePrefs = Omit<
+  Schema<'ArchivePrefsOut'>,
+  'rich_kinds' | 'album_style'
+> & {
   rich_kinds: ArchiveMediaType[];
   album_style: AlbumStyle;
-  collapse_media: boolean;
-  edit_history: boolean;
-  caption_edit_media: boolean;
-  location_map: boolean;
-  voice_transcript: boolean;
-  own_edits: boolean;
-}
+};
 
 export interface ArchivePrefsResponse {
   prefs: ArchivePrefs;

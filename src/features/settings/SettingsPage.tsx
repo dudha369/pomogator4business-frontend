@@ -1,58 +1,58 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { ApiError } from '@/shared/api/client';
 
 import { Section } from '@/shared/ui/Section';
-import type { LocaleCode } from '@/i18n';
-import { LANGUAGE_NAMES, useLocale } from '@/i18n';
+import type { LocaleCode } from '@/shared/i18n';
+import { LANGUAGE_NAMES, useLocale } from '@/shared/i18n';
 import {
-  connectMirror,
-  disconnectMirror,
-  fetchMirrorStatus,
-  fetchPrefix,
-  updatePrefix,
-} from './api';
-import type { MirrorStatus } from './types';
+  useConnectMirror,
+  useDisconnectMirror,
+  useMirror,
+  useSettings,
+  useUpdatePrefix,
+} from '@/features/settings/hooks/useSettings';
+import type { MirrorStatus } from '@/features/settings/types';
 import { ACCENT_SCHEMES } from '@/shared/lib/accents';
 import { useThemeMode } from '@/shared/context/ThemeContext';
 
-type LoadState = 'loading' | 'ready' | 'error';
-
 export function SettingsPage() {
-  const { t, locale, setLocale } = useLocale();
-  const [state, setState] = useState<LoadState>('loading');
-  const [prefix, setPrefix] = useState('.');
-  const [prefixInput, setPrefixInput] = useState('.');
-  const [savingPrefix, setSavingPrefix] = useState(false);
-  const [prefixError, setPrefixError] = useState<string | null>(null);
+  const { t } = useLocale();
+  const settings = useSettings();
+  const mirror = useMirror();
 
-  const [mirror, setMirror] = useState<MirrorStatus>({
-    connected: false,
-    username: null,
-    running: false,
-  });
+  if (settings.isPending || mirror.isPending) {
+    return <div className="page__status">{t('settings.loading')}</div>;
+  }
+  if (settings.isError || mirror.isError) {
+    return (
+      <div className="page__status page__status--error">
+        {t('settings.error')}
+      </div>
+    );
+  }
+  return <SettingsContent mirror={mirror.data} prefix={settings.data.prefix} />;
+}
+
+function SettingsContent({
+  prefix,
+  mirror,
+}: {
+  prefix: string;
+  mirror: MirrorStatus;
+}) {
+  const { t, locale, setLocale } = useLocale();
+  const [prefixInput, setPrefixInput] = useState(prefix);
+  const [prefixError, setPrefixError] = useState<string | null>(null);
   const [mirrorToken, setMirrorToken] = useState('');
-  const [connectingMirror, setConnectingMirror] = useState(false);
   const [mirrorError, setMirrorError] = useState<string | null>(null);
   const { accent, setAccent } = useThemeMode();
 
-  useEffect(() => {
-    let cancelled = false;
-    Promise.all([fetchPrefix(), fetchMirrorStatus()])
-      .then(([prefixRes, mirrorRes]) => {
-        if (cancelled) return;
-        setPrefix(prefixRes);
-        setPrefixInput(prefixRes);
-        setMirror(mirrorRes);
-        setState('ready');
-      })
-      .catch(() => {
-        if (!cancelled) setState('error');
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const updatePrefix = useUpdatePrefix();
+  const connectMirror = useConnectMirror();
+  const disconnectMirror = useDisconnectMirror();
+  const savingPrefix = updatePrefix.isPending;
+  const connectingMirror = connectMirror.isPending;
 
   async function savePrefix() {
     if (prefixInput.length !== 1) {
@@ -60,22 +60,18 @@ export function SettingsPage() {
       return;
     }
     setPrefixError(null);
-    setSavingPrefix(true);
     try {
-      setPrefix(await updatePrefix(prefixInput));
+      await updatePrefix.mutateAsync(prefixInput);
     } catch {
       setPrefixError(t('settings.prefixSaveError'));
-    } finally {
-      setSavingPrefix(false);
     }
   }
 
   async function handleMirrorConnect() {
     if (!mirrorToken.trim()) return;
-    setConnectingMirror(true);
     setMirrorError(null);
     try {
-      setMirror(await connectMirror(mirrorToken.trim()));
+      await connectMirror.mutateAsync(mirrorToken.trim());
       setMirrorToken('');
     } catch (error) {
       // 503 start_failed: токен верный, но вебхук зеркала не поднялся
@@ -90,25 +86,7 @@ export function SettingsPage() {
             : 'settings.mirrorConnectFailed',
         ),
       );
-    } finally {
-      setConnectingMirror(false);
     }
-  }
-
-  async function handleMirrorDisconnect() {
-    await disconnectMirror();
-    setMirror({ connected: false, username: null, running: false });
-  }
-
-  if (state === 'loading') {
-    return <div className="page__status">{t('settings.loading')}</div>;
-  }
-  if (state === 'error') {
-    return (
-      <div className="page__status page__status--error">
-        {t('settings.error')}
-      </div>
-    );
   }
 
   return (
@@ -184,7 +162,7 @@ export function SettingsPage() {
             )}
             <button
               className="prefix-editor__save"
-              onClick={handleMirrorDisconnect}
+              onClick={() => disconnectMirror.mutate()}
               type="button"
             >
               {t('settings.mirrorDisconnect')}

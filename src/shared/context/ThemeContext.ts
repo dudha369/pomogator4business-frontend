@@ -1,9 +1,9 @@
 import { createContext, useContext } from 'react';
-import type { AccentId, Theme, ThemeMode } from '../types/Theme';
-import { getValidTheme } from '../lib/getValidTheme';
-import { DEFAULT_ACCENT } from '../lib/accents';
-import { isDarkColor } from '../lib/colors';
-import { readSystemDark, readThemeParams } from '../lib/telegramTheme';
+import type { AccentId, Theme, ThemeMode } from '@/shared/types/Theme';
+import { getValidTheme } from '@/shared/lib/getValidTheme';
+import { DEFAULT_ACCENT } from '@/shared/lib/accents';
+import { isDarkColor } from '@/shared/lib/colors';
+import { readSystemDark, readThemeParams } from '@/shared/lib/telegramTheme';
 
 export interface ThemeContextValue {
   theme: Theme;

@@ -1,9 +1,12 @@
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/shared/i18n';
 import { BottomSheet } from '@/shared/ui/BottomSheet/BottomSheet';
-import { useChatInfo } from '../hooks/useChatInfo';
-import type { ArchiveEntry } from '../types';
-import { ArchiveAvatar } from './ArchiveAvatar';
-import { ArchiveContentView, contentOf } from './ArchiveContentView';
+import { useChatInfo } from '@/features/archive/hooks/useChatInfo';
+import type { ArchiveEntry } from '@/features/archive/types';
+import { ArchiveAvatar } from '@/features/archive/components/ArchiveAvatar';
+import {
+  ArchiveContentView,
+  contentOf,
+} from '@/features/archive/components/ArchiveContentView';
 
 interface Props {
   /** выбранная запись; у удалённого альбома — все его сообщения */

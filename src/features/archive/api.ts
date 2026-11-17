@@ -4,7 +4,7 @@ import type {
   ArchivePage,
   ArchivePrefs,
   ArchivePrefsResponse,
-} from './types';
+} from '@/features/archive/types';
 
 /** "YYYY-MM-DD" → unix-время начала/конца этого дня в часовом поясе устройства. */
 function dayBoundary(value: string, endOfDay: boolean): number | null {

@@ -9,7 +9,7 @@ import { settingsButton } from '@tma.js/sdk-react';
 
 import { LoadingScreen } from '@/shared/ui/loading/LoadingScreen';
 import { ErrorScreen } from '@/shared/ui/loading/ErrorScreen';
-import { NavBar } from 'src/shared/ui/NavBar/NavBar';
+import { NavBar } from '@/shared/ui/NavBar/NavBar';
 
 import { useTelegram } from '@/shared/hooks/useTelegram';
 import { useBackButton } from '@/shared/hooks/useBackButton';

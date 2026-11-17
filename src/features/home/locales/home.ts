@@ -24,7 +24,7 @@ export const RU = {
   'home.recentActivity': 'Последняя активность',
 };
 
-export const EN = {
+export const EN: Record<keyof typeof RU, string> = {
   'home.chatsLink': 'Chats and mark as read',
   'home.recentActivity': 'Recent activity',
   'home.viewAllFromUser': 'Full archive for this person',
@@ -50,7 +50,7 @@ export const EN = {
   'home.recentEdited': 'A message was recently edited',
 };
 
-export const UK = {
+export const UK: Record<keyof typeof RU, string> = {
   'home.chatsLink': 'Чати та прочитання',
   'home.recentActivity': 'Остання активність',
   'home.viewAllFromUser': 'Весь архів цієї людини',

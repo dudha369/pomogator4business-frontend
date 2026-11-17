@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { backButton } from '@tma.js/sdk-react';
-import { useTelegram } from './useTelegram';
+import { useTelegram } from '@/shared/hooks/useTelegram';
 
 export const useBackButton = (onBack: () => void, enabled: boolean) => {
   const { ready } = useTelegram();

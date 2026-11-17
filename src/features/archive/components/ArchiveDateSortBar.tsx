@@ -1,5 +1,5 @@
-import { useLocale } from '@/i18n';
-import type { ArchiveFilters } from '../types';
+import { useLocale } from '@/shared/i18n';
+import type { ArchiveFilters } from '@/features/archive/types';
 
 interface Props {
   filters: ArchiveFilters;

@@ -1,6 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { ErrorScreen, type ErrorType } from './ErrorScreen';
-import { isNetworkError } from '../../lib/apiErrors';
+import { ErrorScreen, type ErrorType } from '@/shared/ui/loading/ErrorScreen';
+import { isNetworkError } from '@/shared/lib/apiErrors';
 
 interface ErrorBoundaryProps {
   children: ReactNode;

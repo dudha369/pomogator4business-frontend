@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { toggleEmojiStatus } from '@/features/account/api';
-import { useLocale } from '@/i18n';
+import { useToggleEmojiStatus } from '@/features/account/hooks/useAccount';
+import { useLocale } from '@/shared/i18n';
 import { ROUTES } from '@/shared/constants/routes';
 import { Switch } from '@/shared/ui/Switch';
 
@@ -20,20 +19,9 @@ export function HomeQuickToggles({
   mirrorConnected,
 }: Props) {
   const { t } = useLocale();
-  const [emojiOn, setEmojiOn] = useState(emojiStatusEnabled);
-  const [busy, setBusy] = useState(false);
-
-  async function handleEmojiToggle(next: boolean) {
-    setEmojiOn(next);
-    setBusy(true);
-    try {
-      setEmojiOn(await toggleEmojiStatus(next));
-    } catch {
-      setEmojiOn(!next);
-    } finally {
-      setBusy(false);
-    }
-  }
+  const toggle = useToggleEmojiStatus();
+  // пока переключатель в пути — показываем выбор пользователя, потом — данные сервера
+  const emojiOn = toggle.isPending ? toggle.variables : emojiStatusEnabled;
 
   return (
     <div className="divide-line border-line bg-card mb-4 divide-y overflow-hidden rounded-2xl border">
@@ -48,8 +36,8 @@ export function HomeQuickToggles({
         </div>
         <Switch
           checked={emojiStatusGranted && emojiOn}
-          disabled={!emojiStatusGranted || busy}
-          onChange={handleEmojiToggle}
+          disabled={!emojiStatusGranted || toggle.isPending}
+          onChange={toggle.mutate}
         />
       </div>
 

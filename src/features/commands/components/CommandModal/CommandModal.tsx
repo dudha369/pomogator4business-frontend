@@ -1,56 +1,37 @@
-import { useState } from 'react';
-
-import { ApiError, apiPost } from '@/shared/api/client';
+import { ApiError } from '@/shared/api/client';
 import { BottomSheet } from '@/shared/ui/BottomSheet/BottomSheet';
 import { Switch } from '@/shared/ui/Switch';
-import { useLocale } from '@/i18n';
-import { createUserAlias, deleteUserAlias } from '../../api';
-import type { Command, UserAlias } from '../../types';
-import { UserAliasesSection } from './UserAliasesSection';
+import { useLocale } from '@/shared/i18n';
+import {
+  useCreateAlias,
+  useDeleteAlias,
+  useUserAliases,
+} from '@/features/commands/hooks/useCommands';
+import { useToggleModule } from '@/features/settings/hooks/useSettings';
+import type { TranslationKey } from '@/shared/i18n';
+import type { Command } from '@/features/commands/types';
+import { UserAliasesSection } from '@/features/commands/components/CommandModal/UserAliasesSection';
 
-import './commandmodal.css';
+import '@/features/commands/components/CommandModal/commandmodal.css';
 
 interface Props {
   command: Command | null;
   moduleEnabled: boolean;
   onClose: () => void;
-  onModuleToggle: (moduleName: string, enabled: boolean) => void;
-  userAliases: UserAlias[];
-  onUserAliasesChange: (aliases: UserAlias[]) => void;
 }
 
-export function CommandModal({
-  command,
-  moduleEnabled,
-  onClose,
-  onModuleToggle,
-  userAliases,
-  onUserAliasesChange,
-}: Props) {
+export function CommandModal({ command, moduleEnabled, onClose }: Props) {
   const { t } = useLocale();
-  const [toggling, setToggling] = useState(false);
+  const userAliases = useUserAliases();
+  const toggleModule = useToggleModule();
+  const createAlias = useCreateAlias();
+  const deleteAlias = useDeleteAlias();
 
-  async function handleToggle(enabled: boolean) {
-    if (!command) return;
-    setToggling(true);
-    onModuleToggle(command.module, enabled);
-    try {
-      await apiPost('/api/settings/module', {
-        module: command.module,
-        enabled,
-      });
-    } catch {
-      onModuleToggle(command.module, !enabled);
-    } finally {
-      setToggling(false);
-    }
-  }
-
-  async function handleAddAlias(alias: string): Promise<string | null> {
+  /** Возвращает ключ перевода ошибки или null, если алиас добавлен. */
+  async function handleAddAlias(alias: string): Promise<TranslationKey | null> {
     if (!command) return null;
     try {
-      const created = await createUserAlias(command.name, alias);
-      onUserAliasesChange([...userAliases, created]);
+      await createAlias.mutateAsync({ command: command.name, alias });
       return null;
     } catch (error) {
       if (error instanceof ApiError) {
@@ -58,16 +39,6 @@ export function CommandModal({
         if (error.status === 400) return 'commandModal.aliasInvalid';
       }
       return 'commandModal.aliasFailed';
-    }
-  }
-
-  async function handleRemoveAlias(alias: string) {
-    const previous = userAliases;
-    onUserAliasesChange(previous.filter((a) => a.alias !== alias));
-    try {
-      await deleteUserAlias(alias);
-    } catch {
-      onUserAliasesChange(previous);
     }
   }
 
@@ -100,8 +71,10 @@ export function CommandModal({
             </span>
             <Switch
               checked={moduleEnabled}
-              disabled={toggling}
-              onChange={handleToggle}
+              disabled={toggleModule.isPending}
+              onChange={(enabled) =>
+                toggleModule.mutate({ module: command.module, enabled })
+              }
             />
           </div>
 
@@ -134,7 +107,7 @@ export function CommandModal({
           <UserAliasesSection
             aliases={userAliases.filter((a) => a.command === command.name)}
             onAdd={handleAddAlias}
-            onRemove={handleRemoveAlias}
+            onRemove={(alias) => deleteAlias.mutate(alias)}
           />
 
           {command.owner_only && (

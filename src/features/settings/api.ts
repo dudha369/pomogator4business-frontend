@@ -1,31 +1,25 @@
 import { apiGet, apiPost } from '@/shared/api/client';
-import type { MirrorStatus } from './types';
+import type { Schema } from '@/shared/api/schema';
+import type { MirrorStatus, SettingsResponse } from '@/features/settings/types';
 
-export async function fetchPrefix(): Promise<string> {
-  const res = await apiGet<{ prefix: string }>('/api/settings');
-  return res.prefix;
-}
+export const fetchSettings = () => apiGet<SettingsResponse>('/api/settings');
 
-export async function updatePrefix(prefix: string): Promise<string> {
-  const res = await apiPost<{ prefix: string }>('/api/settings/prefix', {
-    prefix,
-  });
-  return res.prefix;
-}
+export const updatePrefix = async (prefix: string) =>
+  (await apiPost<Schema<'PrefixOut'>>('/api/settings/prefix', { prefix }))
+    .prefix;
 
-export async function fetchMirrorStatus(): Promise<MirrorStatus> {
-  return apiGet<MirrorStatus>('/api/mirror');
-}
+export const fetchMirrorStatus = () => apiGet<MirrorStatus>('/api/mirror');
 
 export async function connectMirror(token: string): Promise<MirrorStatus> {
   // 200 приходит только после успешного запуска зеркала
-  const res = await apiPost<{ connected: boolean; username: string }>(
-    '/api/mirror/connect',
-    { token },
-  );
-  return { connected: res.connected, username: res.username, running: true };
+  const res = await apiPost<Schema<'MirrorStatus'>>('/api/mirror/connect', {
+    token,
+  });
+  return { ...res, running: true };
 }
 
-export async function disconnectMirror(): Promise<void> {
-  await apiPost('/api/mirror/disconnect', {});
-}
+export const disconnectMirror = () =>
+  apiPost<Schema<'MirrorDisconnected'>>('/api/mirror/disconnect', {});
+
+export const setModuleEnabled = (module: string, enabled: boolean) =>
+  apiPost<Schema<'ModuleToggle'>>('/api/settings/module', { module, enabled });

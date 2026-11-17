@@ -4,10 +4,10 @@ import {
   useNavigate,
   useRouteError,
 } from 'react-router-dom';
-import { ErrorScreen, type ErrorType } from './ErrorScreen';
-import { isNetworkError } from '../../lib/apiErrors';
-import { useLocale } from '@/i18n';
-import { ROUTES } from '../../constants/routes';
+import { ErrorScreen, type ErrorType } from '@/shared/ui/loading/ErrorScreen';
+import { isNetworkError } from '@/shared/lib/apiErrors';
+import { useLocale } from '@/shared/i18n';
+import { ROUTES } from '@/shared/constants/routes';
 
 function classifyRouteError(error: unknown): ErrorType {
   if (isRouteErrorResponse(error) && error.status === 404) return 'not_found';

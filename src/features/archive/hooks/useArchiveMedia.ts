@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import { apiGetBlob } from '@/shared/api/client';
-import { acquireMedia, peekMedia, releaseMedia } from './mediaCache';
+import {
+  acquireMedia,
+  peekMedia,
+  releaseMedia,
+} from '@/features/archive/hooks/mediaCache';
 
 type MediaState =
   | { status: 'loading' }

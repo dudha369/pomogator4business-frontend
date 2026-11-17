@@ -1,5 +1,5 @@
-import type { LocaleCode } from '@/i18n/types';
-import { request } from './request';
+import type { LocaleCode } from '@/shared/i18n/types';
+import { request } from '@/shared/api/request';
 
 export interface LocaleResponse {
   locale: LocaleCode;

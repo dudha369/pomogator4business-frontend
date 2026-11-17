@@ -2,9 +2,9 @@ import { Star } from 'lucide-react';
 
 import { ArchiveAvatar } from '@/features/archive/components/ArchiveAvatar';
 import { useChatInfo } from '@/features/archive/hooks/useChatInfo';
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/shared/i18n';
 import { formatRelativeTime } from '@/shared/utils/relativeTime';
-import type { ChatItem } from '../types';
+import type { ChatItem } from '@/features/chats/types';
 
 interface Props {
   chat: ChatItem;

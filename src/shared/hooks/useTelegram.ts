@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { TelegramContext } from '../context/TelegramContext';
+import { TelegramContext } from '@/shared/context/TelegramContext';
 
 export function useTelegram() {
   const ctx = useContext(TelegramContext);
