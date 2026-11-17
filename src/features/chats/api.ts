@@ -13,6 +13,10 @@ export async function setFavorite(
   await apiPost('/api/favorites', { chat_id: chatId, favorite });
 }
 
+export function fetchReadAllStatus(): Promise<ReadAllResult> {
+  return apiGet<ReadAllResult>('/api/readall/status');
+}
+
 export function readAll(request: ReadAllRequest): Promise<ReadAllResult> {
   return apiPost<ReadAllResult>('/api/readall', request);
 }

@@ -1,7 +1,7 @@
 import { TRANSLATIONS } from './merge';
 import type { LocaleCode } from './types';
 
-export type TranslateVars = Record<string, string | number>;
+type TranslateVars = Record<string, string | number>;
 export type TranslateFn = (key: string, vars?: TranslateVars) => string;
 
 function interpolate(template: string, vars?: TranslateVars): string {

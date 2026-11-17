@@ -20,6 +20,10 @@ export const RU = {
   'settings.mirrorConnectFailed':
     'Не удалось подключиться с этим токеном. Проверьте и попробуйте снова.',
   'settings.mirrorDisconnect': 'Отключить',
+  'settings.mirrorStartFailed':
+    'Токен принят, но зеркало не запустилось. Попробуйте ещё раз через минуту.',
+  'settings.mirrorNotRunning':
+    'Подключено, но сейчас не запущено. Подождите минуту или подключите заново.',
   'settings.colorSchemeSection': 'Цветовая схема',
 };
 
@@ -44,6 +48,10 @@ export const EN = {
   'settings.mirrorConnectFailed':
     "Couldn't connect with this token. Check it and try again.",
   'settings.mirrorDisconnect': 'Disconnect',
+  'settings.mirrorStartFailed':
+    "The token was accepted, but the mirror didn't start. Please try again in a minute.",
+  'settings.mirrorNotRunning':
+    'Connected, but not running right now. Wait a minute or reconnect.',
   'settings.colorSchemeSection': 'Color scheme',
 };
 
@@ -69,5 +77,9 @@ export const UK = {
   'settings.mirrorConnectFailed':
     'Не вдалося підключитися з цим токеном. Перевірте і спробуйте ще раз.',
   'settings.mirrorDisconnect': 'Відключити',
+  'settings.mirrorStartFailed':
+    'Токен прийнято, але дзеркало не запустилося. Спробуйте ще раз за хвилину.',
+  'settings.mirrorNotRunning':
+    'Підключено, але зараз не запущено. Зачекайте хвилину або підключіть заново.',
   'settings.colorSchemeSection': 'Колірна схема',
 };

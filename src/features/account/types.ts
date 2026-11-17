@@ -1,17 +1,17 @@
-export interface AccountConnection {
+interface AccountConnection {
   owner_name: string | null;
   owner_username: string | null;
   prefix: string;
   rights: Record<string, boolean | null>;
 }
 
-export interface ClockStyleInfo {
+interface ClockStyleInfo {
   id: string;
   titles: Record<string, string>;
   available: boolean;
 }
 
-export interface AccountEmojiStatus {
+interface AccountEmojiStatus {
   granted: boolean;
   enabled: boolean;
   style: string;

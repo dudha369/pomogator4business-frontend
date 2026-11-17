@@ -7,7 +7,7 @@ export const API_BASE_URL: string = (
   import.meta.env.VITE_API_BASE_URL ?? ''
 ).replace(/\/+$/, '');
 
-export const INIT_DATA_HEADER = 'X-Telegram-Init-Data';
+const INIT_DATA_HEADER = 'X-Telegram-Init-Data';
 
 export function getInitDataRaw(): string | undefined {
   try {
@@ -87,6 +87,28 @@ export function onUnauthorized(callback: () => void): () => void {
   return () => authEvents.removeEventListener('unauthorized', handler);
 }
 
+export type BlockedReason = 'maintenance' | 'access_denied';
+
+/** Сервер закрыл API посреди сессии (режим обслуживания / доступ отозван). */
+export function onBlocked(
+  callback: (reason: BlockedReason) => void,
+): () => void {
+  const handler = (event: Event) =>
+    callback((event as CustomEvent<BlockedReason>).detail);
+  authEvents.addEventListener('blocked', handler);
+  return () => authEvents.removeEventListener('blocked', handler);
+}
+
+function blockedReason(error: ApiError): BlockedReason | null {
+  if (error.status === 503 && error.reason === 'maintenance_mode') {
+    return 'maintenance';
+  }
+  if (error.status === 403 && error.reason === 'access_denied') {
+    return 'access_denied';
+  }
+  return null;
+}
+
 const http = axios.create({
   baseURL: API_BASE_URL || undefined,
   timeout: 30_000,
@@ -107,6 +129,10 @@ http.interceptors.response.use(
     const apiError = toApiError(error);
     if (apiError.status === 401) {
       authEvents.dispatchEvent(new Event('unauthorized'));
+    }
+    const blocked = blockedReason(apiError);
+    if (blocked) {
+      authEvents.dispatchEvent(new CustomEvent('blocked', { detail: blocked }));
     }
     return Promise.reject(apiError);
   },

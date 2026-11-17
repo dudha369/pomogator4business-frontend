@@ -180,15 +180,6 @@ export function timezoneLabel(
   return `${formatOffset(option.offsetMinutes)} — ${option.cities[locale]}`;
 }
 
-export function closestTimezoneOption(offsetMinutes: number): TimezoneOption {
-  return TIMEZONE_OPTIONS.reduce((closest, opt) =>
-    Math.abs(opt.offsetMinutes - offsetMinutes) <
-    Math.abs(closest.offsetMinutes - offsetMinutes)
-      ? opt
-      : closest,
-  );
-}
-
 /** IANA-имя пояса устройства (Europe/Kyiv): по нему сервер учитывает летнее время. */
 export function detectBrowserTimezoneName(): string | null {
   try {
@@ -196,10 +187,6 @@ export function detectBrowserTimezoneName(): string | null {
   } catch {
     return null;
   }
-}
-
-export function detectBrowserOffsetMinutes(): number {
-  return -new Date().getTimezoneOffset();
 }
 
 // один раз на устройство отправляем IANA-имя; дальше ручной выбор не перетираем

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   Outlet,
   useLocation,
@@ -16,10 +16,7 @@ import { useBackButton } from '@/shared/hooks/useBackButton';
 import { useDelayedFlag } from '@/shared/hooks/useDelayedFlag';
 import { useUserSession } from '@/shared/hooks/useUserSession';
 import { useTheme } from '@/shared/context/ThemeContext';
-import { NavBarContext } from '@/shared/context/NavBarContext';
-import { ScrollContainerContext } from '@/shared/context/ScrollContainerContext';
 import { ROOT_PATHS, ROUTES } from '@/shared/constants/routes';
-import { cn } from '@/shared/lib/cn';
 
 /**
  * Корневой layout. Отвечает за три вещи:
@@ -38,7 +35,6 @@ export function App() {
   const navigate = useNavigate();
 
   const scrollContainerRef = useRef<HTMLElement>(null);
-  const [navBarHidden, setNavBarHidden] = useState(false);
 
   const isSessionReady = session.status === 'ready';
   const isRootPage = ROOT_PATHS.includes(location.pathname);
@@ -67,10 +63,8 @@ export function App() {
     }
   }, isSessionReady && !isRootPage);
 
-  // Смена страницы: навбар не должен оставаться скрытым с прошлой страницы,
-  // а скролл — унаследоваться (контейнер один на все страницы).
+  // Смена страницы: скролл не должен наследоваться (контейнер один на все страницы).
   useEffect(() => {
-    setNavBarHidden(false);
     if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0;
   }, [location.pathname]);
 
@@ -105,24 +99,17 @@ export function App() {
       ) : session.status === 'error' ? (
         <ErrorScreen errorType={session.kind} onRetry={session.retry} />
       ) : (
-        <NavBarContext.Provider value={{ setHidden: setNavBarHidden }}>
-          <ScrollContainerContext.Provider value={scrollContainerRef}>
-            <main
-              ref={scrollContainerRef}
-              className={cn(
-                'relative mx-auto flex w-full flex-1 flex-col overflow-y-auto overscroll-y-contain',
-                // Место под навбар (он position: fixed) + safe-area снизу
-                !navBarHidden &&
-                  'pb-[calc(104px+max(var(--safe-bottom),env(safe-area-inset-bottom)))]',
-              )}
-            >
-              <Outlet />
-            </main>
-          </ScrollContainerContext.Provider>
+        <>
+          <main
+            ref={scrollContainerRef}
+            className="relative mx-auto flex w-full flex-1 flex-col overflow-y-auto overscroll-y-contain pb-[calc(104px+max(var(--safe-bottom),env(safe-area-inset-bottom)))]"
+          >
+            <Outlet />
+          </main>
 
-          {!navBarHidden && <NavBar />}
+          <NavBar />
           {isNavigating && <LoadingScreen />}
-        </NavBarContext.Provider>
+        </>
       )}
     </div>
   );

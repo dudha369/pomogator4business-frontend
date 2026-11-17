@@ -1,4 +1,3 @@
-import type { TranslateFn } from '@/i18n/translate';
 import { ApiError } from '../api/request';
 
 export function getApiStatus(error: unknown): number | undefined {
@@ -18,16 +17,4 @@ export function isNetworkError(error: unknown): boolean {
     message.includes('Network Error') ||
     message.includes('dynamically imported module')
   );
-}
-
-export function resolveErrorMessage(error: unknown, t: TranslateFn): string {
-  if (isNetworkError(error)) return t('errors.network.subtitle');
-  switch (getApiStatus(error)) {
-    case 401:
-      return t('errors.session_expired.subtitle');
-    case 403:
-      return t('errors.access_denied.subtitle');
-    default:
-      return t('errors.general.subtitle');
-  }
 }

@@ -32,10 +32,19 @@ export function ArchivePage() {
   const [selected, setSelected] = useState<ArchiveEntry[] | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  // Номер «поколения» списка: растёт при каждой смене фильтров. Ответы
+  // loadMore из прошлого поколения игнорируются, иначе записи по старым
+  // фильтрам дописались бы в новый список.
+  const generation = useRef(0);
 
   // Перезагрузка с нуля при смене фильтров (дебаунс 300 мс — чтобы не бить
   // запросом на каждую букву в поиске)
   useEffect(() => {
+    generation.current += 1;
+    // пока идёт дебаунс, старая «страница» не должна подгружать продолжение
+    setHasMore(false);
+    setNextBeforeId(null);
+    setLoadingMore(false);
     let cancelled = false;
     const timer = setTimeout(() => {
       setState('loading');
@@ -59,16 +68,18 @@ export function ArchivePage() {
 
   const loadMore = useCallback(async () => {
     if (nextBeforeId === null || loadingMore) return;
+    const current = generation.current;
     setLoadingMore(true);
     try {
       const page = await fetchArchivePage(filters, nextBeforeId);
+      if (current !== generation.current) return;
       setEntries((prev) => [...prev, ...page.entries]);
       setHasMore(page.has_more);
       setNextBeforeId(page.next_before_id);
     } catch {
       // повторится при следующей прокрутке
     } finally {
-      setLoadingMore(false);
+      if (current === generation.current) setLoadingMore(false);
     }
   }, [filters, nextBeforeId, loadingMore]);
 
