@@ -37,9 +37,6 @@
     -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
 
-    -webkit-user-select: none;
-    user-select: none;
-
     touch-action: none;
 
     overscroll-behavior: none;
@@ -81,10 +78,21 @@
     cursor: pointer;
   }
 
+  /* Интерактивные элементы не выделяются при долгом нажатии,
+     обычный текст (в том числе в архиве) можно выделять и копировать. */
+  button,
+  a,
+  nav,
+  summary,
+  [role='button'] {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
   input {
     padding: 0;
     margin: 0;
-    appearance: 0;
   }
 
   textarea,

@@ -61,16 +61,6 @@
   gap: 10px;
 }
 
-.command-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px 16px;
-}
-
 .command-card__badge {
   flex: 0 0 auto;
   width: 38px;
@@ -312,12 +302,16 @@
 .timezone-select:disabled {
   opacity: 0.6;
 }
-
 .command-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
   width: 100%;
   text-align: left;
-  border: 1px solid var(--border);
-  background: var(--card-bg);
   cursor: pointer;
   font: inherit;
   color: inherit;
@@ -343,25 +337,6 @@
   flex-direction: column;
 }
 
-.archive-entry {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-}
-
-.archive-entry__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.archive-entry__icon {
-  font-size: 15px;
-}
-
 .archive-entry__label {
   font-size: 13px;
   font-weight: 700;
@@ -374,11 +349,6 @@
 
 .archive-entry--edited .archive-entry__label {
   color: var(--accent);
-}
-
-.archive-entry__time {
-  font-size: 12px;
-  color: var(--hint);
 }
 
 .archive-entry__text {
@@ -565,17 +535,16 @@
   font-weight: 700;
   font-size: 16px;
 }
-
 .archive-entry {
-  display: flex;
-  gap: 10px;
-  width: 100%;
-  text-align: left;
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 10px 14px;
   margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
   cursor: pointer;
   font: inherit;
   color: inherit;
@@ -585,7 +554,6 @@
   flex: 1 1 auto;
   min-width: 0;
 }
-
 .archive-entry__header {
   display: flex;
   align-items: center;
@@ -602,10 +570,9 @@
   font-size: 12px;
   color: var(--hint);
 }
-
 .archive-entry__icon {
-  margin-left: auto;
   font-size: 13px;
+  margin-left: auto;
 }
 
 .archive-entry__preview {
@@ -616,7 +583,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .archive-entry__time {
   font-size: 11px;
   color: var(--hint);

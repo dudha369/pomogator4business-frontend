@@ -19,4 +19,6 @@ export interface ReadAllResult {
   matched: number;
   done: number;
   failed: number;
+  /** Задача ещё идёт в фоне; у dry_run ключа нет. */
+  running?: boolean;
 }

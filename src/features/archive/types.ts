@@ -27,7 +27,7 @@ export type ArchiveKind =
   | 'live_photo'
   | 'other';
 
-export type ArchiveEditKind =
+type ArchiveEditKind =
   'text' | 'caption' | 'caption_removed' | 'media' | 'media_caption';
 
 /** Форматирование текста (offset/length — в UTF-16, как в Telegram и в JS). */
@@ -68,7 +68,7 @@ export interface ArchiveContent {
   /** распознанный текст голосового */
   transcript?: string | null;
 }
-export type ArchiveSort = 'desc' | 'asc';
+type ArchiveSort = 'desc' | 'asc';
 
 export interface ArchiveEntry {
   log_id: number;

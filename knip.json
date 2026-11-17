@@ -1,0 +1,15 @@
+{
+  "ignore": [
+    "src/shared/api/types.ts",
+    "src/shared/context/NavBarContext.ts",
+    "src/shared/context/ScrollContainerContext.ts",
+    "src/shared/hooks/useMainButton.ts",
+    "src/shared/hooks/useScrollContainer.ts",
+    "src/shared/hooks/useSecondaryButton.ts",
+    "src/shared/hooks/useToast.ts",
+    "src/shared/types/MainButtonOptions.ts",
+    "src/shared/types/SecondaryButtonOptions.ts",
+    "src/shared/ui/NavBar/lensMap.ts",
+    "src/shared/ui/Toast.tsx"
+  ]
+}

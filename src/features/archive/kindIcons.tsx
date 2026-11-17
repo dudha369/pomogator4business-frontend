@@ -31,7 +31,7 @@ import type { ArchiveKind } from './types';
  * `archive.kind.<kind>`). Чтобы поставить свои иконки, достаточно заменить
  * значения в этих двух объектах — например, на собственные SVG-компоненты.
  */
-export const KIND_ICONS: Record<ArchiveKind, LucideIcon> = {
+const KIND_ICONS: Record<ArchiveKind, LucideIcon> = {
   text: MessageSquare,
   photo: Image,
   video: Video,

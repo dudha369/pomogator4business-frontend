@@ -1,14 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useLocale } from '@/i18n';
 import { Switch } from '@/shared/ui/Switch';
-import { readAll } from '../api';
+import { fetchReadAllStatus, readAll } from '../api';
 import type {
   ReadAllRequest,
   ReadAllResult,
   ReadMode,
   ReadUnit,
 } from '../types';
+
+const POLL_MS = 2000;
+const MAX_POLL_FAILURES = 3;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const MODES: ReadMode[] = ['all', 'last', 'older'];
 
@@ -38,6 +43,46 @@ export function ReadAllPanel() {
   const [matched, setMatched] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<ReadAllResult | 'error' | null>(null);
+  const [progress, setProgress] = useState<ReadAllResult | null>(null);
+  const alive = useRef(true);
+
+  // Бэкенд ждёт ответа ≤ 20 с, дальше работает в фоне: следим по /readall/status.
+  async function follow(first: ReadAllResult) {
+    let current = first;
+    let failures = 0;
+    while (current.running && alive.current) {
+      setProgress(current);
+      await sleep(POLL_MS);
+      if (!alive.current) return;
+      try {
+        current = await fetchReadAllStatus();
+        failures = 0;
+      } catch {
+        failures += 1;
+        if (failures >= MAX_POLL_FAILURES) throw new Error('status');
+      }
+    }
+    if (alive.current) setResult(current);
+  }
+
+  useEffect(() => {
+    alive.current = true;
+    // вернулись на страницу, пока задача идёт — подхватываем прогресс
+    fetchReadAllStatus()
+      .then((status) => {
+        if (!status.running || !alive.current) return;
+        setRunning(true);
+        return follow(status);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (alive.current) setRunning(false);
+        setProgress(null);
+      });
+    return () => {
+      alive.current = false;
+    };
+  }, []);
 
   const amountValid =
     mode === 'all' || (Number.isFinite(amount) && amount >= 1);
@@ -71,13 +116,14 @@ export function ReadAllPanel() {
     setRunning(true);
     setResult(null);
     try {
-      setResult(
+      await follow(
         await readAll(buildRequest(mode, amount, unit, excludeFavorites)),
       );
     } catch {
-      setResult('error');
+      if (alive.current) setResult('error');
     } finally {
-      setRunning(false);
+      if (alive.current) setRunning(false);
+      setProgress(null);
     }
   }
 
@@ -157,7 +203,14 @@ export function ReadAllPanel() {
         onClick={run}
         type="button"
       >
-        {running ? t('chats.reading') : t('chats.readButton')}
+        {running
+          ? progress
+            ? t('chats.progress', {
+                done: progress.done + progress.failed,
+                total: progress.matched,
+              })
+            : t('chats.reading')
+          : t('chats.readButton')}
       </button>
 
       {message && <p className="text-fg mt-3 text-sm">{message}</p>}

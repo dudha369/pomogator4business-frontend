@@ -18,13 +18,12 @@ export async function fetchMirrorStatus(): Promise<MirrorStatus> {
 }
 
 export async function connectMirror(token: string): Promise<MirrorStatus> {
+  // 200 приходит только после успешного запуска зеркала
   const res = await apiPost<{ connected: boolean; username: string }>(
     '/api/mirror/connect',
-    {
-      token,
-    },
+    { token },
   );
-  return { connected: res.connected, username: res.username };
+  return { connected: res.connected, username: res.username, running: true };
 }
 
 export async function disconnectMirror(): Promise<void> {

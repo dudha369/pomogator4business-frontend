@@ -69,7 +69,7 @@ function buildTelegramTheme(params: RawThemeParams, base: Theme): Theme {
   return next;
 }
 
-export function normalizeTheme(theme: Theme): Theme {
+function normalizeTheme(theme: Theme): Theme {
   const { bg_color } = theme;
   let { section_bg_color, secondary_bg_color } = theme;
 

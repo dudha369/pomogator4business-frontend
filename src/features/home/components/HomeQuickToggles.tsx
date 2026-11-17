@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { toggleEmojiStatus } from '@/features/account/api';
 import { useLocale } from '@/i18n';
+import { ROUTES } from '@/shared/constants/routes';
 import { Switch } from '@/shared/ui/Switch';
 
 interface Props {
@@ -40,7 +41,7 @@ export function HomeQuickToggles({
         <div className="flex min-w-0 flex-col">
           <span className="text-fg">{t('home.emojiStatus')}</span>
           {!emojiStatusGranted && (
-            <Link className="text-accent text-xs" to="/account">
+            <Link className="text-accent text-xs" to={ROUTES.account}>
               {t('home.emojiNeedsAccess')}
             </Link>
           )}
@@ -52,7 +53,7 @@ export function HomeQuickToggles({
         />
       </div>
 
-      <Link className={ROW} to="/account">
+      <Link className={ROW} to={ROUTES.settings}>
         <span className="text-fg">{t('home.mirror')}</span>
         <span
           className={

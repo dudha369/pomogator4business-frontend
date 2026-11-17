@@ -21,6 +21,8 @@ interface Props {
 const DISMISS_THRESHOLD_DEFAULT = 120;
 /** px/ms — резкий свайп закрывает лист даже если не дотянули до dismissThreshold. */
 const VELOCITY_DISMISS = 0.6;
+/** Окно (мс), по которому считается скорость в момент отпускания. */
+const VELOCITY_WINDOW_MS = 100;
 const CLOSE_ANIMATION_MS = 220;
 
 export function BottomSheet({
@@ -34,8 +36,7 @@ export function BottomSheet({
   const sheetRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{
     startY: number;
-    lastT: number;
-    dragging: boolean;
+    samples: { y: number; t: number }[];
   } | null>(null);
 
   // Монтируем/размонтируем с задержкой, чтобы успела доиграть анимация закрытия,
@@ -76,17 +77,18 @@ export function BottomSheet({
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     drag.current = {
       startY: e.clientY,
-      lastT: performance.now(),
-      dragging: true,
+      samples: [{ y: e.clientY, t: performance.now() }],
     };
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
     const d = drag.current;
-    if (!d?.dragging) return;
+    if (!d) return;
     const dy = Math.max(0, e.clientY - d.startY);
-    d.lastT = performance.now();
+    const now = performance.now();
+    d.samples.push({ y: e.clientY, t: now });
+    d.samples = d.samples.filter((s) => now - s.t <= VELOCITY_WINDOW_MS);
     const sheet = sheetRef.current;
     if (sheet) {
       sheet.style.transition = 'none';
@@ -99,13 +101,27 @@ export function BottomSheet({
     drag.current = null;
     if (!d) return;
     const dy = Math.max(0, e.clientY - d.startY);
-    const dt = Math.max(1, performance.now() - d.lastT);
-    const velocity = dy / dt;
+    // Скорость — по последним ~100 мс движения. Пауза перед отпусканием
+    // или медленное движение дают ~0, а не «всё смещение за один тик».
+    const now = performance.now();
+    const recent = d.samples.filter((s) => now - s.t <= VELOCITY_WINDOW_MS);
+    const first = recent[0];
+    const last = recent[recent.length - 1];
+    const velocity =
+      first && last && last.t > first.t
+        ? (last.y - first.y) / (last.t - first.t)
+        : 0;
     if (dy > dismissThreshold || velocity > VELOCITY_DISMISS) {
       onClose();
     } else {
       resetDrag();
     }
+  };
+
+  // Системный жест перехватил касание — это не решение пользователя закрыть лист
+  const onPointerCancel = () => {
+    drag.current = null;
+    resetDrag();
   };
 
   if (!mounted) return null;
@@ -127,7 +143,7 @@ export function BottomSheet({
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
+          onPointerCancel={onPointerCancel}
         >
           <span className="sheet__handle" />
         </div>

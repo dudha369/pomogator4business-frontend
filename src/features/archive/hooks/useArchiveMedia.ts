@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { apiGetBlob } from '@/shared/api/client';
+import { acquireMedia, peekMedia, releaseMedia } from './mediaCache';
 
 type MediaState =
   | { status: 'loading' }
@@ -9,32 +10,27 @@ type MediaState =
 
 export type ArchiveMediaSide = 'auto' | 'old' | 'new';
 
-const cache = new Map<string, string>();
-
 /** Медиа архива нельзя положить в <img src> напрямую — нужен заголовок
- * авторизации, поэтому грузим байты через fetch и отдаём object URL. */
+ * авторизации, поэтому грузим байты через fetch и отдаём object URL.
+ * URL живёт в mediaCache, пока хотя бы один компонент им пользуется. */
 export function useArchiveMedia(
   logId: number,
   which: ArchiveMediaSide = 'auto',
 ): MediaState {
   const key = `${logId}:${which}`;
   const [state, setState] = useState<MediaState>(() => {
-    const cached = cache.get(key);
+    const cached = peekMedia(key);
     return cached ? { status: 'ready', url: cached } : { status: 'loading' };
   });
 
   useEffect(() => {
-    const cached = cache.get(key);
-    if (cached) {
-      setState({ status: 'ready', url: cached });
-      return;
-    }
     let cancelled = false;
-    setState({ status: 'loading' });
-    apiGetBlob(`/api/archive/${logId}/media?which=${which}`)
-      .then((blob) => {
-        const url = URL.createObjectURL(blob);
-        cache.set(key, url);
+    const cached = peekMedia(key);
+    setState(cached ? { status: 'ready', url: cached } : { status: 'loading' });
+    acquireMedia(key, () =>
+      apiGetBlob(`/api/archive/${logId}/media?which=${which}`),
+    )
+      .then((url) => {
         if (!cancelled) setState({ status: 'ready', url });
       })
       .catch(() => {
@@ -42,6 +38,7 @@ export function useArchiveMedia(
       });
     return () => {
       cancelled = true;
+      releaseMedia(key);
     };
   }, [key, logId, which]);
 

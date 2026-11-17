@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { ApiError } from './request';
 
-export function shouldRetry(failureCount: number, error: unknown): boolean {
+function shouldRetry(failureCount: number, error: unknown): boolean {
   if (error instanceof ApiError) {
     if (error.isNetworkError) return failureCount < 2;
     if (error.reason === 'maintenance_mode') return false;

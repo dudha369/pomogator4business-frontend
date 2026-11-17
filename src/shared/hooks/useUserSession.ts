@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { localeApi } from '../api/locale';
-import { onUnauthorized } from '../api/request';
+import { onBlocked, onUnauthorized, type BlockedReason } from '../api/request';
 import { isInTelegram } from '../lib/telegramEnv';
 import { getApiReason, getApiStatus, isNetworkError } from '../lib/apiErrors';
 import type { LocaleCode } from '@/i18n/types';
@@ -35,12 +35,15 @@ export function useUserSession(ready: boolean): SessionState {
 
   const [expired, setExpired] = useState(false);
   useEffect(() => onUnauthorized(() => setExpired(true)), []);
+  const [blocked, setBlocked] = useState<BlockedReason | null>(null);
+  useEffect(() => onBlocked(setBlocked), []);
 
   if (!ready || (inTelegram && isLoading)) return { status: 'booting' };
   if (!inTelegram) return { status: 'auth_error' };
   if (expired || getApiStatus(error) === 401) {
     return { status: 'session_expired' };
   }
+  if (blocked) return { status: blocked };
   if (getApiStatus(error) === 403) return { status: 'access_denied' };
   if (
     getApiStatus(error) === 503 &&

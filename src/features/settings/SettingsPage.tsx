@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { ApiError } from '@/shared/api/client';
+
 import { Section } from '@/shared/ui/Section';
 import type { LocaleCode } from '@/i18n';
 import { LANGUAGE_NAMES, useLocale } from '@/i18n';
@@ -27,6 +29,7 @@ export function SettingsPage() {
   const [mirror, setMirror] = useState<MirrorStatus>({
     connected: false,
     username: null,
+    running: false,
   });
   const [mirrorToken, setMirrorToken] = useState('');
   const [connectingMirror, setConnectingMirror] = useState(false);
@@ -74,8 +77,19 @@ export function SettingsPage() {
     try {
       setMirror(await connectMirror(mirrorToken.trim()));
       setMirrorToken('');
-    } catch {
-      setMirrorError(t('settings.mirrorConnectFailed'));
+    } catch (error) {
+      // 503 start_failed: токен верный, но вебхук зеркала не поднялся
+      const startFailed =
+        error instanceof ApiError &&
+        error.status === 503 &&
+        error.detail === 'start_failed';
+      setMirrorError(
+        t(
+          startFailed
+            ? 'settings.mirrorStartFailed'
+            : 'settings.mirrorConnectFailed',
+        ),
+      );
     } finally {
       setConnectingMirror(false);
     }
@@ -83,7 +97,7 @@ export function SettingsPage() {
 
   async function handleMirrorDisconnect() {
     await disconnectMirror();
-    setMirror({ connected: false, username: null });
+    setMirror({ connected: false, username: null, running: false });
   }
 
   if (state === 'loading') {
@@ -163,6 +177,11 @@ export function SettingsPage() {
               </span>
               <span className="info-row__value">@{mirror.username}</span>
             </div>
+            {!mirror.running && (
+              <p className="prefix-editor__error">
+                {t('settings.mirrorNotRunning')}
+              </p>
+            )}
             <button
               className="prefix-editor__save"
               onClick={handleMirrorDisconnect}

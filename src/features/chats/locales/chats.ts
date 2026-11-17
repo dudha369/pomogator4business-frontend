@@ -14,6 +14,7 @@ export const RU = {
   'chats.matched': 'Подходит чатов: {count}',
   'chats.readButton': 'Прочитать',
   'chats.reading': 'Читаю...',
+  'chats.progress': 'Прочитано {done} из {total}…',
   'chats.resultOk': 'Прочитано чатов: {done}.',
   'chats.resultPartial':
     'Прочитано {done} из {total} чатов. Остальные Telegram не принял.',
@@ -44,6 +45,7 @@ export const EN = {
   'chats.matched': 'Matching chats: {count}',
   'chats.readButton': 'Mark as read',
   'chats.reading': 'Marking...',
+  'chats.progress': 'Marked {done} of {total}…',
   'chats.resultOk': 'Chats marked as read: {done}.',
   'chats.resultPartial':
     'Marked {done} of {total} chats as read. Telegram rejected the rest.',
@@ -74,6 +76,7 @@ export const UK = {
   'chats.matched': 'Підходить чатів: {count}',
   'chats.readButton': 'Прочитати',
   'chats.reading': 'Читаю...',
+  'chats.progress': 'Прочитано {done} з {total}…',
   'chats.resultOk': 'Прочитано чатів: {done}.',
   'chats.resultPartial':
     'Прочитано {done} із {total} чатів. Решту Telegram не прийняв.',

@@ -7,7 +7,7 @@ interface Hsl {
   yiq: number;
 }
 
-export function isHexColor(value: unknown): value is string {
+function isHexColor(value: unknown): value is string {
   return typeof value === 'string' && /^#?[0-9a-fA-F]{6}$/.test(value);
 }
 
