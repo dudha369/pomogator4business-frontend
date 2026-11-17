@@ -11,5 +11,10 @@
     "src/shared/types/SecondaryButtonOptions.ts",
     "src/shared/ui/NavBar/lensMap.ts",
     "src/shared/ui/Toast.tsx"
-  ]
+  ],
+  "ignoreIssues": {
+    "src/shared/api/generated/api-types.ts": [
+      "types"
+    ]
+  }
 }

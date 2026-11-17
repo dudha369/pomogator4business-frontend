@@ -8,25 +8,23 @@ import {
 } from 'react';
 import { initData } from '@tma.js/sdk-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { LanguageContext } from '@/shared/context/LanguageContext';
+import { LanguageContext } from '@/shared/i18n/LanguageContext';
 import { useTelegram } from '@/shared/hooks/useTelegram';
-import {
-  SESSION_QUERY_KEY,
-  useSessionQuery,
-} from '@/shared/hooks/useUserSession';
+import { useSessionQuery } from '@/shared/hooks/useUserSession';
+import { queryKeys } from '@/shared/api/queryKeys';
 import {
   loadAppSettings,
   peekAppSettings,
   saveAppSettings,
 } from '@/shared/lib/appSettingsStorage';
 import { localeApi, type LocaleResponse } from '@/shared/api/locale';
-import { createTranslator } from '@/i18n/translate';
+import { createTranslator } from '@/shared/i18n/translate';
 import {
   DEFAULT_LOCALE,
   fromTelegramLocale,
   isLocaleCode,
   type LocaleCode,
-} from '@/i18n/types';
+} from '@/shared/i18n/types';
 
 /**
  * Порядок разрешения языка:
@@ -91,7 +89,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
       setLocaleState(next);
       void saveAppSettings({ language: next });
-      queryClient.setQueryData<LocaleResponse>(SESSION_QUERY_KEY, {
+      queryClient.setQueryData<LocaleResponse>(queryKeys.session, {
         locale: next,
       });
 
@@ -100,7 +98,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         console.error('Failed to update locale', error);
         setLocaleState(previous);
         void saveAppSettings({ language: previous });
-        queryClient.setQueryData<LocaleResponse>(SESSION_QUERY_KEY, {
+        queryClient.setQueryData<LocaleResponse>(queryKeys.session, {
           locale: previous,
         });
       });

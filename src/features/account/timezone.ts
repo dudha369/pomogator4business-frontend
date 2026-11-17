@@ -1,4 +1,4 @@
-import type { LocaleCode } from '@/i18n';
+import type { LocaleCode } from '@/shared/i18n';
 import { getStoredValue, setStoredValue } from '@/shared/telegram/storage';
 
 export interface TimezoneOption {
@@ -181,7 +181,7 @@ export function timezoneLabel(
 }
 
 /** IANA-имя пояса устройства (Europe/Kyiv): по нему сервер учитывает летнее время. */
-export function detectBrowserTimezoneName(): string | null {
+function detectBrowserTimezoneName(): string | null {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
   } catch {
@@ -192,11 +192,14 @@ export function detectBrowserTimezoneName(): string | null {
 // один раз на устройство отправляем IANA-имя; дальше ручной выбор не перетираем
 const STORAGE_KEY = 'pomogator_tz_iana_synced';
 
-export async function shouldAutoApplyTimezone(): Promise<boolean> {
-  const value = await getStoredValue(STORAGE_KEY);
-  return value !== '1';
-}
-
-export async function markTimezoneAutoApplied(): Promise<void> {
+/** Если на этом устройстве имя пояса ещё не отправляли — вызывает `apply(name)`,
+ * когда оно отличается от сохранённого на сервере (`current`). */
+export async function autoApplyTimezone(
+  current: string | null,
+  apply: (name: string) => void,
+): Promise<void> {
+  if ((await getStoredValue(STORAGE_KEY)) === '1') return;
+  const name = detectBrowserTimezoneName();
   await setStoredValue(STORAGE_KEY, '1');
+  if (name && name !== current) apply(name);
 }

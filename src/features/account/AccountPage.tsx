@@ -1,27 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { postEvent, requestEmojiStatusAccess } from '@tma.js/sdk-react';
 
 import { Section } from '@/shared/ui/Section';
 import { Switch } from '@/shared/ui/Switch';
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/shared/i18n';
 import { cn } from '@/shared/lib/cn';
 import {
-  fetchAccount,
-  toggleEmojiStatus as apiToggleEmojiStatus,
-  updateEmojiStatusStyle,
-  syncTimezoneName,
-  updateTimezone,
-} from './api';
+  useAccount,
+  useChangeClockStyle,
+  useChangeTimezone,
+  useSyncTimezoneName,
+  useToggleEmojiStatus,
+} from '@/features/account/hooks/useAccount';
 import {
-  detectBrowserTimezoneName,
-  markTimezoneAutoApplied,
-  shouldAutoApplyTimezone,
+  autoApplyTimezone,
   TIMEZONE_OPTIONS,
   timezoneLabel,
-} from './timezone';
-import type { AccountResponse } from './types';
-
-type LoadState = 'loading' | 'ready' | 'error';
+} from '@/features/account/timezone';
 
 /**
  * Превью стиля: PNG используется как маска, поэтому красится цветом текста
@@ -43,47 +38,21 @@ function clockStyleMask(id: string) {
 
 export function AccountPage() {
   const { t, locale } = useLocale();
-  const [state, setState] = useState<LoadState>('loading');
-  const [account, setAccount] = useState<AccountResponse | null>(null);
+  const { data: account, isPending, isError } = useAccount();
+  const toggleEmojiStatus = useToggleEmojiStatus();
+  const changeClockStyle = useChangeClockStyle();
+  const changeTimezone = useChangeTimezone();
+  const syncTimezone = useSyncTimezoneName();
   const [requesting, setRequesting] = useState(false);
   const [accessMessage, setAccessMessage] = useState<string | null>(null);
-  const [savingTimezone, setSavingTimezone] = useState(false);
-  const [savingStyle, setSavingStyle] = useState(false);
+  const autoTimezoneChecked = useRef(false);
 
-  function load() {
-    fetchAccount()
-      .then((data) => {
-        setAccount(data);
-        setState('ready');
-        maybeAutoApplyTimezone(data);
-      })
-      .catch(() => setState('error'));
-  }
-
-  async function maybeAutoApplyTimezone(data: AccountResponse) {
-    if (!(await shouldAutoApplyTimezone())) return;
-
-    const name = detectBrowserTimezoneName();
-    await markTimezoneAutoApplied();
-
-    if (!name || name === data.timezone) return;
-
-    syncTimezoneName(name)
-      .then((res) => {
-        setAccount((prev) =>
-          prev
-            ? {
-                ...prev,
-                timezone_offset_minutes: res.offset_minutes,
-                timezone: res.timezone,
-              }
-            : prev,
-        );
-      })
-      .catch(() => {});
-  }
-
-  useEffect(load, []);
+  // один раз после загрузки: отправляем пояс устройства (по IANA-имени — с учётом DST)
+  useEffect(() => {
+    if (!account || autoTimezoneChecked.current) return;
+    autoTimezoneChecked.current = true;
+    void autoApplyTimezone(account.timezone, syncTimezone.mutate);
+  }, [account, syncTimezone.mutate]);
 
   async function handleRequestAccess() {
     setRequesting(true);
@@ -104,81 +73,16 @@ export function AccountPage() {
     }
   }
 
-  async function handleToggleEmojiStatus(enabled: boolean) {
-    if (!account) return;
-    setAccount({
-      ...account,
-      emoji_status: { ...account.emoji_status, enabled },
-    });
-    try {
-      await apiToggleEmojiStatus(enabled);
-    } catch {
-      setAccount((prev) =>
-        prev
-          ? {
-              ...prev,
-              emoji_status: { ...prev.emoji_status, enabled: !enabled },
-            }
-          : prev,
-      );
+  function handleStyleChange(style: string) {
+    if (account && style !== account.emoji_status.style) {
+      changeClockStyle.mutate(style);
     }
   }
 
-  async function handleStyleChange(style: string) {
-    if (!account || style === account.emoji_status.style) return;
-    const previous = account.emoji_status.style;
-    setAccount({
-      ...account,
-      emoji_status: { ...account.emoji_status, style },
-    });
-    setSavingStyle(true);
-    try {
-      await updateEmojiStatusStyle(style);
-    } catch {
-      setAccount((prev) =>
-        prev
-          ? {
-              ...prev,
-              emoji_status: { ...prev.emoji_status, style: previous },
-            }
-          : prev,
-      );
-    } finally {
-      setSavingStyle(false);
-    }
-  }
-
-  async function handleTimezoneChange(offsetMinutes: number) {
-    if (!account) return;
-    const previous = account.timezone_offset_minutes;
-    const previousName = account.timezone;
-    setAccount({
-      ...account,
-      timezone_offset_minutes: offsetMinutes,
-      timezone: null,
-    });
-    setSavingTimezone(true);
-    try {
-      await updateTimezone(offsetMinutes);
-    } catch {
-      setAccount((prev) =>
-        prev
-          ? {
-              ...prev,
-              timezone_offset_minutes: previous,
-              timezone: previousName,
-            }
-          : prev,
-      );
-    } finally {
-      setSavingTimezone(false);
-    }
-  }
-
-  if (state === 'loading') {
+  if (isPending) {
     return <div className="page__status">{t('account.loading')}</div>;
   }
-  if (state === 'error' || !account) {
+  if (isError) {
     return (
       <div className="page__status page__status--error">
         {t('account.error')}
@@ -237,8 +141,8 @@ export function AccountPage() {
       <Section title={t('account.timezoneSection')}>
         <select
           className="timezone-select"
-          disabled={savingTimezone}
-          onChange={(e) => handleTimezoneChange(Number(e.target.value))}
+          disabled={changeTimezone.isPending}
+          onChange={(e) => changeTimezone.mutate(Number(e.target.value))}
           value={account.timezone_offset_minutes}
         >
           {TIMEZONE_OPTIONS.map((opt) => (
@@ -259,7 +163,7 @@ export function AccountPage() {
               </span>
               <Switch
                 checked={account.emoji_status.enabled}
-                onChange={handleToggleEmojiStatus}
+                onChange={toggleEmojiStatus.mutate}
               />
             </div>
             {clockStyles.length > 1 && (
@@ -279,7 +183,7 @@ export function AccountPage() {
                             ? 'border-accent text-accent'
                             : 'border-line text-fg',
                         )}
-                        disabled={savingStyle}
+                        disabled={changeClockStyle.isPending}
                         key={style.id}
                         onClick={() => handleStyleChange(style.id)}
                         type="button"

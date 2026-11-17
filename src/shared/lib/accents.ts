@@ -1,4 +1,4 @@
-import type { AccentId, HexColor } from '../types/Theme';
+import type { AccentId, HexColor } from '@/shared/types/Theme';
 
 export interface AccentScheme {
   id: AccentId;

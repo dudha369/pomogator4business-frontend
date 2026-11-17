@@ -1,4 +1,4 @@
-import type { Command } from '../types';
+import type { Command } from '@/features/commands/types';
 
 interface Props {
   command: Command;

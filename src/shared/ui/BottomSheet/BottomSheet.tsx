@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 
-import './bottomsheet.css';
+import '@/shared/ui/BottomSheet/bottomsheet.css';
 
 interface Props {
   open: boolean;

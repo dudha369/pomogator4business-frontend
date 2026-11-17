@@ -1,5 +1,5 @@
 import { retrieveLaunchParams, themeParams } from '@tma.js/sdk-react';
-import type { RawThemeParams } from './getValidTheme';
+import type { RawThemeParams } from '@/shared/lib/getValidTheme';
 
 export function readThemeParams(): RawThemeParams | undefined {
   try {

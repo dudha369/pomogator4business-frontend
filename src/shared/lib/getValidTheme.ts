@@ -1,6 +1,11 @@
-import type { AccentId, HexColor, Theme, ThemeMode } from '../types/Theme';
-import { isDarkColor, makeContrast, normalizeHex } from './colors';
-import { resolveAccent } from './accents';
+import type {
+  AccentId,
+  HexColor,
+  Theme,
+  ThemeMode,
+} from '@/shared/types/Theme';
+import { isDarkColor, makeContrast, normalizeHex } from '@/shared/lib/colors';
+import { resolveAccent } from '@/shared/lib/accents';
 
 export type RawThemeParams = Partial<
   Record<Exclude<keyof Theme, 'accent_color'>, string>

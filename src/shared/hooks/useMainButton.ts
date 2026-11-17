@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { mainButton } from '@tma.js/sdk-react';
-import { useTelegram } from './useTelegram';
-import type { MainButtonOptions } from '../types/MainButtonOptions';
-import { useTheme } from '../context/ThemeContext';
+import { useTelegram } from '@/shared/hooks/useTelegram';
+import type { MainButtonOptions } from '@/shared/types/MainButtonOptions';
+import { useTheme } from '@/shared/context/ThemeContext';
 
 export function useMainButton({
   text = '',

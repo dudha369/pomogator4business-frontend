@@ -1,4 +1,4 @@
-import type { HexColor } from './Theme';
+import type { HexColor } from '@/shared/types/Theme';
 
 export type SecondaryButtonPosition = 'left' | 'right' | 'top' | 'bottom';
 

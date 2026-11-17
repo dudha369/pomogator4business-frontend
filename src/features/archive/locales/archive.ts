@@ -84,7 +84,7 @@ export const RU = {
   'archive.settings.ownEdits': 'Изменения моих сообщений',
 };
 
-export const EN = {
+export const EN: Record<keyof typeof RU, string> = {
   'archive.dateFrom': 'From',
   'archive.dateTo': 'To',
   'archive.sortNewest': 'Newest first',
@@ -169,7 +169,7 @@ export const EN = {
   'archive.settings.ownEdits': 'Edits of my own messages',
 };
 
-export const UK = {
+export const UK: Record<keyof typeof RU, string> = {
   'archive.dateFrom': 'З дати',
   'archive.dateTo': 'По дату',
   'archive.sortNewest': 'Спочатку нові',

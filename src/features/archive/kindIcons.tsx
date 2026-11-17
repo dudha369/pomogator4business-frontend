@@ -23,7 +23,7 @@ import {
   Video,
 } from 'lucide-react';
 
-import type { ArchiveKind } from './types';
+import type { ArchiveKind } from '@/features/archive/types';
 
 /**
  * ВСЕ иконки архива — здесь. Бэкенд отдаёт только `kind`, а какую иконку и какую

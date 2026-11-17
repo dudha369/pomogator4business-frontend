@@ -29,7 +29,7 @@ export const RU = {
   'chats.favoriteRemove': 'Убрать из избранного',
 };
 
-export const EN = {
+export const EN: Record<keyof typeof RU, string> = {
   'chats.title': 'Chats',
   'chats.loading': 'Loading...',
   'chats.error': "Couldn't load chats.",
@@ -60,7 +60,7 @@ export const EN = {
   'chats.favoriteRemove': 'Remove from favorites',
 };
 
-export const UK = {
+export const UK: Record<keyof typeof RU, string> = {
   'chats.title': 'Чати',
   'chats.loading': 'Завантаження...',
   'chats.error': 'Не вдалося завантажити чати.',

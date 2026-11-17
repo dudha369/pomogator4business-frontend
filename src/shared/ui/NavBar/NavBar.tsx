@@ -15,10 +15,10 @@ import {
   UserCircle2,
 } from 'lucide-react';
 
-import { useLocale } from '@/i18n';
-import { haptic } from '../../telegram/haptics';
+import { useLocale } from '@/shared/i18n';
+import { haptic } from '@/shared/telegram/haptics';
 
-import './navbar.css';
+import '@/shared/ui/NavBar/navbar.css';
 
 type NavItem = {
   to: string;

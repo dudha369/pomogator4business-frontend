@@ -1,49 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { ApiError, apiGet } from '@/shared/api/client';
+import type { Schema } from '@/shared/api/schema';
+import { queryKeys } from '@/shared/api/queryKeys';
 
-export interface ChatInfo {
-  full_name: string;
-  username: string | null;
-}
+export type ChatInfo = Schema<'ChatInfoOut'>;
 
-/** userId → запрос. Хранится и «собеседника нет» (null, ответ 404): иначе
- * каждая карточка архива того же собеседника ходила бы на сервер заново.
- * Одновременные запросы объединяются. Сетевой сбой не кэшируется. */
-const requests = new Map<number, Promise<ChatInfo | null>>();
-
-function loadChatInfo(userId: number): Promise<ChatInfo | null> {
-  let request = requests.get(userId);
-  if (!request) {
-    request = apiGet<ChatInfo>(`/api/chat-info/${userId}`).catch(
-      (error: unknown) => {
-        if (!(error instanceof ApiError && error.status === 404)) {
-          requests.delete(userId); // временный сбой — пусть повторится
-        }
-        return null;
-      },
-    );
-    requests.set(userId, request);
+/** 404 («собеседника нет») — тоже ответ: кэшируется как `null`, иначе каждая
+ * карточка архива того же собеседника ходила бы на сервер заново. Одновременные
+ * запросы react-query объединяет; сетевой сбой в кэш не попадает. */
+async function loadChatInfo(userId: number): Promise<ChatInfo | null> {
+  try {
+    return await apiGet<ChatInfo>(`/api/chat-info/${userId}`);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
   }
-  return request;
 }
 
 export function useChatInfo(userId: number | null): ChatInfo | null {
-  const [info, setInfo] = useState<ChatInfo | null>(null);
-
-  useEffect(() => {
-    if (userId === null) {
-      setInfo(null);
-      return;
-    }
-    let cancelled = false;
-    loadChatInfo(userId).then((data) => {
-      if (!cancelled) setInfo(data);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
-
-  return info;
+  const { data } = useQuery({
+    queryKey: queryKeys.chatInfo(userId ?? 0),
+    queryFn: () => loadChatInfo(userId!),
+    enabled: userId !== null,
+    staleTime: Infinity,
+  });
+  return data ?? null;
 }

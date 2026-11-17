@@ -1,16 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
-
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/shared/i18n';
 import { BottomSheet } from '@/shared/ui/BottomSheet/BottomSheet';
 import { Switch } from '@/shared/ui/Switch';
-import { fetchArchivePrefs, saveArchivePrefs } from '../api';
-import { KindIcon } from '../kindIcons';
+import {
+  useArchivePrefs,
+  useSaveArchivePrefs,
+} from '@/features/archive/hooks/useArchive';
+import { KindIcon } from '@/features/archive/kindIcons';
 import type {
   AlbumStyle,
   ArchiveMediaType,
   ArchivePrefs,
-  ArchivePrefsResponse,
-} from '../types';
+} from '@/features/archive/types';
 
 interface Props {
   open: boolean;
@@ -59,36 +59,12 @@ function Title({ children }: { children: string }) {
  * бот подхватывает его со следующего уведомления. */
 export function ArchiveSettingsSheet({ open, onClose }: Props) {
   const { t } = useLocale();
-  const [data, setData] = useState<ArchivePrefsResponse | null>(null);
-  const [failed, setFailed] = useState(false);
-  // номер последнего запроса: ответы на более ранние уже не актуальны
-  const lastRequest = useRef(0);
-
-  useEffect(() => {
-    if (!open || data) return;
-    fetchArchivePrefs()
-      .then(setData)
-      .catch(() => setFailed(true));
-  }, [open, data]);
-
+  const { data, isError: failed } = useArchivePrefs(open);
+  const save = useSaveArchivePrefs();
   const prefs = data?.prefs;
 
   const update = (patch: Partial<ArchivePrefs>) => {
-    if (!data) return;
-    const request = ++lastRequest.current;
-    setData({ ...data, prefs: { ...data.prefs, ...patch } }); // сразу показываем
-    saveArchivePrefs(patch)
-      .then((saved) => {
-        // ответ на старый запрос не должен перебить более свежие переключатели
-        if (request === lastRequest.current) setData(saved);
-      })
-      .catch(() => {
-        // не сохранилось — возвращаем то, что реально хранится на сервере
-        if (request !== lastRequest.current) return;
-        fetchArchivePrefs()
-          .then(setData)
-          .catch(() => setFailed(true));
-      });
+    if (data) save(patch);
   };
 
   const toggle = (key: BooleanKey) => (value: boolean) =>

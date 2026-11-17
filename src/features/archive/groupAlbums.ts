@@ -1,4 +1,4 @@
-import type { ArchiveEntry } from './types';
+import type { ArchiveEntry } from '@/features/archive/types';
 
 /** Одна карточка в списке: обычная запись или целый удалённый альбом. */
 export interface ArchiveGroup {

@@ -1,5 +1,5 @@
-import { useLocale } from '@/i18n';
-import type { HomeStats } from '../types';
+import { useLocale } from '@/shared/i18n';
+import type { HomeStats } from '@/features/home/types';
 
 interface Props {
   stats: HomeStats;
@@ -33,14 +33,14 @@ export function HomeCounters({ stats }: Props) {
   return (
     <div className="mb-4 flex gap-3">
       <Counter
-        incoming={stats.todayIncoming}
+        incoming={stats.today.incoming}
         label={t('home.messagesToday')}
-        total={stats.todayTotal}
+        total={stats.today.total}
       />
       <Counter
-        incoming={stats.weekIncoming}
+        incoming={stats.week.incoming}
         label={t('home.messagesWeek')}
-        total={stats.weekTotal}
+        total={stats.week.total}
       />
     </div>
   );

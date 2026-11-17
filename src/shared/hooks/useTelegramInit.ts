@@ -11,7 +11,7 @@ import {
   themeParams,
   viewport,
 } from '@tma.js/sdk-react';
-import { isMobileDevice } from '../lib/device';
+import { isMobileDevice } from '@/shared/lib/device';
 
 const INIT_TIMEOUT_MS = 4000;
 

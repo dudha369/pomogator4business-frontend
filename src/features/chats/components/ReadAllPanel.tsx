@@ -1,19 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/shared/i18n';
 import { Switch } from '@/shared/ui/Switch';
-import { fetchReadAllStatus, readAll } from '../api';
+import {
+  useReadAllPreview,
+  useReadAllRun,
+  useReadAllStatus,
+} from '@/features/chats/hooks/useReadAll';
+import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue';
 import type {
   ReadAllRequest,
   ReadAllResult,
   ReadMode,
   ReadUnit,
-} from '../types';
-
-const POLL_MS = 2000;
-const MAX_POLL_FAILURES = 3;
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+} from '@/features/chats/types';
 
 const MODES: ReadMode[] = ['all', 'last', 'older'];
 
@@ -40,91 +40,39 @@ export function ReadAllPanel() {
   const [amount, setAmount] = useState(6);
   const [unit, setUnit] = useState<ReadUnit>('h');
   const [excludeFavorites, setExcludeFavorites] = useState(false);
-  const [matched, setMatched] = useState<number | null>(null);
-  const [running, setRunning] = useState(false);
-  const [result, setResult] = useState<ReadAllResult | 'error' | null>(null);
-  const [progress, setProgress] = useState<ReadAllResult | null>(null);
-  const alive = useRef(true);
+  const [followed, setFollowed] = useState(false);
 
-  // Бэкенд ждёт ответа ≤ 20 с, дальше работает в фоне: следим по /readall/status.
-  async function follow(first: ReadAllResult) {
-    let current = first;
-    let failures = 0;
-    while (current.running && alive.current) {
-      setProgress(current);
-      await sleep(POLL_MS);
-      if (!alive.current) return;
-      try {
-        current = await fetchReadAllStatus();
-        failures = 0;
-      } catch {
-        failures += 1;
-        if (failures >= MAX_POLL_FAILURES) throw new Error('status');
-      }
-    }
-    if (alive.current) setResult(current);
-  }
+  const status = useReadAllStatus();
+  const run = useReadAllRun();
 
-  useEffect(() => {
-    alive.current = true;
-    // вернулись на страницу, пока задача идёт — подхватываем прогресс
-    fetchReadAllStatus()
-      .then((status) => {
-        if (!status.running || !alive.current) return;
-        setRunning(true);
-        return follow(status);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (alive.current) setRunning(false);
-        setProgress(null);
-      });
-    return () => {
-      alive.current = false;
-    };
-  }, []);
+  // вернулись на страницу, пока задача идёт, — подхватываем прогресс
+  if (status.data?.running && !followed) setFollowed(true);
+
+  const pollFailed = status.isError;
+  const running =
+    run.isPending || (status.data?.running === true && !pollFailed);
+  const progress = running && status.data?.running ? status.data : null;
+  const result: ReadAllResult | 'error' | null =
+    !followed || running
+      ? null
+      : run.isError || pollFailed
+        ? 'error'
+        : (status.data ?? null);
 
   const amountValid =
     mode === 'all' || (Number.isFinite(amount) && amount >= 1);
 
-  // Предпросмотр: сколько чатов подойдёт под фильтр (с дебаунсом)
-  useEffect(() => {
-    if (!amountValid) {
-      setMatched(null);
-      return;
-    }
-    let cancelled = false;
-    const timer = setTimeout(() => {
-      readAll({
-        ...buildRequest(mode, amount, unit, excludeFavorites),
-        dry_run: true,
-      })
-        .then((res) => {
-          if (!cancelled) setMatched(res.matched);
-        })
-        .catch(() => {
-          if (!cancelled) setMatched(null);
-        });
-    }, 300);
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
-  }, [mode, amount, unit, excludeFavorites, amountValid]);
+  const request = useMemo(
+    () => buildRequest(mode, amount, unit, excludeFavorites),
+    [mode, amount, unit, excludeFavorites],
+  );
+  const debouncedRequest = useDebouncedValue(request, 300);
+  const preview = useReadAllPreview(amountValid ? debouncedRequest : null);
+  const matched = amountValid ? (preview.data?.matched ?? null) : null;
 
-  async function run() {
-    setRunning(true);
-    setResult(null);
-    try {
-      await follow(
-        await readAll(buildRequest(mode, amount, unit, excludeFavorites)),
-      );
-    } catch {
-      if (alive.current) setResult('error');
-    } finally {
-      if (alive.current) setRunning(false);
-      setProgress(null);
-    }
+  function start() {
+    setFollowed(true);
+    run.mutate(request);
   }
 
   function resultText(): string | null {
@@ -200,7 +148,7 @@ export function ReadAllPanel() {
       <button
         className="bg-accent w-full rounded-xl px-4 py-3 font-medium text-white disabled:opacity-40"
         disabled={running || !amountValid || matched === 0}
-        onClick={run}
+        onClick={start}
         type="button"
       >
         {running

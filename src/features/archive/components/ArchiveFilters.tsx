@@ -1,7 +1,10 @@
-import { useLocale } from '@/i18n';
-import { useChatInfo } from '../hooks/useChatInfo';
-import { ArchiveDateSortBar } from './ArchiveDateSortBar';
-import type { ArchiveEventType, ArchiveFilters as Filters } from '../types';
+import { useLocale } from '@/shared/i18n';
+import { useChatInfo } from '@/features/archive/hooks/useChatInfo';
+import { ArchiveDateSortBar } from '@/features/archive/components/ArchiveDateSortBar';
+import type {
+  ArchiveEventType,
+  ArchiveFilters as Filters,
+} from '@/features/archive/types';
 
 interface Props {
   filters: Filters;

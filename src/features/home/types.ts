@@ -1,22 +1,4 @@
-import type { ArchiveEntry } from '@/features/archive/types';
+import type { Schema } from '@/shared/api/schema';
 
-export interface HomeSummary {
-  connected: boolean;
-  ownerName: string | null;
-  ownerUsername: string | null;
-  mirrorConnected: boolean;
-  commandsTotal: number;
-  modulesEnabled: number;
-  modulesTotal: number;
-  emojiStatusEnabled: boolean;
-  emojiStatusGranted: boolean;
-  stats: HomeStats | null;
-  recentArchiveEntries: ArchiveEntry[];
-}
-
-export interface HomeStats {
-  todayTotal: number;
-  todayIncoming: number;
-  weekTotal: number;
-  weekIncoming: number;
-}
+export type HomeSummary = Schema<'HomeOut'>;
+export type HomeStats = Schema<'StatsOut'>;

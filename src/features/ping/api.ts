@@ -1,10 +1,5 @@
 import { API_BASE_URL, apiGet } from '@/shared/api/client';
-
-export interface DeepPing {
-  telegram_ms: number | null;
-  db_ms: number | null;
-  uptime_seconds: number;
-}
+import type { Schema } from '@/shared/api/schema';
 
 /** Одно измерение: круговое время GET /api/ping в мс. null — сервер недоступен. */
 async function pingOnce(): Promise<number | null> {
@@ -34,6 +29,5 @@ export async function measurePing(samples = 3): Promise<number | null> {
 }
 
 /** Задержки БД и Telegram API на стороне сервера + аптайм (нужна авторизация). */
-export function fetchDeepPing(): Promise<DeepPing> {
-  return apiGet<DeepPing>('/api/ping/deep');
-}
+export const fetchDeepPing = () =>
+  apiGet<Schema<'HealthOut'>>('/api/ping/deep');

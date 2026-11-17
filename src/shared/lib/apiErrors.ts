@@ -1,4 +1,4 @@
-import { ApiError } from '../api/request';
+import { ApiError } from '@/shared/api/request';
 
 export function getApiStatus(error: unknown): number | undefined {
   return error instanceof ApiError ? error.status : undefined;

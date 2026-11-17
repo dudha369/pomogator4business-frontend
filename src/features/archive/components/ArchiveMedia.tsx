@@ -1,10 +1,13 @@
-import { useLocale } from '@/i18n';
-import { TgsSticker } from './TgsSticker';
+import { useLocale } from '@/shared/i18n';
+import { TgsSticker } from '@/features/archive/components/TgsSticker';
 import {
   type ArchiveMediaSide,
   useArchiveMedia,
-} from '../hooks/useArchiveMedia';
-import type { ArchiveContent, ArchiveMediaType } from '../types';
+} from '@/features/archive/hooks/useArchiveMedia';
+import type {
+  ArchiveContent,
+  ArchiveMediaType,
+} from '@/features/archive/types';
 
 interface Props {
   logId: number;

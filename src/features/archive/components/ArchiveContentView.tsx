@@ -1,14 +1,14 @@
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/shared/i18n';
 import type {
   ArchiveContent,
   ArchiveEntry,
   ArchiveForward,
   ArchiveMediaType,
-} from '../types';
-import type { ArchiveMediaSide } from '../hooks/useArchiveMedia';
-import { EntityText } from './EntityText';
-import { KindIcon } from '../kindIcons';
-import { ArchiveMedia } from './ArchiveMedia';
+} from '@/features/archive/types';
+import type { ArchiveMediaSide } from '@/features/archive/hooks/useArchiveMedia';
+import { EntityText } from '@/features/archive/components/EntityText';
+import { KindIcon } from '@/features/archive/kindIcons';
+import { ArchiveMedia } from '@/features/archive/components/ArchiveMedia';
 
 const FILE_KINDS = new Set<string>([
   'photo',

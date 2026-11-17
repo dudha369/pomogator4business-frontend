@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { secondaryButton } from '@tma.js/sdk-react';
-import { useTelegram } from './useTelegram';
-import type { SecondaryButtonOptions } from '../types/SecondaryButtonOptions';
-import { useTheme } from '../context/ThemeContext';
+import { useTelegram } from '@/shared/hooks/useTelegram';
+import type { SecondaryButtonOptions } from '@/shared/types/SecondaryButtonOptions';
+import { useTheme } from '@/shared/context/ThemeContext';
 
 export function useSecondaryButton({
   text = '',

@@ -4,7 +4,7 @@ import {
   initDataHeader,
   request,
   requestBlob,
-} from './request';
+} from '@/shared/api/request';
 
 export { ApiError, API_BASE_URL, initDataHeader };
 

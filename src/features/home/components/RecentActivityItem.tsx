@@ -1,13 +1,16 @@
 import { Link } from 'react-router-dom';
 
-import { useLocale } from '@/i18n';
+import { useLocale } from '@/shared/i18n';
 import { ArchiveAvatar } from '@/features/archive/components/ArchiveAvatar';
 import { useChatInfo } from '@/features/archive/hooks/useChatInfo';
 import type { ArchiveEntry } from '@/features/archive/types';
 import { formatRelativeTime } from '@/shared/utils/relativeTime';
 
 interface Props {
-  entry: ArchiveEntry;
+  entry: Pick<
+    ArchiveEntry,
+    'chat_id' | 'event' | 'old_text' | 'new_text' | 'created_at'
+  >;
 }
 
 export function RecentActivityItem({ entry }: Props) {

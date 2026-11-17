@@ -10,7 +10,7 @@ export const RU = {
   'ping.unitM': '{n} мин',
 };
 
-export const EN = {
+export const EN: Record<keyof typeof RU, string> = {
   'ping.offline': 'No connection',
   'ping.checking': 'Checking...',
   'ping.failed': 'error',
@@ -22,7 +22,7 @@ export const EN = {
   'ping.unitM': '{n} min',
 };
 
-export const UK = {
+export const UK: Record<keyof typeof RU, string> = {
   'ping.offline': "Немає зв'язку",
   'ping.checking': 'Перевірка...',
   'ping.failed': 'помилка',

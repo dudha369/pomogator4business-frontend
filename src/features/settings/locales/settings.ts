@@ -27,7 +27,7 @@ export const RU = {
   'settings.colorSchemeSection': 'Цветовая схема',
 };
 
-export const EN = {
+export const EN: Record<keyof typeof RU, string> = {
   'settings.title': 'Settings',
   'settings.loading': 'Loading...',
   'settings.error':
@@ -55,7 +55,7 @@ export const EN = {
   'settings.colorSchemeSection': 'Color scheme',
 };
 
-export const UK = {
+export const UK: Record<keyof typeof RU, string> = {
   'settings.title': 'Налаштування',
   'settings.loading': 'Завантаження...',
   'settings.error':

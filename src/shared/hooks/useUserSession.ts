@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { localeApi } from '../api/locale';
-import { onBlocked, onUnauthorized, type BlockedReason } from '../api/request';
-import { isInTelegram } from '../lib/telegramEnv';
-import { getApiReason, getApiStatus, isNetworkError } from '../lib/apiErrors';
-import type { LocaleCode } from '@/i18n/types';
-
-export const SESSION_QUERY_KEY = ['session'] as const;
+import { queryKeys } from '@/shared/api/queryKeys';
+import { localeApi } from '@/shared/api/locale';
+import {
+  onBlocked,
+  onUnauthorized,
+  type BlockedReason,
+} from '@/shared/api/request';
+import { isInTelegram } from '@/shared/lib/telegramEnv';
+import {
+  getApiReason,
+  getApiStatus,
+  isNetworkError,
+} from '@/shared/lib/apiErrors';
+import type { LocaleCode } from '@/shared/i18n/types';
 
 export type SessionState =
   | { status: 'booting' }
@@ -21,7 +28,7 @@ export function useSessionQuery(ready: boolean) {
   const inTelegram = useMemo(() => isInTelegram(ready), [ready]);
 
   const query = useQuery({
-    queryKey: SESSION_QUERY_KEY,
+    queryKey: queryKeys.session,
     queryFn: ({ signal }) => localeApi.get(signal),
     enabled: ready && inTelegram,
   });

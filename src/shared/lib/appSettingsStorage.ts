@@ -1,7 +1,7 @@
-import { getStoredValue, setStoredValue } from '../telegram/storage';
-import { isAccentId } from './accents';
-import { isLocaleCode, type LocaleCode } from '@/i18n/types';
-import type { AccentId, ThemeMode } from '../types/Theme';
+import { getStoredValue, setStoredValue } from '@/shared/telegram/storage';
+import { isAccentId } from '@/shared/lib/accents';
+import { isLocaleCode, type LocaleCode } from '@/shared/i18n/types';
+import type { AccentId, ThemeMode } from '@/shared/types/Theme';
 
 const SETTINGS_KEY = 'app_settings';
 const LEGACY_ACCENT_KEY = 'color_scheme';

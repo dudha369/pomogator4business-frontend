@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
-import { createTranslator, type TranslateFn } from '@/i18n/translate';
-import { DEFAULT_LOCALE, type LocaleCode } from '@/i18n/types';
+import { createTranslator, type TranslateFn } from '@/shared/i18n/translate';
+import { DEFAULT_LOCALE, type LocaleCode } from '@/shared/i18n/types';
 
 export interface LanguageContextValue {
   locale: LocaleCode;

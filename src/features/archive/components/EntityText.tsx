@@ -1,6 +1,6 @@
 import { type ReactNode, useState } from 'react';
 
-import type { ArchiveEntity } from '../types';
+import type { ArchiveEntity } from '@/features/archive/types';
 
 function Spoiler({ children }: { children: ReactNode }) {
   const [shown, setShown] = useState(false);
