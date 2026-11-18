@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { ROUTES } from '@/shared/constants/routes';
 import { useLocale } from '@/shared/i18n';
 import { useHome } from '@/features/home/hooks/useHome';
 import { HomeCounters } from '@/features/home/components/HomeCounters';
@@ -55,6 +56,20 @@ export function HomePage() {
       >
         <span>{t('home.chatsLink')}</span>
         <span className="text-accent text-sm">→</span>
+      </Link>
+
+      <Link
+        className="border-line bg-card text-fg mb-4 flex items-center justify-between rounded-2xl border px-4 py-3 active:opacity-70"
+        to={ROUTES.alerts}
+      >
+        <span>{t('alerts.link')}</span>
+        {summary.alerts_active > 0 ? (
+          <span className="text-accent text-sm font-medium">
+            ⚠️ {summary.alerts_active}
+          </span>
+        ) : (
+          <span className="text-accent text-sm">→</span>
+        )}
       </Link>
 
       <HomeQuickToggles

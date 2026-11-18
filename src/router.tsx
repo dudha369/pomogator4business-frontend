@@ -49,6 +49,13 @@ export const router = createBrowserRouter([
               })),
           },
           {
+            path: 'alerts',
+            lazy: () =>
+              import('@/features/alerts/AlertsPage').then((m) => ({
+                Component: m.AlertsPage,
+              })),
+          },
+          {
             path: 'account',
             lazy: () =>
               import('@/features/account/AccountPage').then((m) => ({
