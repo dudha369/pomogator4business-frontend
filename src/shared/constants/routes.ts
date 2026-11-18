@@ -5,6 +5,7 @@ export const ROUTES = {
   chats: '/chats',
   settings: '/settings',
   account: '/account',
+  alerts: '/alerts',
 } as const;
 
 export const ROOT_PATHS: readonly string[] = [

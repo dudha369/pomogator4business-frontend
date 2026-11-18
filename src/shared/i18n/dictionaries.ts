@@ -1,6 +1,7 @@
 import type { LocaleCode } from '@/shared/i18n/types';
 import * as common from '@/shared/i18n/common';
 import * as account from '@/features/account/locales/account';
+import * as alerts from '@/features/alerts/locales/alerts';
 import * as archive from '@/features/archive/locales/archive';
 import * as chats from '@/features/chats/locales/chats';
 import * as commands from '@/features/commands/locales/commands';
@@ -14,6 +15,7 @@ import * as settings from '@/features/settings/locales/settings';
 const ru = {
   ...common.RU,
   ...account.RU,
+  ...alerts.RU,
   ...archive.RU,
   ...chats.RU,
   ...commands.RU,
@@ -34,6 +36,7 @@ export const TRANSLATIONS: Record<LocaleCode, Dict> = {
   en: {
     ...common.EN,
     ...account.EN,
+    ...alerts.EN,
     ...archive.EN,
     ...chats.EN,
     ...commands.EN,
@@ -44,6 +47,7 @@ export const TRANSLATIONS: Record<LocaleCode, Dict> = {
   uk: {
     ...common.UK,
     ...account.UK,
+    ...alerts.UK,
     ...archive.UK,
     ...chats.UK,
     ...commands.UK,
