@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from 'react';
 
+import { CustomEmoji } from '@/features/archive/components/CustomEmoji';
 import type { ArchiveEntity } from '@/features/archive/types';
 
 function Spoiler({ children }: { children: ReactNode }) {
@@ -63,8 +64,16 @@ function wrap(entity: ArchiveEntity, children: ReactNode[], key: string) {
           {children}
         </a>
       );
+    case 'custom_emoji':
+      return entity.custom_emoji_id ? (
+        <CustomEmoji key={key} emojiId={entity.custom_emoji_id}>
+          {children}
+        </CustomEmoji>
+      ) : (
+        <span key={key}>{children}</span>
+      );
     default:
-      // custom_emoji, mention, hashtag, url…: показываем исходный текст/эмодзи
+      // mention, hashtag, url…: показываем исходный текст
       return <span key={key}>{children}</span>;
   }
 }
