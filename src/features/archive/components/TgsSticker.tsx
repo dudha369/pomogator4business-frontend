@@ -6,6 +6,10 @@ interface Props {
   /** что показать, если анимацию отрисовать не удалось */
   fallback?: string;
   className?: string;
+  /** вызывается, если анимацию отрисовать не удалось (вместо своей заглушки) */
+  onError?: () => void;
+  /** `<span>` вместо `<div>`: для эмодзи внутри абзаца (div в p недопустим) */
+  inline?: boolean;
 }
 
 async function gunzip(buffer: ArrayBuffer): Promise<string> {
@@ -21,8 +25,10 @@ export function TgsSticker({
   url,
   fallback = '🖼',
   className = 'mx-auto size-40',
+  onError,
+  inline = false,
 }: Props) {
-  const container = useRef<HTMLDivElement>(null);
+  const container = useRef<HTMLElement>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -46,7 +52,9 @@ export function TgsSticker({
         });
         destroy = () => animation.destroy();
       } catch {
-        if (!cancelled) setFailed(true);
+        if (cancelled) return;
+        setFailed(true);
+        onError?.();
       }
     })();
 
@@ -54,10 +62,12 @@ export function TgsSticker({
       cancelled = true;
       destroy?.();
     };
+    // onError не в зависимостях: смена колбэка не должна перезапускать анимацию
   }, [url]);
 
   if (failed) {
     return <div className="py-4 text-center text-6xl">{fallback}</div>;
   }
-  return <div className={className} ref={container} />;
+  const Tag = inline ? 'span' : 'div';
+  return <Tag className={className} ref={container as never} />;
 }
