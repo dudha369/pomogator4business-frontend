@@ -28,6 +28,15 @@ export const RU = {
   'alert.ai_no_key.title': 'ИИ-ответы не работают: нет ключа',
   'alert.ai_no_key.text':
     'ИИ включён, но на сервере не задан AI_API_KEY, поэтому бот не отвечает через ИИ. Задайте ключ или выключите ИИ.',
+  'alert.dangerous_link.title': '{headline} от {sender}',
+  'alert.dangerous_link.text':
+    'Показано как: {display}\nАдрес: {url}\nВердикт: {verdict}',
+  'alert.dangerous_file.title': '{headline} от {sender}',
+  'alert.dangerous_file.text':
+    'Файл: {name}\nSHA-256: {sha}\nВердикт: {verdict}',
+  'alert.file_unchecked.title': 'Файл не проверен ({sender})',
+  'alert.file_unchecked.text':
+    'Файл: {name}, {size} МБ\nTelegram не отдаёт боту файлы больше 20 МБ, поэтому проверить содержимое не удалось. Тип файла: {verdict}',
 };
 
 export const EN: Record<keyof typeof RU, string> = {
@@ -59,6 +68,15 @@ export const EN: Record<keyof typeof RU, string> = {
   'alert.ai_no_key.title': 'AI replies are not working: no key',
   'alert.ai_no_key.text':
     'AI is on, but AI_API_KEY is not set on the server, so the bot cannot reply with AI. Set the key or turn AI off.',
+  'alert.dangerous_link.title': '{headline} from {sender}',
+  'alert.dangerous_link.text':
+    'Shown as: {display}\nAddress: {url}\nVerdict: {verdict}',
+  'alert.dangerous_file.title': '{headline} from {sender}',
+  'alert.dangerous_file.text':
+    'File: {name}\nSHA-256: {sha}\nVerdict: {verdict}',
+  'alert.file_unchecked.title': 'File not checked ({sender})',
+  'alert.file_unchecked.text':
+    'File: {name}, {size} MB\nTelegram does not give bots files larger than 20 MB, so the contents could not be checked. File type: {verdict}',
 };
 
 export const UK: Record<keyof typeof RU, string> = {
@@ -90,4 +108,13 @@ export const UK: Record<keyof typeof RU, string> = {
   'alert.ai_no_key.title': 'ШІ-відповіді не працюють: немає ключа',
   'alert.ai_no_key.text':
     'ШІ увімкнено, але на сервері не задано AI_API_KEY, тому бот не відповідає через ШІ. Задайте ключ або вимкніть ШІ.',
+  'alert.dangerous_link.title': '{headline} від {sender}',
+  'alert.dangerous_link.text':
+    'Показано як: {display}\nАдреса: {url}\nВердикт: {verdict}',
+  'alert.dangerous_file.title': '{headline} від {sender}',
+  'alert.dangerous_file.text':
+    'Файл: {name}\nSHA-256: {sha}\nВердикт: {verdict}',
+  'alert.file_unchecked.title': 'Файл не перевірено ({sender})',
+  'alert.file_unchecked.text':
+    'Файл: {name}, {size} МБ\nTelegram не віддає боту файли понад 20 МБ, тому перевірити вміст не вдалося. Тип файлу: {verdict}',
 };

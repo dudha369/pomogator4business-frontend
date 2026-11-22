@@ -19,7 +19,9 @@ export function AlertCard({ alert, busy, onDismiss, onMute }: Props) {
   return (
     <div className="border-line bg-card mb-3 rounded-2xl border px-4 py-3">
       <p className="text-fg font-medium">⚠️ {title}</p>
-      {text && <p className="text-fg/80 mt-1 text-sm">{text}</p>}
+      {text && (
+        <p className="text-fg/80 mt-1 text-sm whitespace-pre-line">{text}</p>
+      )}
       <p className="text-fg/60 mt-2 text-xs">
         {t('alerts.last', { time })}
         {alert.count > 1 && ` · ${t('alerts.count', { n: alert.count })}`}

@@ -6,6 +6,7 @@ import * as archive from '@/features/archive/locales/archive';
 import * as chats from '@/features/chats/locales/chats';
 import * as commands from '@/features/commands/locales/commands';
 import * as home from '@/features/home/locales/home';
+import * as linkscan from '@/features/linkscan/locales/linkscan';
 import * as ping from '@/features/ping/locales/ping';
 import * as settings from '@/features/settings/locales/settings';
 
@@ -20,6 +21,7 @@ const ru = {
   ...chats.RU,
   ...commands.RU,
   ...home.RU,
+  ...linkscan.RU,
   ...ping.RU,
   ...settings.RU,
 };
@@ -41,6 +43,7 @@ export const TRANSLATIONS: Record<LocaleCode, Dict> = {
     ...chats.EN,
     ...commands.EN,
     ...home.EN,
+    ...linkscan.EN,
     ...ping.EN,
     ...settings.EN,
   },
@@ -52,6 +55,7 @@ export const TRANSLATIONS: Record<LocaleCode, Dict> = {
     ...chats.UK,
     ...commands.UK,
     ...home.UK,
+    ...linkscan.UK,
     ...ping.UK,
     ...settings.UK,
   },
