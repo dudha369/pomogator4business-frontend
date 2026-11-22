@@ -4,6 +4,7 @@ export const queryKeys = {
   session: ['session'] as const,
   home: ['home'] as const,
   alerts: ['alerts'] as const,
+  linkscan: ['linkscan'] as const,
   account: ['account'] as const,
   settings: ['settings'] as const,
   mirror: ['mirror'] as const,

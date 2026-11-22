@@ -9,6 +9,9 @@ const ALERT_CODES = [
   'mirror_not_running',
   'emoji_access_revoked',
   'ai_no_key',
+  'dangerous_link',
+  'dangerous_file',
+  'file_unchecked',
 ] as const;
 
 export type AlertCode = (typeof ALERT_CODES)[number];

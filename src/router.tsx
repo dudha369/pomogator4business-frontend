@@ -56,6 +56,13 @@ export const router = createBrowserRouter([
               })),
           },
           {
+            path: 'linkscan',
+            lazy: () =>
+              import('@/features/linkscan/LinkscanPage').then((m) => ({
+                Component: m.LinkscanPage,
+              })),
+          },
+          {
             path: 'account',
             lazy: () =>
               import('@/features/account/AccountPage').then((m) => ({

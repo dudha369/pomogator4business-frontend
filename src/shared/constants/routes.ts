@@ -6,6 +6,7 @@ export const ROUTES = {
   settings: '/settings',
   account: '/account',
   alerts: '/alerts',
+  linkscan: '/linkscan',
 } as const;
 
 export const ROOT_PATHS: readonly string[] = [
