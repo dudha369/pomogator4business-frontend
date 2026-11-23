@@ -7,7 +7,7 @@ import {
   releaseMedia,
 } from '@/features/archive/hooks/mediaCache';
 
-export type EmojiFormat = 'tgs' | 'webm' | 'webp';
+type EmojiFormat = 'tgs' | 'webm' | 'webp';
 
 export type CustomEmojiState =
   | { status: 'loading' }

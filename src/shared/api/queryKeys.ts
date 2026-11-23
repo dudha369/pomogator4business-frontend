@@ -5,6 +5,7 @@ export const queryKeys = {
   home: ['home'] as const,
   alerts: ['alerts'] as const,
   linkscan: ['linkscan'] as const,
+  userbot: ['userbot'] as const,
   account: ['account'] as const,
   settings: ['settings'] as const,
   mirror: ['mirror'] as const,

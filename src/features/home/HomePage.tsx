@@ -80,6 +80,14 @@ export function HomePage() {
         <span className="text-accent text-sm">→</span>
       </Link>
 
+      <Link
+        className="border-line bg-card text-fg mb-4 flex items-center justify-between rounded-2xl border px-4 py-3 active:opacity-70"
+        to={ROUTES.userbot}
+      >
+        <span>{t('userbot.link')}</span>
+        <span className="text-accent text-sm">→</span>
+      </Link>
+
       <HomeQuickToggles
         emojiStatusEnabled={summary.emoji_status_enabled}
         emojiStatusGranted={summary.emoji_status_granted}

@@ -2,7 +2,6 @@
   "ignore": [
     "src/shared/api/types.ts",
     "src/shared/context/NavBarContext.ts",
-    "src/shared/context/ScrollContainerContext.ts",
     "src/shared/hooks/useMainButton.ts",
     "src/shared/hooks/useScrollContainer.ts",
     "src/shared/hooks/useSecondaryButton.ts",
