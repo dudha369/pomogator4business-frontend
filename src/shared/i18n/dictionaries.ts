@@ -9,6 +9,7 @@ import * as home from '@/features/home/locales/home';
 import * as linkscan from '@/features/linkscan/locales/linkscan';
 import * as ping from '@/features/ping/locales/ping';
 import * as settings from '@/features/settings/locales/settings';
+import * as userbot from '@/features/userbot/locales/userbot';
 
 // Явный реестр вместо import.meta.glob: типы ключей выводятся из RU-словарей,
 // а EN/UK каждого файла объявлены как Record<keyof typeof RU, string> —
@@ -24,6 +25,7 @@ const ru = {
   ...linkscan.RU,
   ...ping.RU,
   ...settings.RU,
+  ...userbot.RU,
 };
 
 export type TranslationKey = keyof typeof ru;
@@ -46,6 +48,7 @@ export const TRANSLATIONS: Record<LocaleCode, Dict> = {
     ...linkscan.EN,
     ...ping.EN,
     ...settings.EN,
+    ...userbot.EN,
   },
   uk: {
     ...common.UK,
@@ -58,5 +61,6 @@ export const TRANSLATIONS: Record<LocaleCode, Dict> = {
     ...linkscan.UK,
     ...ping.UK,
     ...settings.UK,
+    ...userbot.UK,
   },
 };

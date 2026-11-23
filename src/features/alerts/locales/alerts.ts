@@ -28,6 +28,15 @@ export const RU = {
   'alert.ai_no_key.title': 'ИИ-ответы не работают: нет ключа',
   'alert.ai_no_key.text':
     'ИИ включён, но на сервере не задан AI_API_KEY, поэтому бот не отвечает через ИИ. Задайте ключ или выключите ИИ.',
+  'alert.data_key_missing.title': 'Часть данных не расшифровывается',
+  'alert.data_key_missing.text':
+    'Ключ шифрования недоступен: некоторые записи архива показываются без содержимого. Данные не удалены, верните ключ в DATA_MASTER_KEYS на сервере.',
+  'alert.userbot_disconnected.title': 'Юзербот отключился',
+  'alert.userbot_disconnected.text':
+    'Связь с аккаунтом через юзербота потеряна и не восстанавливается. Бот продолжит пытаться; если не поможет, переподключите юзербота.',
+  'alert.userbot_session_revoked.title': 'Сеанс юзербота завершён',
+  'alert.userbot_session_revoked.text':
+    'Telegram завершил сеанс юзербота (возможно, вы вышли из устройства в настройках Telegram). Подключите его заново.',
   'alert.dangerous_link.title': '{headline} от {sender}',
   'alert.dangerous_link.text':
     'Показано как: {display}\nАдрес: {url}\nВердикт: {verdict}',
@@ -68,6 +77,15 @@ export const EN: Record<keyof typeof RU, string> = {
   'alert.ai_no_key.title': 'AI replies are not working: no key',
   'alert.ai_no_key.text':
     'AI is on, but AI_API_KEY is not set on the server, so the bot cannot reply with AI. Set the key or turn AI off.',
+  'alert.data_key_missing.title': 'Some data cannot be decrypted',
+  'alert.data_key_missing.text':
+    'The encryption key is unavailable, so some archive records are shown without content. Nothing was deleted: restore the key in DATA_MASTER_KEYS on the server.',
+  'alert.userbot_disconnected.title': 'Userbot disconnected',
+  'alert.userbot_disconnected.text':
+    'The connection to your account through the userbot was lost and is not recovering. The bot keeps trying; if that does not help, reconnect the userbot.',
+  'alert.userbot_session_revoked.title': 'Userbot session ended',
+  'alert.userbot_session_revoked.text':
+    'Telegram ended the userbot session (you may have logged out that device in Telegram settings). Connect it again.',
   'alert.dangerous_link.title': '{headline} from {sender}',
   'alert.dangerous_link.text':
     'Shown as: {display}\nAddress: {url}\nVerdict: {verdict}',
@@ -108,6 +126,15 @@ export const UK: Record<keyof typeof RU, string> = {
   'alert.ai_no_key.title': 'ШІ-відповіді не працюють: немає ключа',
   'alert.ai_no_key.text':
     'ШІ увімкнено, але на сервері не задано AI_API_KEY, тому бот не відповідає через ШІ. Задайте ключ або вимкніть ШІ.',
+  'alert.data_key_missing.title': 'Частину даних не вдається розшифрувати',
+  'alert.data_key_missing.text':
+    'Ключ шифрування недоступний, тому деякі записи архіву показано без вмісту. Дані не видалено, поверніть ключ у DATA_MASTER_KEYS на сервері.',
+  'alert.userbot_disconnected.title': 'Юзербот відключився',
+  'alert.userbot_disconnected.text':
+    "Зв'язок з акаунтом через юзербота втрачено й не відновлюється. Бот продовжить спроби; якщо не допоможе, підключіть юзербота знову.",
+  'alert.userbot_session_revoked.title': 'Сеанс юзербота завершено',
+  'alert.userbot_session_revoked.text':
+    'Telegram завершив сеанс юзербота (можливо, ви вийшли з пристрою в налаштуваннях Telegram). Підключіть його знову.',
   'alert.dangerous_link.title': '{headline} від {sender}',
   'alert.dangerous_link.text':
     'Показано як: {display}\nАдреса: {url}\nВердикт: {verdict}',

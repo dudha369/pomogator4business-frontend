@@ -7,6 +7,7 @@ export const ROUTES = {
   account: '/account',
   alerts: '/alerts',
   linkscan: '/linkscan',
+  userbot: '/userbot',
 } as const;
 
 export const ROOT_PATHS: readonly string[] = [

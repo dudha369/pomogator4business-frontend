@@ -63,6 +63,13 @@ export const router = createBrowserRouter([
               })),
           },
           {
+            path: 'userbot',
+            lazy: () =>
+              import('@/features/userbot/UserbotPage').then((m) => ({
+                Component: m.UserbotPage,
+              })),
+          },
+          {
             path: 'account',
             lazy: () =>
               import('@/features/account/AccountPage').then((m) => ({
