@@ -46,6 +46,9 @@ export const RU = {
   'alert.file_unchecked.title': 'Файл не проверен ({sender})',
   'alert.file_unchecked.text':
     'Файл: {name}, {size} МБ\nTelegram не отдаёт боту файлы больше 20 МБ, поэтому проверить содержимое не удалось. Тип файла: {verdict}',
+  'alert.limit_reached.title': 'Лимит тарифа: {label}',
+  'alert.limit_reached.text':
+    'Достигнут лимит ({limit}) на тарифе «{plan}». {effect}',
 };
 
 export const EN: Record<keyof typeof RU, string> = {
@@ -95,6 +98,9 @@ export const EN: Record<keyof typeof RU, string> = {
   'alert.file_unchecked.title': 'File not checked ({sender})',
   'alert.file_unchecked.text':
     'File: {name}, {size} MB\nTelegram does not give bots files larger than 20 MB, so the contents could not be checked. File type: {verdict}',
+  'alert.limit_reached.title': 'Plan limit: {label}',
+  'alert.limit_reached.text':
+    'The limit ({limit}) of the “{plan}” plan is reached. {effect}',
 };
 
 export const UK: Record<keyof typeof RU, string> = {
@@ -144,4 +150,7 @@ export const UK: Record<keyof typeof RU, string> = {
   'alert.file_unchecked.title': 'Файл не перевірено ({sender})',
   'alert.file_unchecked.text':
     'Файл: {name}, {size} МБ\nTelegram не віддає боту файли понад 20 МБ, тому перевірити вміст не вдалося. Тип файлу: {verdict}',
+  'alert.limit_reached.title': 'Ліміт тарифу: {label}',
+  'alert.limit_reached.text':
+    'Досягнуто ліміт ({limit}) на тарифі «{plan}». {effect}',
 };
