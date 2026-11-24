@@ -15,6 +15,7 @@ const ALERT_CODES = [
   'dangerous_link',
   'dangerous_file',
   'file_unchecked',
+  'limit_reached',
 ] as const;
 
 export type AlertCode = (typeof ALERT_CODES)[number];
