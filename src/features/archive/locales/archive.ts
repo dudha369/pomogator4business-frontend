@@ -82,6 +82,30 @@ export const RU = {
   'archive.settings.ownEditsHint':
     'По умолчанию бот сообщает только об изменениях сообщений собеседника.',
   'archive.settings.ownEdits': 'Изменения моих сообщений',
+  'archive.chats.link': 'Чаты архива',
+  'archive.chats.title': 'Чаты архива',
+  'archive.chats.tabPrivate': 'Личные',
+  'archive.chats.tabGroups': 'Группы и каналы',
+  'archive.chats.privateHint':
+    'Личные чаты ведёт бизнес-бот: по умолчанию они в архиве. Выключенный чат перестаёт сохраняться и уведомлять.',
+  'archive.chats.groupsHint':
+    'Группы и каналы пишет юзербот, и только те, что вы включили. Файлы хранятся 14 дней и только если включено «Файлы».',
+  'archive.chats.limit': 'Включено: {used} из {limit}',
+  'archive.chats.limitFree': 'Включено: {used}',
+  'archive.chats.files': 'Файлы',
+  'archive.chats.notify': 'Уведомлять',
+  'archive.chats.search': 'Поиск по названию',
+  'archive.chats.loading': 'Загрузка...',
+  'archive.chats.empty': 'Ничего не найдено.',
+  'archive.chats.error': 'Не удалось загрузить список.',
+  'archive.chats.unavailable':
+    'Юзербот сейчас недоступен. Подключите его или повторите через несколько секунд.',
+  'archive.chats.openUserbot': 'Юзербот',
+  'archive.chats.limitReached':
+    'Достигнут лимит тарифа на группы и каналы в архиве.',
+  'archive.chats.saveError': 'Не удалось сохранить.',
+  'archive.chats.more': 'Показать ещё',
+  'archive.rangeChip': 'Записи одной пачки',
 };
 
 export const EN: Record<keyof typeof RU, string> = {
@@ -167,6 +191,30 @@ export const EN: Record<keyof typeof RU, string> = {
   'archive.settings.ownEditsHint':
     'By default the bot reports only edits made by the other person.',
   'archive.settings.ownEdits': 'Edits of my own messages',
+  'archive.chats.link': 'Archive chats',
+  'archive.chats.title': 'Archive chats',
+  'archive.chats.tabPrivate': 'Private',
+  'archive.chats.tabGroups': 'Groups & channels',
+  'archive.chats.privateHint':
+    'Private chats are handled by the business bot and are archived by default. A disabled chat is no longer saved or notified about.',
+  'archive.chats.groupsHint':
+    'Groups and channels are recorded by the userbot, and only the ones you turn on. Files are kept for 14 days and only if “Files” is on.',
+  'archive.chats.limit': 'Enabled: {used} of {limit}',
+  'archive.chats.limitFree': 'Enabled: {used}',
+  'archive.chats.files': 'Files',
+  'archive.chats.notify': 'Notify',
+  'archive.chats.search': 'Search by name',
+  'archive.chats.loading': 'Loading...',
+  'archive.chats.empty': 'Nothing found.',
+  'archive.chats.error': 'Could not load the list.',
+  'archive.chats.unavailable':
+    'The userbot is unavailable right now. Connect it or try again in a few seconds.',
+  'archive.chats.openUserbot': 'Userbot',
+  'archive.chats.limitReached':
+    'Your plan limit for archived groups and channels is reached.',
+  'archive.chats.saveError': 'Could not save.',
+  'archive.chats.more': 'Show more',
+  'archive.rangeChip': 'Entries of one batch',
 };
 
 export const UK: Record<keyof typeof RU, string> = {
@@ -253,4 +301,28 @@ export const UK: Record<keyof typeof RU, string> = {
   'archive.settings.ownEditsHint':
     'За замовчуванням бот повідомляє лише про зміни повідомлень співрозмовника.',
   'archive.settings.ownEdits': 'Зміни моїх повідомлень',
+  'archive.chats.link': 'Чати архіву',
+  'archive.chats.title': 'Чати архіву',
+  'archive.chats.tabPrivate': 'Особисті',
+  'archive.chats.tabGroups': 'Групи та канали',
+  'archive.chats.privateHint':
+    'Особисті чати веде бізнес-бот: за замовчуванням вони в архіві. Вимкнений чат перестає зберігатися й сповіщати.',
+  'archive.chats.groupsHint':
+    'Групи та канали записує юзербот, і лише ті, що ви ввімкнули. Файли зберігаються 14 днів і лише якщо ввімкнено «Файли».',
+  'archive.chats.limit': 'Увімкнено: {used} з {limit}',
+  'archive.chats.limitFree': 'Увімкнено: {used}',
+  'archive.chats.files': 'Файли',
+  'archive.chats.notify': 'Сповіщати',
+  'archive.chats.search': 'Пошук за назвою',
+  'archive.chats.loading': 'Завантаження...',
+  'archive.chats.empty': 'Нічого не знайдено.',
+  'archive.chats.error': 'Не вдалося завантажити список.',
+  'archive.chats.unavailable':
+    'Юзербот зараз недоступний. Підключіть його або повторіть за кілька секунд.',
+  'archive.chats.openUserbot': 'Юзербот',
+  'archive.chats.limitReached':
+    'Досягнуто ліміт тарифу на групи та канали в архіві.',
+  'archive.chats.saveError': 'Не вдалося зберегти.',
+  'archive.chats.more': 'Показати ще',
+  'archive.rangeChip': 'Записи однієї пачки',
 };

@@ -14,6 +14,9 @@ export const apiGet = <T>(path: string): Promise<T> =>
 export const apiPost = <T>(path: string, body: unknown): Promise<T> =>
   request<T>(path, 'POST', body).then((res) => res.data);
 
+export const apiPut = <T>(path: string, body: unknown): Promise<T> =>
+  request<T>(path, 'PUT', body).then((res) => res.data);
+
 export const apiDelete = <T>(path: string): Promise<T> =>
   request<T>(path, 'DELETE').then((res) => res.data);
 

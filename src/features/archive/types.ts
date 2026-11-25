@@ -92,6 +92,10 @@ export interface ArchiveFilters {
   /** YYYY-MM-DD в локальном времени пользователя, "" — без ограничения */
   dateFrom: string;
   dateTo: string;
+  /** точный промежуток в unix-секундах (ссылка из сводки о массовом удалении);
+   * важнее dateFrom/dateTo */
+  fromTs: number | null;
+  toTs: number | null;
   sort: ArchiveSort;
 }
 
@@ -101,6 +105,8 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilters = {
   chatId: null,
   dateFrom: '',
   dateTo: '',
+  fromTs: null,
+  toTs: null,
   sort: 'desc',
 };
 
@@ -119,3 +125,11 @@ export interface ArchivePrefsResponse {
   prefs: ArchivePrefs;
   options: { album_style: AlbumStyle[]; rich_kinds: ArchiveMediaType[] };
 }
+
+/** Правила архива по чатам (бизнес-бот и юзербот), только отклонения от умолчаний. */
+export type ArchiveRules = Schema<'RulesOut'>;
+export type ArchiveRule = Schema<'RuleOut'>;
+export type ArchiveRuleBody = Schema<'RuleIn'>;
+export type DialogKind = Schema<'DialogOut'>['kind'];
+export type UserbotDialog = Schema<'DialogOut'>;
+export type UserbotDialogs = Schema<'DialogsOut'>;

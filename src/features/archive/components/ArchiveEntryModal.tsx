@@ -17,8 +17,12 @@ interface Props {
 export function ArchiveEntryModal({ entries, onClose }: Props) {
   const entry = entries?.[0] ?? null;
   const { t, locale } = useLocale();
-  const info = useChatInfo(entry?.chat_id ?? null);
-  const displayName = info?.full_name || t('archive.unknownSender');
+  const fromUserbot =
+    entry?.source === 'userbot' && entry.chat_kind !== 'private';
+  const info = useChatInfo(fromUserbot ? null : (entry?.chat_id ?? null));
+  const displayName =
+    (fromUserbot ? entry?.chat_title : info?.full_name) ||
+    t('archive.unknownSender');
   const isDeleted = entry?.event === 'deleted';
 
   return (
@@ -26,7 +30,10 @@ export function ArchiveEntryModal({ entries, onClose }: Props) {
       {entry && (
         <div className="archive-modal">
           <div className="archive-modal__header">
-            <ArchiveAvatar fallbackLabel={displayName} userId={entry.chat_id} />
+            <ArchiveAvatar
+              fallbackLabel={displayName}
+              userId={fromUserbot ? null : entry.chat_id}
+            />
             <div>
               <h2 className="archive-modal__name">{displayName}</h2>
               {info?.username && (

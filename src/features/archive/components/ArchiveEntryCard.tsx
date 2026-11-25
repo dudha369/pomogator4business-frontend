@@ -14,9 +14,14 @@ interface Props {
 export function ArchiveEntryCard({ entries, onOpen }: Props) {
   const { t, locale } = useLocale();
   const entry = entries[0];
-  const info = useChatInfo(entry.chat_id);
+  // чаты юзербота бот не видит: название берём из самой записи
+  const fromUserbot =
+    entry.source === 'userbot' && entry.chat_kind !== 'private';
+  const info = useChatInfo(fromUserbot ? null : entry.chat_id);
   const isDeleted = entry.event === 'deleted';
-  const displayName = info?.full_name || t('archive.unknownSender');
+  const displayName =
+    (fromUserbot ? entry.chat_title : info?.full_name) ||
+    t('archive.unknownSender');
   const content = isDeleted ? entry.old : entry.new;
   const kind = content?.kind ?? entry.media_type ?? 'text';
   const text =
@@ -26,7 +31,10 @@ export function ArchiveEntryCard({ entries, onOpen }: Props) {
 
   return (
     <button className="archive-entry" onClick={onOpen} type="button">
-      <ArchiveAvatar fallbackLabel={displayName} userId={entry.chat_id} />
+      <ArchiveAvatar
+        fallbackLabel={displayName}
+        userId={fromUserbot ? null : entry.chat_id}
+      />
       <div className="archive-entry__body">
         <div className="archive-entry__header">
           <span className="archive-entry__name">{displayName}</span>
@@ -34,7 +42,11 @@ export function ArchiveEntryCard({ entries, onOpen }: Props) {
             <span className="archive-entry__username">@{info.username}</span>
           )}
           <span className="text-hint shrink-0 text-xs">
-            {entry.is_owner ? t('archive.authorOwn') : t('archive.authorPeer')}
+            {entry.is_owner
+              ? t('archive.authorOwn')
+              : fromUserbot && entry.sender_name
+                ? entry.sender_name
+                : t('archive.authorPeer')}
           </span>
           <span className="archive-entry__icon">
             <EventIcon className="size-4" />

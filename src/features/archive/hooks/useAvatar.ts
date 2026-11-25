@@ -14,10 +14,11 @@ async function loadAvatar(userId: number): Promise<string | null> {
   return res.ok ? URL.createObjectURL(await res.blob()) : null;
 }
 
-export function useAvatar(userId: number): string | null {
+export function useAvatar(userId: number | null): string | null {
   const { data } = useQuery({
-    queryKey: queryKeys.avatar(userId),
-    queryFn: () => loadAvatar(userId),
+    queryKey: queryKeys.avatar(userId ?? 0),
+    queryFn: () => loadAvatar(userId!),
+    enabled: userId !== null,
     staleTime: Infinity,
     gcTime: Infinity, // object URL не отзываем: один маленький файл на собеседника
   });

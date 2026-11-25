@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { SlidersHorizontal } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { ListChecks, SlidersHorizontal } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+
+import { ROUTES } from '@/shared/constants/routes';
 
 import { useLocale } from '@/shared/i18n';
 import { useArchiveList } from '@/features/archive/hooks/useArchive';
@@ -18,9 +20,15 @@ export function ArchivePage() {
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<ArchiveFilters>(() => {
     const chatId = searchParams.get('chat_id');
+    // ссылка из сводки о массовом удалении: чат и точный промежуток (unix-секунды)
+    const from = Number(searchParams.get('date_from'));
+    const to = Number(searchParams.get('date_to'));
     return {
       ...DEFAULT_ARCHIVE_FILTERS,
       chatId: chatId ? Number(chatId) : null,
+      fromTs: from > 0 ? from : null,
+      toTs: to > 0 ? to : null,
+      sort: searchParams.get('sort') === 'asc' ? 'asc' : 'desc',
     };
   });
   const [selected, setSelected] = useState<ArchiveEntry[] | null>(null);
@@ -58,21 +66,36 @@ export function ArchivePage() {
     <div className="page">
       <header className="page__header flex items-center justify-between">
         <h1>{t('archive.title')}</h1>
-        <button
-          aria-label={t('archive.settings.title')}
-          className="text-hint p-2"
-          onClick={() => setSettingsOpen(true)}
-          type="button"
-        >
-          <SlidersHorizontal className="size-5" />
-        </button>
+        <div className="flex items-center">
+          <Link
+            aria-label={t('archive.chats.link')}
+            className="text-hint p-2"
+            to={ROUTES.archiveChats}
+          >
+            <ListChecks className="size-5" />
+          </Link>
+          <button
+            aria-label={t('archive.settings.title')}
+            className="text-hint p-2"
+            onClick={() => setSettingsOpen(true)}
+            type="button"
+          >
+            <SlidersHorizontal className="size-5" />
+          </button>
+        </div>
       </header>
       <ArchiveSettingsSheet
         onClose={() => setSettingsOpen(false)}
         open={settingsOpen}
       />
 
-      <ArchiveFiltersBar filters={filters} onChange={setFilters} />
+      <ArchiveFiltersBar
+        chatTitle={
+          entries.find((e) => e.chat_id === filters.chatId)?.chat_title
+        }
+        filters={filters}
+        onChange={setFilters}
+      />
 
       {loading && <div className="page__status">{t('archive.loading')}</div>}
       {failed && (

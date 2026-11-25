@@ -9,11 +9,13 @@ import type {
 interface Props {
   filters: Filters;
   onChange: (filters: Filters) => void;
+  /** название чата из записей (для чатов юзербота: бот их не знает) */
+  chatTitle?: string | null;
 }
 
 const EVENT_OPTIONS: (ArchiveEventType | null)[] = [null, 'edited', 'deleted'];
 
-export function ArchiveFiltersBar({ filters, onChange }: Props) {
+export function ArchiveFiltersBar({ filters, onChange, chatTitle }: Props) {
   const { t } = useLocale();
   const chatInfo = useChatInfo(filters.chatId);
 
@@ -42,7 +44,17 @@ export function ArchiveFiltersBar({ filters, onChange }: Props) {
           onClick={() => onChange({ ...filters, chatId: null })}
           type="button"
         >
-          {chatInfo?.full_name || t('archive.unknownSender')} ✕
+          {chatInfo?.full_name || chatTitle || t('archive.unknownSender')} ✕
+        </button>
+      )}
+
+      {(filters.fromTs !== null || filters.toTs !== null) && (
+        <button
+          className="archive-filters__chip"
+          onClick={() => onChange({ ...filters, fromTs: null, toTs: null })}
+          type="button"
+        >
+          {t('archive.rangeChip')} ✕
         </button>
       )}
 

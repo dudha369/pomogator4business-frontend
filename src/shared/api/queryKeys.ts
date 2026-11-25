@@ -17,6 +17,9 @@ export const queryKeys = {
     ['readall', 'preview', request] as const,
   archive: (filters: unknown) => ['archive', filters] as const,
   archivePrefs: ['archive', 'prefs'] as const,
+  archiveRules: ['archive', 'rules'] as const,
+  userbotDialogs: (query: string, kind: string | null) =>
+    ['userbot', 'dialogs', query, kind] as const,
   chatInfo: (userId: number) => ['chat-info', userId] as const,
   avatar: (userId: number) => ['avatar', userId] as const,
   ping: ['ping'] as const,

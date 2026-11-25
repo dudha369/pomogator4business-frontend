@@ -35,6 +35,13 @@ export const router = createBrowserRouter([
               })),
           },
           {
+            path: 'archive/chats',
+            lazy: () =>
+              import('@/features/archive/ArchiveChatsPage').then((m) => ({
+                Component: m.ArchiveChatsPage,
+              })),
+          },
+          {
             path: 'chats',
             lazy: () =>
               import('@/features/chats/ChatsPage').then((m) => ({

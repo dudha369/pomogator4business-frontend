@@ -2,7 +2,8 @@
 import { useAvatar } from '@/features/archive/hooks/useAvatar';
 
 interface Props {
-  userId: number;
+  /** null — аватарку не грузим (группы юзербота: бот их не видит) */
+  userId: number | null;
   fallbackLabel: string;
 }
 
