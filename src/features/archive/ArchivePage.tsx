@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ListChecks, SlidersHorizontal } from 'lucide-react';
+import { CheckSquare, ListChecks, SlidersHorizontal } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import { ROUTES } from '@/shared/constants/routes';
@@ -9,7 +9,9 @@ import { useArchiveList } from '@/features/archive/hooks/useArchive';
 import { useDebouncedValue } from '@/shared/hooks/useDebouncedValue';
 import { ArchiveEntryCard } from '@/features/archive/components/ArchiveEntryCard';
 import { ArchiveEntryModal } from '@/features/archive/components/ArchiveEntryModal';
+import { ArchiveUsageBar } from '@/features/archive/components/ArchiveUsageBar';
 import { ArchiveFiltersBar } from '@/features/archive/components/ArchiveFilters';
+import { ArchiveSelectBar } from '@/features/archive/components/ArchiveSelectBar';
 import { ArchiveSettingsSheet } from '@/features/archive/components/ArchiveSettingsSheet';
 import { groupAlbums } from '@/features/archive/groupAlbums';
 import type { ArchiveEntry, ArchiveFilters } from '@/features/archive/types';
@@ -33,6 +35,11 @@ export function ArchivePage() {
   });
   const [selected, setSelected] = useState<ArchiveEntry[] | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // режим выбора; `?select=1` — ссылка из предупреждения «архив заполнен»
+  const [selecting, setSelecting] = useState(
+    () => searchParams.get('select') === '1',
+  );
+  const [picked, setPicked] = useState<Set<number>>(new Set());
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // дебаунс 300 мс — чтобы не бить запросом на каждую букву в поиске
@@ -45,6 +52,21 @@ export function ArchivePage() {
   const failed = list.isError && !list.data;
   const loading = list.isPending;
   const hasMore = settled && hasNextPage;
+
+  const toggleGroup = (group: ArchiveEntry[]) =>
+    setPicked((prev) => {
+      const next = new Set(prev);
+      const all = group.every((e) => next.has(e.log_id));
+      for (const e of group) {
+        if (all) next.delete(e.log_id);
+        else next.add(e.log_id);
+      }
+      return next;
+    });
+  const stopSelecting = () => {
+    setSelecting(false);
+    setPicked(new Set());
+  };
 
   // Автоподгрузка: невидимый сентинел внизу списка + IntersectionObserver
   useEffect(() => {
@@ -67,6 +89,15 @@ export function ArchivePage() {
       <header className="page__header flex items-center justify-between">
         <h1>{t('archive.title')}</h1>
         <div className="flex items-center">
+          <button
+            aria-label={t('archive.select.start')}
+            aria-pressed={selecting}
+            className={`p-2 ${selecting ? 'text-accent' : 'text-hint'}`}
+            onClick={() => (selecting ? stopSelecting() : setSelecting(true))}
+            type="button"
+          >
+            <CheckSquare className="size-5" />
+          </button>
           <Link
             aria-label={t('archive.chats.link')}
             className="text-hint p-2"
@@ -88,6 +119,8 @@ export function ArchivePage() {
         onClose={() => setSettingsOpen(false)}
         open={settingsOpen}
       />
+
+      <ArchiveUsageBar />
 
       <ArchiveFiltersBar
         chatTitle={
@@ -113,7 +146,13 @@ export function ArchivePage() {
             <ArchiveEntryCard
               entries={group.entries}
               key={group.key}
-              onOpen={() => setSelected(group.entries)}
+              checked={group.entries.every((e) => picked.has(e.log_id))}
+              onOpen={() =>
+                selecting
+                  ? toggleGroup(group.entries)
+                  : setSelected(group.entries)
+              }
+              selectable={selecting}
             />
           ))}
           {hasMore && <div className="archive-sentinel" ref={sentinelRef} />}
@@ -121,6 +160,10 @@ export function ArchivePage() {
             <div className="page__status">{t('archive.loadingMore')}</div>
           )}
         </div>
+      )}
+
+      {selecting && (
+        <ArchiveSelectBar ids={[...picked]} onDone={stopSelecting} />
       )}
 
       <ArchiveEntryModal entries={selected} onClose={() => setSelected(null)} />

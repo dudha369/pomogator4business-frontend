@@ -1,5 +1,6 @@
-import { apiGet, apiPost, apiPut } from '@/shared/api/client';
+import { apiDelete, apiGet, apiPost, apiPut } from '@/shared/api/client';
 import type {
+  ArchiveDeleteResult,
   ArchiveFilters,
   ArchivePage,
   ArchivePrefs,
@@ -7,6 +8,7 @@ import type {
   ArchiveRuleBody,
   ArchiveRules,
   DialogKind,
+  Plan,
   UserbotDialogs,
 } from '@/features/archive/types';
 
@@ -73,3 +75,12 @@ export function fetchUserbotDialogs(
   if (kind) params.set('kind', kind);
   return apiGet<UserbotDialogs>(`/api/userbot/dialogs?${params.toString()}`);
 }
+
+/** Удаляет записи архива (или только их файлы); чужие id сервер игнорирует. */
+export const deleteArchiveEntries = (ids: number[], mediaOnly: boolean) =>
+  apiDelete<ArchiveDeleteResult>('/api/archive', {
+    ids,
+    media_only: mediaOnly,
+  });
+
+export const fetchPlan = () => apiGet<Plan>('/api/plan');

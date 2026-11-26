@@ -1,3 +1,5 @@
+import { Check } from 'lucide-react';
+
 import { useLocale } from '@/shared/i18n';
 import { formatRelativeTime } from '@/shared/utils/relativeTime';
 import { useChatInfo } from '@/features/archive/hooks/useChatInfo';
@@ -9,9 +11,17 @@ interface Props {
   /** одна запись или все сообщения удалённого альбома */
   entries: ArchiveEntry[];
   onOpen: () => void;
+  /** режим выбора: нажатие отмечает запись, вместо чекбокса не открывает её */
+  selectable?: boolean;
+  checked?: boolean;
 }
 
-export function ArchiveEntryCard({ entries, onOpen }: Props) {
+export function ArchiveEntryCard({
+  entries,
+  onOpen,
+  selectable = false,
+  checked = false,
+}: Props) {
   const { t, locale } = useLocale();
   const entry = entries[0];
   // чаты юзербота бот не видит: название берём из самой записи
@@ -30,7 +40,20 @@ export function ArchiveEntryCard({ entries, onOpen }: Props) {
   const EventIcon = isDeleted ? EVENT_ICONS.deleted : EVENT_ICONS.edited;
 
   return (
-    <button className="archive-entry" onClick={onOpen} type="button">
+    <button
+      aria-pressed={selectable ? checked : undefined}
+      className="archive-entry"
+      onClick={onOpen}
+      type="button"
+    >
+      {selectable && (
+        <span
+          aria-hidden
+          className={`flex size-5 shrink-0 items-center justify-center self-center rounded-md border ${checked ? 'border-accent bg-accent text-white' : 'border-line'}`}
+        >
+          {checked && <Check className="size-3.5" />}
+        </span>
+      )}
       <ArchiveAvatar
         fallbackLabel={displayName}
         userId={fromUserbot ? null : entry.chat_id}

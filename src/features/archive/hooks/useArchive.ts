@@ -7,7 +7,9 @@ import {
 import { useRef } from 'react';
 
 import {
+  deleteArchiveEntries,
   fetchArchivePage,
+  fetchPlan,
   fetchArchivePrefs,
   saveArchivePrefs,
 } from '@/features/archive/api';
@@ -72,3 +74,29 @@ export function useSaveArchivePrefs() {
   });
   return mutate;
 }
+
+/** Бэкенд принимает не больше 500 id за запрос. */
+const DELETE_CHUNK = 500;
+
+/** Удаление выбранных записей (или только файлов): после — свежая лента и тариф. */
+export function useDeleteArchiveEntries() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (vars: { ids: number[]; mediaOnly: boolean }) => {
+      let count = 0;
+      for (let i = 0; i < vars.ids.length; i += DELETE_CHUNK) {
+        const part = vars.ids.slice(i, i + DELETE_CHUNK);
+        count += (await deleteArchiveEntries(part, vars.mediaOnly)).count;
+      }
+      return count;
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.archiveAll });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.plan });
+    },
+  });
+}
+
+/** Тариф и использование архива (для плашки заполнения). */
+export const usePlan = () =>
+  useQuery({ queryKey: queryKeys.plan, queryFn: fetchPlan });

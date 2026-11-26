@@ -133,3 +133,6 @@ export type ArchiveRuleBody = Schema<'RuleIn'>;
 export type DialogKind = Schema<'DialogOut'>['kind'];
 export type UserbotDialog = Schema<'DialogOut'>;
 export type UserbotDialogs = Schema<'DialogsOut'>;
+
+export type ArchiveDeleteResult = Schema<'DeleteOut'>;
+export type Plan = Schema<'PlanOut'>;

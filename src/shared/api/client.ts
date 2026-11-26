@@ -17,7 +17,7 @@ export const apiPost = <T>(path: string, body: unknown): Promise<T> =>
 export const apiPut = <T>(path: string, body: unknown): Promise<T> =>
   request<T>(path, 'PUT', body).then((res) => res.data);
 
-export const apiDelete = <T>(path: string): Promise<T> =>
-  request<T>(path, 'DELETE').then((res) => res.data);
+export const apiDelete = <T>(path: string, body?: unknown): Promise<T> =>
+  request<T>(path, 'DELETE', body).then((res) => res.data);
 
 export const apiGetBlob = (path: string): Promise<Blob> => requestBlob(path);

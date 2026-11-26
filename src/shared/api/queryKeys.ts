@@ -16,6 +16,9 @@ export const queryKeys = {
   readAllPreview: (request: unknown) =>
     ['readall', 'preview', request] as const,
   archive: (filters: unknown) => ['archive', filters] as const,
+  /** все запросы архива сразу: лента, настройки, правила */
+  archiveAll: ['archive'] as const,
+  plan: ['plan'] as const,
   archivePrefs: ['archive', 'prefs'] as const,
   archiveRules: ['archive', 'rules'] as const,
   userbotDialogs: (query: string, kind: string | null) =>

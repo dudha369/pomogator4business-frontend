@@ -106,6 +106,21 @@ export const RU = {
   'archive.chats.saveError': 'Не удалось сохранить.',
   'archive.chats.more': 'Показать ещё',
   'archive.rangeChip': 'Записи одной пачки',
+  'archive.select.start': 'Выбрать записи',
+  'archive.select.count': 'Выбрано: {count}',
+  'archive.select.files': 'Только файлы',
+  'archive.select.delete': 'Удалить',
+  'archive.select.confirmDelete':
+    'Удалить выбранные записи ({count}) вместе с файлами? Это нельзя отменить.',
+  'archive.select.confirmFiles':
+    'Удалить файлы у выбранных записей ({count})? Сами записи останутся.',
+  'archive.select.confirm': 'Да, удалить',
+  'archive.select.cancel': 'Отмена',
+  'archive.select.error': 'Не удалось удалить. Попробуйте ещё раз.',
+  'archive.usage.entries': 'Записей: {used} из {limit}',
+  'archive.usage.media': 'Файлы: {used} из {limit} МБ',
+  'archive.usage.full':
+    'Архив заполнен: новые записи не сохраняются, но уведомления приходят. Удалите ненужное.',
 };
 
 export const EN: Record<keyof typeof RU, string> = {
@@ -215,6 +230,21 @@ export const EN: Record<keyof typeof RU, string> = {
   'archive.chats.saveError': 'Could not save.',
   'archive.chats.more': 'Show more',
   'archive.rangeChip': 'Entries of one batch',
+  'archive.select.start': 'Select entries',
+  'archive.select.count': 'Selected: {count}',
+  'archive.select.files': 'Files only',
+  'archive.select.delete': 'Delete',
+  'archive.select.confirmDelete':
+    'Delete the selected entries ({count}) together with their files? This cannot be undone.',
+  'archive.select.confirmFiles':
+    'Delete the files of the selected entries ({count})? The entries themselves will stay.',
+  'archive.select.confirm': 'Yes, delete',
+  'archive.select.cancel': 'Cancel',
+  'archive.select.error': 'Could not delete. Please try again.',
+  'archive.usage.entries': 'Entries: {used} of {limit}',
+  'archive.usage.media': 'Files: {used} of {limit} MB',
+  'archive.usage.full':
+    "The archive is full: new entries are not saved, but notifications still arrive. Delete what you don't need.",
 };
 
 export const UK: Record<keyof typeof RU, string> = {
@@ -325,4 +355,19 @@ export const UK: Record<keyof typeof RU, string> = {
   'archive.chats.saveError': 'Не вдалося зберегти.',
   'archive.chats.more': 'Показати ще',
   'archive.rangeChip': 'Записи однієї пачки',
+  'archive.select.start': 'Вибрати записи',
+  'archive.select.count': 'Вибрано: {count}',
+  'archive.select.files': 'Лише файли',
+  'archive.select.delete': 'Видалити',
+  'archive.select.confirmDelete':
+    'Видалити вибрані записи ({count}) разом із файлами? Це не можна скасувати.',
+  'archive.select.confirmFiles':
+    'Видалити файли вибраних записів ({count})? Самі записи залишаться.',
+  'archive.select.confirm': 'Так, видалити',
+  'archive.select.cancel': 'Скасувати',
+  'archive.select.error': 'Не вдалося видалити. Спробуйте ще раз.',
+  'archive.usage.entries': 'Записів: {used} із {limit}',
+  'archive.usage.media': 'Файли: {used} із {limit} МБ',
+  'archive.usage.full':
+    'Архів заповнений: нові записи не зберігаються, але сповіщення приходять. Видаліть непотрібне.',
 };
