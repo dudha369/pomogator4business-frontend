@@ -1,7 +1,6 @@
-import { type ReactNode, useState } from 'react';
+import type { ReactNode } from 'react';
 
-import { TgsSticker } from '@/features/archive/components/TgsSticker';
-import { useCustomEmoji } from '@/features/archive/hooks/useCustomEmoji';
+import { RemoteSticker } from '@/shared/ui/RemoteSticker';
 
 const SIZE = 'inline-block size-[1.25em] align-text-bottom';
 
@@ -14,40 +13,12 @@ export function CustomEmoji({
   emojiId: string;
   children: ReactNode;
 }) {
-  const emoji = useCustomEmoji(emojiId);
-  const [broken, setBroken] = useState(false);
-
-  if (emoji.status !== 'ready' || broken) return <>{children}</>;
-  if (emoji.format === 'tgs') {
-    return (
-      <TgsSticker
-        inline
-        className={SIZE}
-        onError={() => setBroken(true)}
-        url={emoji.url}
-      />
-    );
-  }
-  if (emoji.format === 'webm') {
-    return (
-      <video
-        aria-hidden
-        autoPlay
-        className={SIZE}
-        loop
-        muted
-        onError={() => setBroken(true)}
-        playsInline
-        src={emoji.url}
-      />
-    );
-  }
   return (
-    <img
-      alt=""
+    <RemoteSticker
       className={SIZE}
-      onError={() => setBroken(true)}
-      src={emoji.url}
+      fallback={children}
+      inline
+      path={`/api/custom-emoji/${emojiId}`}
     />
   );
 }

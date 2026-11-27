@@ -10,6 +10,8 @@ interface Props {
   onError?: () => void;
   /** `<span>` вместо `<div>`: для эмодзи внутри абзаца (div в p недопустим) */
   inline?: boolean;
+  /** неподвижный первый кадр (prefers-reduced-motion) */
+  still?: boolean;
 }
 
 async function gunzip(buffer: ArrayBuffer): Promise<string> {
@@ -27,6 +29,7 @@ export function TgsSticker({
   className = 'mx-auto size-40',
   onError,
   inline = false,
+  still = false,
 }: Props) {
   const container = useRef<HTMLElement>(null);
   const [failed, setFailed] = useState(false);
@@ -47,7 +50,7 @@ export function TgsSticker({
           container: container.current,
           renderer: 'svg',
           loop: true,
-          autoplay: true,
+          autoplay: !still,
           animationData,
         });
         destroy = () => animation.destroy();
@@ -63,7 +66,7 @@ export function TgsSticker({
       destroy?.();
     };
     // onError не в зависимостях: смена колбэка не должна перезапускать анимацию
-  }, [url]);
+  }, [url, still]);
 
   if (failed) {
     return <div className="py-4 text-center text-6xl">{fallback}</div>;

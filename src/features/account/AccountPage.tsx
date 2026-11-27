@@ -5,6 +5,7 @@ import { Section } from '@/shared/ui/Section';
 import { Switch } from '@/shared/ui/Switch';
 import { useLocale } from '@/shared/i18n';
 import { cn } from '@/shared/lib/cn';
+import { ClockStylePreview } from '@/features/account/components/ClockStylePreview';
 import {
   useAccount,
   useChangeClockStyle,
@@ -18,27 +19,25 @@ import {
   timezoneLabel,
 } from '@/features/account/timezone';
 
-/**
- * Превью стиля: PNG используется как маска, поэтому красится цветом текста
- * (так же, как Telegram перекрашивает эмодзи) и работает в любой теме.
- */
-function clockStyleMask(id: string) {
-  const url = `url(${import.meta.env.BASE_URL}clock-styles/${id}.png)`;
-  return {
-    WebkitMaskImage: url,
-    maskImage: url,
-    WebkitMaskSize: 'contain',
-    maskSize: 'contain',
-    WebkitMaskRepeat: 'no-repeat',
-    maskRepeat: 'no-repeat',
-    WebkitMaskPosition: 'center',
-    maskPosition: 'center',
-  } as const;
-}
-
 export function AccountPage() {
   const { t, locale } = useLocale();
-  const { data: account, isPending, isError } = useAccount();
+  const { data: account, isPending, isError, refetch } = useAccount();
+
+  // Превью часов показывает текущую минуту: перечитываем на границе каждой минуты
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    const schedule = () => {
+      timer = setTimeout(
+        () => {
+          void refetch();
+          schedule();
+        },
+        60_000 - (Date.now() % 60_000) + 500,
+      );
+    };
+    schedule();
+    return () => clearTimeout(timer);
+  }, [refetch]);
   const toggleEmojiStatus = useToggleEmojiStatus();
   const changeClockStyle = useChangeClockStyle();
   const changeTimezone = useChangeTimezone();
@@ -188,11 +187,7 @@ export function AccountPage() {
                         onClick={() => handleStyleChange(style.id)}
                         type="button"
                       >
-                        <span
-                          aria-hidden
-                          className="size-12 bg-current"
-                          style={clockStyleMask(style.id)}
-                        />
+                        <ClockStylePreview emojiId={style.preview_emoji_id} />
                         <span>
                           {style.titles[locale] ?? style.titles.en ?? style.id}
                         </span>

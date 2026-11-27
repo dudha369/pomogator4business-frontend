@@ -12,6 +12,8 @@ import {
 import { useTheme } from '@/shared/context/ThemeContext';
 import { useLocale } from '@/shared/i18n';
 import { withOpacity } from '@/shared/lib/colors';
+import { Sticker } from '@/shared/ui/Sticker';
+import type { StickerName } from '@/shared/ui/stickers';
 
 export type ErrorType =
   | 'network'
@@ -32,6 +34,17 @@ const CONFIG: Record<ErrorType, { Icon: ElementType; showRetry: boolean }> = {
   not_found: { Icon: SearchX, showRetry: true },
 };
 
+/** Стикер вместо иконки; для остальных типов остаётся иконка. Файлы лежат в сборке
+ * (`src/assets/stickers`), поэтому экран «нет соединения» работает без сети. */
+const STICKER: Partial<Record<ErrorType, StickerName>> = {
+  network: 'error_crying',
+  general: 'error_crying',
+  session_expired: 'error_crying',
+  not_found: 'error_crying',
+  no_telegram: 'error_forbidden',
+  access_denied: 'error_forbidden',
+};
+
 const BOT_URL: string | undefined = import.meta.env.VITE_BOT_URL;
 
 interface ErrorScreenProps {
@@ -50,22 +63,30 @@ export const ErrorScreen = ({
   const theme = useTheme();
   const { t } = useLocale();
   const { Icon, showRetry } = CONFIG[errorType];
+  const stickerName = STICKER[errorType];
+  const icon = (
+    <Icon
+      className="animate-pulse"
+      style={{
+        color:
+          errorType === 'maintenance'
+            ? '#f59e0b'
+            : theme.destructive_text_color,
+      }}
+      size={64}
+    />
+  );
 
   return (
     <div
       className="fixed inset-0 z-999 flex flex-col items-center justify-center gap-5 backdrop-blur-sm"
       style={{ backgroundColor: withOpacity(theme.bg_color, 0.85) }}
     >
-      <Icon
-        className="animate-pulse"
-        style={{
-          color:
-            errorType === 'maintenance'
-              ? '#f59e0b'
-              : theme.destructive_text_color,
-        }}
-        size={64}
-      />
+      {stickerName ? (
+        <Sticker name={stickerName} size={128} fallback={icon} />
+      ) : (
+        icon
+      )}
 
       <div className="px-6">
         <p

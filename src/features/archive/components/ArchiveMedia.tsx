@@ -1,5 +1,5 @@
 import { useLocale } from '@/shared/i18n';
-import { TgsSticker } from '@/features/archive/components/TgsSticker';
+import { TgsSticker } from '@/shared/ui/TgsSticker';
 import {
   type ArchiveMediaSide,
   useArchiveMedia,

@@ -1,39 +1,36 @@
 import { useEffect, useState } from 'react';
 
 import { apiGetBlob } from '@/shared/api/client';
-import {
-  acquireMedia,
-  peekMedia,
-  releaseMedia,
-} from '@/features/archive/hooks/mediaCache';
+import { acquireMedia, peekMedia, releaseMedia } from '@/shared/lib/mediaCache';
 
-type EmojiFormat = 'tgs' | 'webm' | 'webp';
+export type StickerFormat = 'tgs' | 'webm' | 'webp';
 
-export type CustomEmojiState =
+export type StickerFileState =
   | { status: 'loading' }
-  | { status: 'ready'; url: string; format: EmojiFormat }
+  | { status: 'ready'; url: string; format: StickerFormat }
   | { status: 'error' };
 
 /** Формат приходит в Content-Type ответа; object URL его не хранит,
  * поэтому запоминаем рядом (запись живёт столько же, сколько URL в mediaCache). */
-const formats = new Map<string, EmojiFormat>();
+const formats = new Map<string, StickerFormat>();
 
-function toFormat(mime: string): EmojiFormat {
+function toFormat(mime: string): StickerFormat {
   if (mime === 'application/x-tgsticker') return 'tgs';
   return mime === 'video/webm' ? 'webm' : 'webp';
 }
 
-function readyState(key: string): CustomEmojiState | undefined {
+function readyState(key: string): StickerFileState | undefined {
   const url = peekMedia(key);
   const format = formats.get(key);
   return url && format ? { status: 'ready', url, format } : undefined;
 }
 
-/** Файл кастомного эмодзи по id. Запросы одного id делятся (mediaCache),
- * ошибка — не повод ломать текст: компонент покажет обычный символ. */
-export function useCustomEmoji(emojiId: string): CustomEmojiState {
-  const key = `emoji:${emojiId}`;
-  const [state, setState] = useState<CustomEmojiState>(
+/** Файл стикера или эмодзи по адресу API (`/api/custom-emoji/…`, `/api/ui-stickers/…`).
+ * Запросы одного адреса делятся (mediaCache); ошибка — не повод ломать экран:
+ * вызывающий покажет запасной вариант. */
+export function useStickerFile(path: string): StickerFileState {
+  const key = `sticker:${path}`;
+  const [state, setState] = useState<StickerFileState>(
     () => readyState(key) ?? { status: 'loading' },
   );
 
@@ -41,7 +38,7 @@ export function useCustomEmoji(emojiId: string): CustomEmojiState {
     let cancelled = false;
     setState(readyState(key) ?? { status: 'loading' });
     acquireMedia(key, async () => {
-      const blob = await apiGetBlob(`/api/custom-emoji/${emojiId}`);
+      const blob = await apiGetBlob(path);
       formats.set(key, toFormat(blob.type));
       return blob;
     })
@@ -56,7 +53,7 @@ export function useCustomEmoji(emojiId: string): CustomEmojiState {
       cancelled = true;
       releaseMedia(key);
     };
-  }, [key, emojiId]);
+  }, [key, path]);
 
   return state;
 }
